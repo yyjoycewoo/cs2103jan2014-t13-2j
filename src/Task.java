@@ -1,4 +1,8 @@
-
+/**
+ * Class that stores a Task description, and optional additional information.
+ * @author Joyce
+ *
+ */
 public class Task {
 	private static final String START_TIME_PREP = " at ";
 	private static final String END_TIME_PREP = " until ";
