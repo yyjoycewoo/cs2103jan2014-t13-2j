@@ -8,10 +8,6 @@ import java.util.ArrayList;
 public class TaskList {
 	private ArrayList<Task> list;
 	
-	public void sortByDate() {
-		//TODO
-	}
-	
 	public void addToList(Task t) {
 		list.add(t);
 	}
