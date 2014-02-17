@@ -14,7 +14,7 @@ public class Date {
 	}
 	
 	public Date(int day, int month, int year) {
-		this(month, day);
+		this(day, month);
 		this.setYear(year);
 	}
 	
