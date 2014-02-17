@@ -1,4 +1,7 @@
 # Hello World
 So far so good
+<<<<<<< local
 yo
-hello!
+hello!=======
+woohoo!
+>>>>>>> other
