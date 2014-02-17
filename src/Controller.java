@@ -1,9 +1,7 @@
 import java.util.ArrayList;
 
 /** For the commands such as add, delete, update, display so on
- */
-//adding some comments
-/**
+ * 
  * @author Hao Eng
  *
  */
