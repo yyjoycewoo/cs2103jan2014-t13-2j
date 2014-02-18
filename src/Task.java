@@ -1,5 +1,6 @@
 /**
  * Class that stores a Task description, and optional additional information.
+ * @author Joyce
  *
  */
 public class Task {
@@ -14,55 +15,120 @@ public class Task {
 	private Date date;
 	private String location;
 	
+	/**
+	 * Create a new Task object with description
+	 * @param description The description
+	 */
 	public Task(String description) {
 		this.setDescription(description);
 	}
 	
+	/**
+	 * Create a new Task object with description and date
+	 * @param description The description
+	 * @param date The date
+	 */
 	public Task(String description, Date date) {
 		this.setDescription(description);
 		this.setDate(date);
 	}
 	
+	/**
+	 * Create a new Task object with description and startTime
+	 * @param description The description
+	 * @param startTime The start time
+	 */
 	public Task(String description, Time startTime) {
 		this(description);
 		this.setStartTime(startTime);
 	}
 	
+	/**
+	 * Create a new Task object with description and location
+	 * @param description The description
+	 * @param location The location
+	 */
 	public Task(String description, String location) {
 		this.setDescription(description);
 		this.setLocation(location);
 	}
 
+	/**
+	 * Create a new Task object with description, startTime and date
+	 * @param description The description
+	 * @param startTime The start time
+	 * @param date The date
+	 */
 	public Task(String description, Time startTime, Date date) {
 		this(description, startTime);
 		this.setDate(date);
 	}
 	
+	/**
+	 * Create a new Task object with description, startTime and endTime
+	 * @param description The description
+	 * @param startTime The start time
+	 * @param endTime The end time
+	 */
 	public Task(String description, Time startTime, Time endTime) {
 		this(description, startTime);
 		this.setEndTime(endTime);
 	}
 	
+	/**
+	 * Create a new Task object with description, startTime and location
+	 * @param description The description
+	 * @param startTime The start time
+	 * @param location The location
+	 */
 	public Task(String description, Time startTime, String location) {
 		this(description, startTime);
 		this.setLocation(location);
 	}
 	
+	/**
+	 * Create a new Task object with description, date and location
+	 * @param description The description
+	 * @param date The date
+	 * @param location The location
+	 */
 	public Task(String description, Date date, String location) {
 		this(description, date);
 		this.setLocation(location);
 	}
 	
+	/**
+	 * Create a new Task object with description, startTime, endTime and date
+	 * @param description The description
+	 * @param startTime The start time
+	 * @param endTime The end time
+	 * @param date The date
+	 */
 	public Task(String description, Time startTime, Time endTime, Date date) {
 		this(description, startTime, endTime);
 		this.setDate(date);
 	}
 	
+	/**
+	 * Create a new Task object with description, startTime, endTime, location
+	 * @param description The description
+	 * @param startTime The start time
+	 * @param endTime The end time
+	 * @param location The location
+	 */
 	public Task(String description, Time startTime, Time endTime, String location) {
 		this(description, startTime, endTime);
 		this.setLocation(location);
 	}
 	
+	/**
+	 * Create a new Task object with description, startTime, endTime, date and location
+	 * @param description The description
+	 * @param startTime The start time
+	 * @param endTime The end time
+	 * @param date The date
+	 * @param location The location
+	 */
 	public Task(String description, Time startTime, Time endTime, Date date, String location) {
 		this(description, startTime, endTime, date);
 		this.setLocation(location);
