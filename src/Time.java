@@ -9,14 +9,14 @@ public class Time {
 	private static final int MAX_ONE_DIGIT_INT = 9;
 	
 	private int hour;
-	private int min = 0;
+	private int min;
 	
 	/**
 	 * Create a new Time object with the specified hour and 0 minutes
 	 * @param hour The hour
 	 */
 	public Time(int hour) {
-		this.setHour(hour);
+		this(hour, 0);
 	}
 	
 	/**
@@ -25,7 +25,7 @@ public class Time {
 	 * @param min The minutes
 	 */
 	public Time(int hour, int min) {
-		this(hour);
+		this.setHour(hour);
 		this.setMin(min);
 	}
 	
