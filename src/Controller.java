@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /** For the commands such as add, delete, update, display so on
  * 
  * @author Hao Eng
@@ -7,7 +5,7 @@ import java.util.ArrayList;
  */
 public class Controller {
 
-	private ArrayList<Task> list;
+	private TaskList list;
 	
 	// take in task description and index of the task
 	public Task update(String des, int index){
@@ -21,11 +19,11 @@ public class Controller {
 				int time = Integer.parseInt(words[1]);
 				int hr = time/100;
 				int min = time%100;
-				list.get(index).setStartTime(new Time(hr, min));
+				list.getListItem(index).setStartTime(new Time(hr, min));
 			}
 		}
 		
 		//TBC...
-		return list.get(index);
+		return list.getListItem(index);
 	}
 }
