@@ -1,4 +1,8 @@
-
+/**
+ * Class to store the day, month and year of a date
+ * @author Joyce
+ *
+ */
 public class Date {
 	private static final int CURR_YEAR = 2014;
 	private static final int MAX_ONE_DIGIT_INT = 9;
