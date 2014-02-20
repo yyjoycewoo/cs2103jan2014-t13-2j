@@ -1,8 +1,6 @@
-
 public class CmdHandler {
-	private Command com;
-	
+	// adding comment
 	public CmdHandler(String c) {
-		
+
 	}
 }
