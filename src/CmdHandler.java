@@ -16,16 +16,16 @@ public class CmdHandler {
 			System.exit(0);
 		}			
 		if (command.getAction().equals(DISPLAY_COMMAND)) {
-			return Controller.processDisplay();				
+			return Controller.processDisplay().toString();				
 		}
 		else if (command.getAction().equals(UPDATE_COMMAND)) {
-			return Controller.processUpdate(command.getArgument());			
+			return Controller.processUpdate(command.getArgument()).toString();			
 		}
 		else if (command.getAction().equals(DELETE_COMMAND)) {
-			return Controller.processDelete(command.getArgument());					
+			return Controller.processDelete(command.getArgument()).toString();					
 		}
 		else if (command.getAction().equals(ADD_COMMAND)) {
-			return Controller.processAdd(command.getArgument());			
+			return Controller.processAdd(command.getArgument()).toString();			
 		}
 		else {
 			return INVALID_COMMAND_MSG;
