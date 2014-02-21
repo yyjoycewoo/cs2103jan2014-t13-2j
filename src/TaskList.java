@@ -32,6 +32,12 @@ public class TaskList {
 		return list.get(i);
 	}
 
+	@Override
+	public String toString() {
+		//TODO
+		return null;
+	}
+	
 	public ArrayList<Task> getList() {
 		return list;
 	} 
