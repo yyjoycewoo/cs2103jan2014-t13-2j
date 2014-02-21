@@ -4,6 +4,7 @@
  *
  */
 public class Command {
+	private static final String EMPTY_STRING = "";
 	private String action;
 	private String argument;
 	
@@ -23,6 +24,22 @@ public class Command {
 	public Command(String action, String argument) {
 		this.setAction(action);
 		this.setArgument(argument);
+	}
+
+	/**
+	 * Create a new Command object with specified input
+	 * @param input Array with action and argument that the user wants to execute
+	 */
+	public Command(String[] input) {
+		//command is the first word that the user enters
+		this.setAction(input[0]);
+		
+		//argument is everything except the first word that the user enters
+		if (input.length > 1) {
+			this.setArgument(input[1]);
+		} else {
+			this.setArgument(EMPTY_STRING);
+		}
 	}
 
 	public String getAction() {
