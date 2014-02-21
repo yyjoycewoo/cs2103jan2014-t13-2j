@@ -8,7 +8,7 @@ public class Controller {
 	private TaskList list;
 	
 	// take in task description and index of the task
-	public Task update(String des, int index){
+	public Task processUpdate(String des, int index){
 		// description can have "from", "on", "to" and "at"
 		// split according to the above keywords
 		String[] words = des.split("\\s+");
@@ -25,5 +25,29 @@ public class Controller {
 		
 		//TBC...
 		return list.getListItem(index);
+	}
+
+	/*Hao Eng, your function should be like this (takes in a string)
+	 * You would have to parse it to get the des and index, then call
+	 * a helper function (refer to image from whiteboard)
+	 */
+	public static Task processUpdate(String argument) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static TaskList processDisplay() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Task processDelete(String argument) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static Task processAdd(String argument) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
