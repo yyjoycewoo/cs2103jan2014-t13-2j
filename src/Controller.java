@@ -8,7 +8,6 @@ public class Controller {
 	// " at "
 	private static final int noOfCharInAt = 4;
 	private static final int posOfMinute = 2;
-	private static final int posOfDes = 0;
 	private static final int posOfDate = 3;
 	private static final int posOfTime = 2;
 	private static final int noOfPartsWithDateandTime = 4;
@@ -27,7 +26,7 @@ public class Controller {
 	public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
 		String[] parts = input.split(" ");
-		String taskDes = parts[posOfDes];
+		String taskDes = getTaskDes(input);
 		if (parts.length == noOfPartsWithDateandTime) {
 			Date userDate = getDate(parts[posOfDate]);
 			Time userTime = getTime(parts[posOfTime]);
