@@ -14,6 +14,11 @@ public class Controller {
 	private static boolean timeFlag = false, descFlag = false;
 	private static TaskList list;
 
+	/**
+	 * @author Daryl
+	 * @param input
+	 * @return Task
+	 */
 	public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
 		String taskDes = getTaskDes(input);
