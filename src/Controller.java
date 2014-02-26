@@ -8,6 +8,11 @@ public class Controller {
 	// " at "
 	private static final int noOfCharInAt = 4;
 	private static final int posOfMinute = 2;
+	private static final int posOfDes = 0;
+	private static final int posOfDate = 3;
+	private static final int posOfTime = 2;
+	private static final int noOfPartsWithDateandTime = 4;
+	private static final int noOfPartsWithTime = 3;
 	// " time "
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
@@ -21,13 +26,23 @@ public class Controller {
 	 */
 	public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
-		String taskDes = getTaskDes(input);
-		String timeAndDate = getTimeAndDate(input);
-		Date userDate = getDate(timeAndDate);
-		Time userTime = getTime(timeAndDate);
-		Task userTask = new Task(taskDes, userTime, userDate);
-		return userTask;
+		String[] parts = input.split(" ");
+		String taskDes = parts[posOfDes];
+		if (parts.length == noOfPartsWithDateandTime) {
+			Date userDate = getDate(parts[posOfDate]);
+			Time userTime = getTime(parts[posOfTime]);
+			Task userTask = new Task(taskDes, userTime, userDate);
+			return userTask;
+		} else if (parts.length == noOfPartsWithTime) {
+			Time userTime = getTime(parts[posOfTime]);
+			Task userTask = new Task(taskDes, userTime);
+			return userTask;
+		} else {
+			Task userTask = new Task(taskDes);
+			return userTask;
+		}
 	}
+
 
 	/**
 	 * @author Hao Eng
@@ -135,18 +150,27 @@ public class Controller {
 			return input.indexOf(checkForAt);
 		}
 	}
-
-	public static int checkForSpcPos(String input) {
-		String checkForSpc = " ";
-		return input.indexOf(checkForSpc);
-	}
+	/**
+	 * Retrieves date from user input of the form "19/10"
+	 * @param input
+	 * @return userDate
+	 */
 
 	public static Date getDate(String input) {
 		String delims = "/";
 		String[] tokens = input.split(delims);
-		Date userDate = new Date(Integer.parseInt(tokens[0]),
-				Integer.parseInt(tokens[1]));
-		return userDate;
+		if (tokens.length == 2) {
+			Date userDate = new Date(Integer.parseInt(tokens[0]),
+					Integer.parseInt(tokens[1]));
+			return userDate;
+		} else if (tokens.length == 3) {
+			Date userDate = new Date(Integer.parseInt(tokens[0]),
+					Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+			return userDate;
+		} else {
+			return null;
+		}
+		
 	}
 
 	/**
@@ -163,6 +187,13 @@ public class Controller {
 		TaskDes = input.substring(0, index);
 		return TaskDes;
 	}
+	
+	/**
+	 * Retrieves the time and date from user input
+	 * @param input
+	 * 			the raw user input after command word
+	 * @return string with time and date
+	 */
 
 	public static String getTimeAndDate(String input) {
 		String checkForAt = " at ";
@@ -170,11 +201,15 @@ public class Controller {
 		input = input.substring(index + noOfCharInAt);
 		return input;
 	}
+	
+	/**
+	 * Returns time from user string
+	 * i.e. 19 hours 30 minutes from "1930"
+	 * @param input
+	 * @return userTime
+	 */
 
 	public static Time getTime(String input) {
-		String delims = " ";
-		int index = input.indexOf(delims);
-		input = input.substring(0, index);
 		String userHour = input.substring(0, posOfMinute);
 		String userMinute = input.substring(posOfMinute);
 		Time userTime = new Time(Integer.parseInt(userHour),
@@ -183,3 +218,4 @@ public class Controller {
 	}
 
 }
+
