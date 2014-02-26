@@ -3,6 +3,10 @@
  * @author Joyce
  *
  */
+/**
+ * @author Yiwen
+ *
+ */
 public class Time {
 	private static final char TIME_PADDING = '0';
 	private static final char DATE_SEPARATOR = ':';
@@ -25,6 +29,19 @@ public class Time {
 	 * @param min The minutes
 	 */
 	public Time(int hour, int min) {
+		this.setHour(hour);
+		this.setMin(min);
+	}
+	
+	
+	/**
+	 * Create a new Time object with a standard string
+	 * @param timeString a standard string representing time 00:00
+	 */
+	public Time(String timeString) {
+		String[] timeArray = timeString.split(":");
+		int hour = Integer.parseInt(timeArray[0]);
+		int min = Integer.parseInt(timeArray[1]);
 		this.setHour(hour);
 		this.setMin(min);
 	}
