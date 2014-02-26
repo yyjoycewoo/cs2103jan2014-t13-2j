@@ -35,6 +35,20 @@ public class Date {
 		this.setYear(year);
 	}
 	
+	/**
+	 * Create a new Date object with a standard string
+	 * @param dateString a standard string representing date 01/01/2001
+	 */
+	public Date(String dateString) {
+		String[] dateArray = dateString.split("/");
+		int day = Integer.parseInt(dateArray[0]);
+		int month = Integer.parseInt(dateArray[1]);
+		int year = Integer.parseInt(dateArray[2]);
+		this.setDay(day);
+		this.setMonth(month);
+		this.setYear(year);
+	}
+	
 	@Override
 	public String toString() {
 		String date = "";
