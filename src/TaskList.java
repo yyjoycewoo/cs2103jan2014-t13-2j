@@ -26,7 +26,7 @@ public class TaskList {
 	/**
 	 * Get the task at index i
 	 * @param i Index of Task to get
-	 * @return Taks at index i
+	 * @return Task at index i
 	 */
 	public Task getListItem(int i) {
 		return list.get(i);
@@ -34,8 +34,12 @@ public class TaskList {
 
 	@Override
 	public String toString() {
-		//TODO
-		return null;
+		String s = "";
+		
+		for (Task t : this.list){
+			s += t.toString() + "\r\n";
+		}
+		return s;
 	}
 	
 	public ArrayList<Task> getList() {
