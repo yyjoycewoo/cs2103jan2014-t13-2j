@@ -6,6 +6,7 @@ import java.util.ArrayList;
  *
  */
 public class TaskList {
+	private static final String LINE_BREAK = "\r\n";
 	private ArrayList<Task> list;
 	
 	/**
@@ -37,7 +38,7 @@ public class TaskList {
 		String s = "";
 		
 		for (Task t : this.list){
-			s += t.toString() + "\r\n";
+			s += t.toString() + LINE_BREAK;
 		}
 		return s;
 	}
