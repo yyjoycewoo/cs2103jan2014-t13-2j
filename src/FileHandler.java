@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class FileHandler {
 	
+	private static final String LINE_BREAK = "\r\n";
 	private String fileLocation;
 	private File file;
 	
@@ -63,25 +64,25 @@ public class FileHandler {
 		
 		try {
 		
-		String content;
-		
-		FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-		if (!file.exists()) {
-			file.createNewFile();
-		}
-		
-		for (Task task : taskList.getList()) {
-			content = task.toString() + "\r\n";
-			bufferedWriter.write(content);
-		}
-
-		bufferedWriter.close();
-		
-		TaskList updatedList = readFile();
-		
-		return updatedList;
+			String content;
+			
+			FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+	
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			
+			for (Task task : taskList.getList()) {
+				content = task.toString() + LINE_BREAK;
+				bufferedWriter.write(content);
+			}
+	
+			bufferedWriter.close();
+			
+			TaskList updatedList = readFile();
+			
+			return updatedList;
 		
 		} catch (IOException e) {
 			
