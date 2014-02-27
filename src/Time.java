@@ -4,12 +4,12 @@
  *
  */
 /**
- * @author Yiwen
+ * @author Joyce
  *
  */
 public class Time {
 	private static final char TIME_PADDING = '0';
-	private static final char DATE_SEPARATOR = ':';
+	private static final char TIME_SEPARATOR = ':';
 	private static final int MAX_ONE_DIGIT_INT = 9;
 	
 	private int hour;
@@ -48,7 +48,15 @@ public class Time {
 	
 	@Override
 	public String toString() {
-		String time = String.valueOf(hour) + DATE_SEPARATOR;
+		String time = "";
+		
+		//if hour is only one digit, pad it with an extra digit
+		if (isOneDigit(hour)) {
+			time += TIME_PADDING;
+		}
+		
+		time += (String.valueOf(hour) + TIME_SEPARATOR);
+		
 		//if min is only one digit, pad it with an extra digit
 		if (isOneDigit(min)) {
 			time += TIME_PADDING;

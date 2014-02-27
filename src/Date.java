@@ -67,9 +67,10 @@ public class Date {
 		}
 		date += String.valueOf(month);
 		
-		if (year != CURR_YEAR) {
-			date += DATE_SEPARATOR + String.valueOf(year);
-		}
+		
+		date += DATE_SEPARATOR + String.valueOf(year);
+
+		
 		return date;
 	}
 	
