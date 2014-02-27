@@ -16,7 +16,7 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static TaskList list;
+	private static TaskList list = FileHandler.readFile();
 
 	/**
 	 * @author Daryl
@@ -62,6 +62,24 @@ public class Controller {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * @author linxuan
+	 * @param argument
+	 * @return task at index
+	 */
+	public static Task processDelete(String argument) {
+		int index = Integer.parseInt(argument);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * @author linxuan
+	 * @return TaskList
+	 */
+	public static TaskList processDisplay() {
+		return list;
 	}
 
 	/**
@@ -131,15 +149,7 @@ public class Controller {
 		return (Integer.parseInt(input.substring(0, spaceAfterIndex)));
 	}
 
-	public static Task processDelete(String argument) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static TaskList processDisplay() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	public static int checkForAtPosition(String input) {
 		String checkForAt = " at ";
