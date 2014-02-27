@@ -8,6 +8,8 @@ public class Task {
 	private static final String END_TIME_PREP = " until ";
 	private static final String DATE_PREP = " on ";
 	private static final String LOCATION_PREP = " in ";
+	private static final int TIME_LENGTH = 5;
+	private static final int DATE_LENGTH = 10;
 	
 	private String description;
 	private Time startTime;
@@ -132,7 +134,71 @@ public class Task {
 	public Task(String description, Time startTime, Time endTime, Date date, String location) {
 		this(description, startTime, endTime, date);
 		this.setLocation(location);
-	}	
+	}
+
+	/**
+	 * Create a new Task object from a standard taskString (from data file) 
+	 * TODO: need to Refractor
+	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
+	 * @return Task object generated from taskString, null if taskString is empty
+	 * @author Yiwen
+	 */
+	public static Task createTaskFromString(String taskString) {
+		Task task;
+		String description = null;
+		Time startTime = null;
+		Time endTime = null;
+		Date date = null;
+		String location = null;
+		
+		if (taskString.contains(START_TIME_PREP)) {
+			int startTimeBegins = taskString.lastIndexOf(START_TIME_PREP) + START_TIME_PREP.length();
+			int startTimeEnds = startTimeBegins + TIME_LENGTH;
+			startTime = new Time(taskString.substring(startTimeBegins, startTimeEnds));
+			
+			if (taskString.indexOf(START_TIME_PREP) != 0 && description == null) {
+				description = taskString.substring(0, taskString.indexOf(START_TIME_PREP));
+			}
+		}
+		
+		if (taskString.contains(END_TIME_PREP)) {
+			int endTimeBegins = taskString.lastIndexOf(END_TIME_PREP) + END_TIME_PREP.length();
+			int endTimeEnds = endTimeBegins + TIME_LENGTH;
+			endTime = new Time(taskString.substring(endTimeBegins, endTimeEnds));
+			
+			if (taskString.indexOf(END_TIME_PREP) != 0 && description == null) {
+				description = taskString.substring(0, taskString.indexOf(END_TIME_PREP));
+			}
+		}
+		
+		if (taskString.contains(DATE_PREP)) {
+			int dateBegins = taskString.lastIndexOf(DATE_PREP) + DATE_PREP.length();
+			int dateEnds = dateBegins + DATE_LENGTH;
+			date = new Date(taskString.substring(dateBegins, dateEnds));
+
+			if (taskString.indexOf(DATE_PREP) != 0 && description == null) {
+				description = taskString.substring(0, taskString.indexOf(DATE_PREP));
+			}
+		}
+		
+		if (taskString.contains(LOCATION_PREP)) {
+			int locationBegins = taskString.lastIndexOf(LOCATION_PREP) + LOCATION_PREP.length();
+			int locationEnds = taskString.length();
+			location = taskString.substring(locationBegins, locationEnds);
+			
+			if (taskString.indexOf(LOCATION_PREP) != 0 && description == null) {
+				description = taskString.substring(0, taskString.indexOf(LOCATION_PREP));
+			}
+		}
+		
+		if (description == null && startTime == null && endTime == null && date == null && location == null) {
+			task = null;
+		} else {
+			task = new Task(description, startTime, endTime, date, location);
+		}
+		
+		return task;
+	}
 	
 	@Override
 	public String toString() {
