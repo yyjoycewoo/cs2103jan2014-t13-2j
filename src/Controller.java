@@ -16,7 +16,9 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static TaskList list = FileHandler.readFile();
+	private static String fileLoc = ""; //TODO
+	private static FileHandler fileHandler = new FileHandler(fileLoc);
+	private static TaskList list = fileHandler.readFile();
 
 	/**
 	 * @author Daryl
