@@ -24,6 +24,11 @@ public class TaskList {
 		list.add(t);
 	}
 	
+	
+	public void deleteListItem(int i){
+		list.remove(i);
+	}
+	
 	/**
 	 * Get the task at index i
 	 * @param i Index of Task to get

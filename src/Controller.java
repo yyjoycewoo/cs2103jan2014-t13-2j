@@ -37,12 +37,14 @@ public class Controller {
 			Date userDate = getDate(parts[posOfDate]);
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime, userDate);
+			
 		} else if (parts.length == noOfPartsWithTime) {
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime);
 		} else {
 			userTask = new Task(taskDes);
 		}
+		
 		list.addToList(userTask);
 		list = fileHandler.updateFile(list);
 		return userTask;
@@ -76,8 +78,11 @@ public class Controller {
 	 * @return task at index
 	 */
 	public static Task processDelete(String argument) {
-		int index = Integer.parseInt(argument);
-		return list.getListItem(index);
+		int index = Integer.parseInt(argument) - 1;
+		Task deletedTask = list.getListItem(index);
+		list.deleteListItem(index);
+		fileHandler.updateFile(list);
+		return deletedTask;
 	}
 
 	/**
