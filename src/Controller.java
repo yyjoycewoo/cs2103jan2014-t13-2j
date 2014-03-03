@@ -37,7 +37,6 @@ public class Controller {
 			Date userDate = getDate(parts[posOfDate]);
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime, userDate);
-			
 		} else if (parts.length == noOfPartsWithTime) {
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime);
