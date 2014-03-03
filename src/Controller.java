@@ -18,7 +18,7 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static String fileLoc = "D:\\test.txt"; //TODO
+	private static String fileLoc = "D:/test.txt"; //TODO
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 
@@ -44,6 +44,7 @@ public class Controller {
 		} else {
 			userTask = new Task(taskDes);
 		}
+		
 		list.addToList(userTask);
 		list = fileHandler.updateFile(list);
 		return userTask;
@@ -77,8 +78,11 @@ public class Controller {
 	 * @return task at index
 	 */
 	public static Task processDelete(String argument) {
-		int index = Integer.parseInt(argument);
-		return list.getListItem(index);
+		int index = Integer.parseInt(argument) - 1;
+		Task deletedTask = list.getListItem(index);
+		list.deleteListItem(index);
+		fileHandler.updateFile(list);
+		return deletedTask;
 	}
 
 	/**
