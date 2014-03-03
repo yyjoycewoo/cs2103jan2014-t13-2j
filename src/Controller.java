@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 /**
  * For the commands such as add, delete, update, display so on
  * 
@@ -16,7 +18,7 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static String fileLoc = "C:\\Users\\Daryl Ho\\Desktop\\filename.txt"; //TODO
+	private static String fileLoc = "D:\\test.txt"; //TODO
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 
@@ -24,6 +26,7 @@ public class Controller {
 	 * @author Daryl
 	 * @param input
 	 * @return Task
+	 * @throws IOException 
 	 */
 	public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
@@ -34,7 +37,7 @@ public class Controller {
 			Date userDate = getDate(parts[posOfDate]);
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime, userDate);
-			return userTask;
+			
 		} else if (parts.length == noOfPartsWithTime) {
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime);
@@ -42,7 +45,7 @@ public class Controller {
 			userTask = new Task(taskDes);
 		}
 		list.addToList(userTask);
-		fileHandler.updateFile(list);
+		list = fileHandler.updateFile(list);
 		return userTask;
 	}
 
