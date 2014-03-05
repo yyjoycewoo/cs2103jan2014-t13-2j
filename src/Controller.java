@@ -10,12 +10,9 @@ public class Controller {
 
 	// " at "
 	private static final int NO_OF_CHAR_IN_AT = 4;
+	private static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
+	private static final int SPACE_NOT_FOUND = -1;
 	private static final int POS_OF_MINUTE = 2;
-	private static final int POS_OF_DATE = 3;
-	private static final int POS_OF_TIME = 2;
-	private static final int NO_OF_PARTS_WITH_DATE_AND_TIME = 4;
-	private static final int NO_OF_PARTS_WITH_TIME = 3;
-	private static final int AT_NOT_FOUND = 0;
 	// " time "
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
@@ -23,22 +20,24 @@ public class Controller {
 	private static String fileLoc = "D:\\test.txt"; // TODO
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
+	private static String[] keywords = new String[] {" at ", " from ", " in ", " due "};
 
 	/**
 	 * @author Daryl
 	 * @param input
 	 * @return Task
 	 * @throws IOException
-	 */
-	public static Task processAdd(String input) {
+	 *
+	 *
+	 *
+		private static final int POS_OF_DATE = 3;
+		private static final int POS_OF_TIME = 2;
+		private static final int NO_OF_PARTS_WITH_DATE_AND_TIME = 4;
+		private static final int NO_OF_PARTS_WITH_TIME = 3;
+		private static final int AT_NOT_FOUND = 0;
+		public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
-		String[] parts = input.split(" ");
 		String taskDes = getTaskDes(input);
-		Task userTask;
-		if (parts.length == noOfPartsWithDateandTime) {
-			Date userDate = getDate(parts[posOfDate]);
-			Time userTime = getTime(parts[posOfTime]);
-			userTask = new Task(taskDes, userTime, userDate);
 		Task userTask = null;
 		if (checkForAtPosition(input) == AT_NOT_FOUND) {
 			userTask = new Task(taskDes);
@@ -56,53 +55,98 @@ public class Controller {
 				userTask = new Task(taskDes, userTime);
 			}
 		}
-
+		System.out.print(userTask.toString());
 		list.addToList(userTask);
-		//list = fileHandler.updateFile(list);
+		list = fileHandler.updateFile(list);
 		return userTask;
 	}
-	
-	public static int checkForKeywords(String input) {
-		String[] keywords = new String[] {" at ", " from ", " in ", " due "};
-		for (int i = 0; i < keywords.length; i++) {
-			if (input.contains(keywords[i])) {
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	public static Task processAdd2(String input) {
-		String[] keywords = new String[] {" at ", " from ", " in ", "due "};
-		String[] data = null;
+	*/
+
+	public static Task processAdd(String input) {
+		boolean taskDesExtracted = false;
+		int keywordIndex = -1;
 		Task userTask = null;
-		if (checkForKeywords(input) == -1) {
-			String taskDes = input;
+		String location = null;
+		String startTimeString = null;
+		String endTimeString = null;
+		String[] stringFragments = null;
+		String taskDes = null;
+		Date userDate = null;
+		if (!checkForKeywords(input)) {
+			taskDes = input;
 			userTask = new Task(taskDes);
 		}
 		else {
-			data = splitByKeyword (input, keywords[checkForKeywords(input)]);
-			String taskDes = data[0];
-		}
-		/*
-		for (int i = 0; i < keywords.length; i++) {
-			if (input.contains(keywords[i])) {
-				data = splitByKeyword(input, keywords[i]);
+			while (checkForKeywords(input)) {
+				keywordIndex = getFirstKeyword(input);
+				stringFragments = splitByKeyword(input, keywords[keywordIndex]);
+				if (!taskDesExtracted) {
+					taskDes = stringFragments[0];
+					userTask = new Task(taskDes);
+					taskDesExtracted = true;
+				}
+				input = stringFragments[1];
+				int spaceIndex = stringFragments[1].indexOf(" ");
+				if (spaceIndex == SPACE_NOT_FOUND) {
+					switch (keywordIndex) {
+					case 0: startTimeString = stringFragments[1];
+							break;
+					case 1: endTimeString = stringFragments[1];
+							break;
+					case 2: location = stringFragments[1];
+							break;
+					}
+				}
+				else {
+					switch (keywordIndex) {
+						case 0: startTimeString = stringFragments[1].substring(0,spaceIndex);
+								userDate = retrieveDateInTimeString(stringFragments[1]);
+								break;
+						case 1: endTimeString = stringFragments[1].substring(0,spaceIndex);
+								break;
+						case 2: location = stringFragments[1].substring(0,spaceIndex);
+								break;
+					}
+				}
 			}
-		}*/
+			Time endUserTime = getTime(endTimeString);
+			Time startUserTime = getTime(startTimeString);
+			userTask.setEndTime(endUserTime);
+			userTask.setStartTime(startUserTime);
+			userTask.setDate(userDate);
+			userTask.setLocation(location);
+		}
+		list.addToList(userTask);
 		return userTask;
 	}
 	
-	public static int checkWhichKeywordIsFirst(String input) {
-		String[] keywords = new String[] {" at ", " from ", " in ", " due "};
-		//int[] keywordpos = null;
+	public static Date retrieveDateInTimeString(String input) {
+		String[] parts = input.split(" ");
+		String dateDelimiter = "/";
+		if (parts[1].contains(dateDelimiter)) {
+			Date userDate = getDate(parts[1]);
+			return userDate;
+		}
+		return null;
+	}
+	
+	public static Boolean checkForKeywords(String input) {
+		for (int i = 0; i < keywords.length; i++) {
+			if (input.contains(keywords[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static int getFirstKeyword(String input) {
 		int firstKeywordPos = input.length();
 		int firstKeyword = -1;
 		
 		for (int i = 0; i < keywords.length; i++) {
 			if (input.contains(keywords[i])) {
 				if(input.indexOf(keywords[i]) < firstKeywordPos) {
-					firstKeywordPos = input.indexOf(keywords[i]);
+					firstKeywordPos = input.indexOf(keywords[i]);	
 					firstKeyword = i;
 				}
 			}
@@ -306,10 +350,19 @@ public class Controller {
 	 */
 
 	public static Time getTime(String input) {
-		String userHour = input.substring(0, POS_OF_MINUTE);
-		String userMinute = input.substring(POS_OF_MINUTE);
-		Time userTime = new Time(Integer.parseInt(userHour),
-				Integer.parseInt(userMinute));
+		if (input == null) {
+			return null;
+		}
+		String userHour = input.substring(0,POS_OF_MINUTE);
+		Time userTime = null;
+		if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
+			String userMinute = input.substring(POS_OF_MINUTE);
+			userTime = new Time(Integer.parseInt(userHour),
+					Integer.parseInt(userMinute));
+		}
+		else {
+			userTime = new Time(Integer.parseInt(userHour));
+		}
 		return userTime;
 	}
 
