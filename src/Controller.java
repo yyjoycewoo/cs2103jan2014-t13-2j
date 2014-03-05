@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * For the commands such as add, delete, update, display so on
@@ -8,12 +9,13 @@ import java.io.IOException;
 public class Controller {
 
 	// " at "
-	private static final int noOfCharInAt = 4;
-	private static final int posOfMinute = 2;
-	private static final int posOfDate = 3;
-	private static final int posOfTime = 2;
-	private static final int noOfPartsWithDateandTime = 4;
-	private static final int noOfPartsWithTime = 3;
+	private static final int NO_OF_CHAR_IN_AT = 4;
+	private static final int POS_OF_MINUTE = 2;
+	private static final int POS_OF_DATE = 3;
+	private static final int POS_OF_TIME = 2;
+	private static final int NO_OF_PARTS_WITH_DATE_AND_TIME = 4;
+	private static final int NO_OF_PARTS_WITH_TIME = 3;
+	private static final int AT_NOT_FOUND = 0;
 	// " time "
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
@@ -30,24 +32,84 @@ public class Controller {
 	 */
 	public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
-		String[] parts = input.split(" ");
 		String taskDes = getTaskDes(input);
-		Task userTask;
-		if (parts.length == noOfPartsWithDateandTime) {
-			Date userDate = getDate(parts[posOfDate]);
-			Time userTime = getTime(parts[posOfTime]);
-			userTask = new Task(taskDes, userTime, userDate);
-			
-		} else if (parts.length == noOfPartsWithTime) {
-			Time userTime = getTime(parts[posOfTime]);
-			userTask = new Task(taskDes, userTime);
-		} else {
+		Task userTask = null;
+		if (checkForAtPosition(input) == AT_NOT_FOUND) {
 			userTask = new Task(taskDes);
+		}
+		else {
+			input = input.substring(checkForAtPosition(input));
+			String[] parts = input.split(" ");
+			if (parts.length == NO_OF_PARTS_WITH_DATE_AND_TIME) {
+				Date userDate = getDate(parts[POS_OF_DATE]);
+				Time userTime = getTime(parts[POS_OF_TIME]);
+				userTask = new Task(taskDes, userTime, userDate);
+				
+			} else if (parts.length == NO_OF_PARTS_WITH_TIME) {
+				Time userTime = getTime(parts[POS_OF_TIME]);
+				userTask = new Task(taskDes, userTime);
+			}
 		}
 		
 		list.addToList(userTask);
-		list = fileHandler.updateFile(list);
+		//list = fileHandler.updateFile(list);
 		return userTask;
+	}
+	
+	public static int checkForKeywords(String input) {
+		String[] keywords = new String[] {" at ", " from ", " in ", " due "};
+		for (int i = 0; i < keywords.length; i++) {
+			if (input.contains(keywords[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public static Task processAdd2(String input) {
+		String[] keywords = new String[] {" at ", " from ", " in ", "due "};
+		String[] data = null;
+		Task userTask = null;
+		if (checkForKeywords(input) == -1) {
+			String taskDes = input;
+			userTask = new Task(taskDes);
+		}
+		else {
+			data = splitByKeyword (input, keywords[checkForKeywords(input)]);
+			String taskDes = data[0];
+		}
+		/*
+		for (int i = 0; i < keywords.length; i++) {
+			if (input.contains(keywords[i])) {
+				data = splitByKeyword(input, keywords[i]);
+			}
+		}*/
+		return userTask;
+	}
+	
+	public static int checkWhichKeywordIsFirst(String input) {
+		String[] keywords = new String[] {" at ", " from ", " in ", " due "};
+		//int[] keywordpos = null;
+		int firstKeywordPos = input.length();
+		int firstKeyword = -1;
+		
+		for (int i = 0; i < keywords.length; i++) {
+			if (input.contains(keywords[i])) {
+				if(input.indexOf(keywords[i]) < firstKeywordPos) {
+					firstKeywordPos = input.indexOf(keywords[i]);
+					firstKeyword = i;
+				}
+			}
+		}
+		return firstKeyword;
+	}
+	
+	public static String[] splitByKeyword(String input, String keyword) {
+		 String[] splitWords = null;
+		 Pattern pattern = Pattern.compile(Pattern.quote(keyword));
+		 splitWords = pattern.split(input);
+		
+		return splitWords;
 	}
 
 
@@ -218,7 +280,7 @@ public class Controller {
 	public static String getTimeAndDate(String input) {
 		String checkForAt = " at ";
 		int index = input.indexOf(checkForAt);
-		input = input.substring(index + noOfCharInAt);
+		input = input.substring(index + NO_OF_CHAR_IN_AT);
 		return input;
 	}
 	
@@ -230,8 +292,8 @@ public class Controller {
 	 */
 
 	public static Time getTime(String input) {
-		String userHour = input.substring(0, posOfMinute);
-		String userMinute = input.substring(posOfMinute);
+		String userHour = input.substring(0, POS_OF_MINUTE);
+		String userMinute = input.substring(POS_OF_MINUTE);
 		Time userTime = new Time(Integer.parseInt(userHour),
 				Integer.parseInt(userMinute));
 		return userTime;
