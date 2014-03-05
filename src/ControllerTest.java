@@ -8,8 +8,20 @@ public class ControllerTest {
 	@Test
 	public void testProcessAdd() {
 		Task userTask = Controller
-				.processAdd("dinner with parents at 1900 14/10/12");
+				.processAdd("dinner with parents at 1930 14/10 in utown");
 		assertEquals("", userTask.getDescription(), "dinner with parents");
+		assertEquals("", 10, userTask.getDate().getMonth());
+		assertEquals("", 14, userTask.getDate().getDay());
+		assertEquals("", 19, userTask.getStartTime().getHour());
+		assertEquals("", 30, userTask.getStartTime().getMin());
+	}
+	
+	@Test
+	public void testRetrieveDateFromEndTime() {
+		String input = "1420 14/10";
+		Date userDate = Controller.retrieveDateInTimeString(input);
+		assertEquals("", 10, userDate.getMonth());
+		assertEquals("", 14, userDate.getDay());
 	}
 
 	@Test
@@ -33,7 +45,7 @@ public class ControllerTest {
 	@Test
 	public void testGetTaskDes() {
 		assertEquals("GetTaskDes", "dinner",
-				Controller.getTaskDes("dinner at 9 14/10/12"));
+				Controller.getTaskDes("dinner at 0900 14/10/12"));
 	}
 
 	@Test
@@ -55,6 +67,13 @@ public class ControllerTest {
 		assertEquals("", 30, checkTime.getMin());
 	}
 
+	@Test
+	public void testCheckTimeHour() {
+		Time checkTime = Controller.getTime("19");
+		assertEquals("", 19, checkTime.getHour());
+		assertEquals("", 00, checkTime.getMin());
+	}
+	
 	@Test
 	public void testCheckForEmptyAtPosition() {
 		assertEquals("Check Empty", 0, Controller.checkForAtPosition("1234"));
