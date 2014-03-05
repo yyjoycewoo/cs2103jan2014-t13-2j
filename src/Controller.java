@@ -18,7 +18,7 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static String fileLoc = "D:\\test.txt"; //TODO
+	private static String fileLoc = "C:\\User\\Hao Eng\\Desktop\\test.txt"; // TODO
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 
@@ -26,7 +26,7 @@ public class Controller {
 	 * @author Daryl
 	 * @param input
 	 * @return Task
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static Task processAdd(String input) {
 		// TODO Auto-generated method stub
@@ -37,23 +37,24 @@ public class Controller {
 			Date userDate = getDate(parts[posOfDate]);
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime, userDate);
-			
+
 		} else if (parts.length == noOfPartsWithTime) {
 			Time userTime = getTime(parts[posOfTime]);
 			userTask = new Task(taskDes, userTime);
 		} else {
 			userTask = new Task(taskDes);
 		}
-		
+
 		list.addToList(userTask);
 		list = fileHandler.updateFile(list);
 		return userTask;
 	}
 
-
 	/**
 	 * @author Hao Eng
 	 * @param argument
+	 *            : <index of the task> time <startTime e.g. 1300> or <index of
+	 *            the task> desc <description e.g. cut dog's hair>
 	 * @return Updated Task
 	 */
 	public static Task processUpdate(String argument) {
@@ -71,7 +72,7 @@ public class Controller {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @author linxuan
 	 * @param argument
@@ -97,7 +98,7 @@ public class Controller {
 	 * @param index
 	 * @param editTime
 	 * @param argument
-	 *            that contains new time
+	 *            that contains new time 1300
 	 * @return updated task
 	 */
 	private static Task updateTime(int index, int editTime, String argument) {
@@ -129,6 +130,7 @@ public class Controller {
 
 	/**
 	 * @param argument
+	 *            that contains index, time, date e.g. 1 time 1300 date 03/01
 	 * @return the starting index of which task detail to change
 	 */
 	private static int findDetailToEdit(String argument) {
@@ -154,13 +156,9 @@ public class Controller {
 	 */
 	private static int getTaskIndex(String argument)
 			throws NumberFormatException {
-		// remove the command word: edit
-		String input = argument.replaceFirst("update ", "");
-		int spaceAfterIndex = input.indexOf(" ");
-		return (Integer.parseInt(input.substring(0, spaceAfterIndex)));
+		int spaceAfterIndex = argument.indexOf(" ");
+		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
 	}
-
-	
 
 	public static int checkForAtPosition(String input) {
 		String checkForAt = " at ";
@@ -170,8 +168,10 @@ public class Controller {
 			return input.indexOf(checkForAt);
 		}
 	}
+
 	/**
 	 * Retrieves date from user input of the form "19/10"
+	 * 
 	 * @param input
 	 * @return userDate
 	 */
@@ -190,7 +190,7 @@ public class Controller {
 		} else {
 			return null;
 		}
-		
+
 	}
 
 	/**
@@ -207,11 +207,12 @@ public class Controller {
 		TaskDes = input.substring(0, index);
 		return TaskDes;
 	}
-	
+
 	/**
 	 * Retrieves the time and date from user input
+	 * 
 	 * @param input
-	 * 			the raw user input after command word
+	 *            the raw user input after command word
 	 * @return string with time and date
 	 */
 
@@ -221,10 +222,10 @@ public class Controller {
 		input = input.substring(index + noOfCharInAt);
 		return input;
 	}
-	
+
 	/**
-	 * Returns time from user string
-	 * i.e. 19 hours 30 minutes from "1930"
+	 * Returns time from user string i.e. 19 hours 30 minutes from "1930"
+	 * 
 	 * @param input
 	 * @return userTime
 	 */
@@ -238,4 +239,3 @@ public class Controller {
 	}
 
 }
-
