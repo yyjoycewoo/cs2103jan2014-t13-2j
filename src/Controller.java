@@ -18,6 +18,7 @@ public class Controller {
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
 	private static String fileLoc = "D:\\test.txt";
+	//private static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt"; // TODO
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 	private static String[] keywords = new String[] { " at ", " from ", " in ",
