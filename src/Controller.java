@@ -17,50 +17,43 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static String fileLoc = "D:\\test.txt"; // TODO
+	private static String fileLoc = //"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
-	private static String[] keywords = new String[] {" at ", " from ", " in ", " due "};
+	private static String[] keywords = new String[] { " at ", " from ", " in ",
+			" due " };
 
 	/**
 	 * @author Daryl
 	 * @param input
 	 * @return Task
 	 * @throws IOException
-	 *
-	 *
-	 *
-		private static final int POS_OF_DATE = 3;
-		private static final int POS_OF_TIME = 2;
-		private static final int NO_OF_PARTS_WITH_DATE_AND_TIME = 4;
-		private static final int NO_OF_PARTS_WITH_TIME = 3;
-		private static final int AT_NOT_FOUND = 0;
-		public static Task processAdd(String input) {
-		// TODO Auto-generated method stub
-		String taskDes = getTaskDes(input);
-		Task userTask = null;
-		if (checkForAtPosition(input) == AT_NOT_FOUND) {
-			userTask = new Task(taskDes);
-		}
-		else {
-			input = input.substring(checkForAtPosition(input));
-			String[] parts = input.split(" ");
-			if (parts.length == NO_OF_PARTS_WITH_DATE_AND_TIME) {
-				Date userDate = getDate(parts[POS_OF_DATE]);
-				Time userTime = getTime(parts[POS_OF_TIME]);
-				userTask = new Task(taskDes, userTime, userDate);
-				
-			} else if (parts.length == NO_OF_PARTS_WITH_TIME) {
-				Time userTime = getTime(parts[POS_OF_TIME]);
-				userTask = new Task(taskDes, userTime);
-			}
-		}
-		System.out.print(userTask.toString());
-		list.addToList(userTask);
-		list = fileHandler.updateFile(list);
-		return userTask;
-	}
-	*/
+	 * 
+	 * 
+	 * 
+	 *             private static final int POS_OF_DATE = 3; private static
+	 *             final int POS_OF_TIME = 2; private static final int
+	 *             NO_OF_PARTS_WITH_DATE_AND_TIME = 4; private static final int
+	 *             NO_OF_PARTS_WITH_TIME = 3; private static final int
+	 *             AT_NOT_FOUND = 0; public static Task processAdd(String input)
+	 *             { // TODO Auto-generated method stub String taskDes =
+	 *             getTaskDes(input); Task userTask = null; if
+	 *             (checkForAtPosition(input) == AT_NOT_FOUND) { userTask = new
+	 *             Task(taskDes); } else { input =
+	 *             input.substring(checkForAtPosition(input)); String[] parts =
+	 *             input.split(" "); if (parts.length ==
+	 *             NO_OF_PARTS_WITH_DATE_AND_TIME) { Date userDate =
+	 *             getDate(parts[POS_OF_DATE]); Time userTime =
+	 *             getTime(parts[POS_OF_TIME]); userTask = new Task(taskDes,
+	 *             userTime, userDate);
+	 * 
+	 *             } else if (parts.length == NO_OF_PARTS_WITH_TIME) { Time
+	 *             userTime = getTime(parts[POS_OF_TIME]); userTask = new
+	 *             Task(taskDes, userTime); } }
+	 *             System.out.print(userTask.toString());
+	 *             list.addToList(userTask); list =
+	 *             fileHandler.updateFile(list); return userTask; }
+	 */
 
 	public static Task processAdd(String input) {
 		boolean taskDesExtracted = false;
@@ -75,8 +68,7 @@ public class Controller {
 		if (!checkForKeywords(input)) {
 			taskDes = input;
 			userTask = new Task(taskDes);
-		}
-		else {
+		} else {
 			while (checkForKeywords(input)) {
 				keywordIndex = getFirstKeyword(input);
 				stringFragments = splitByKeyword(input, keywords[keywordIndex]);
@@ -89,23 +81,30 @@ public class Controller {
 				int spaceIndex = stringFragments[1].indexOf(" ");
 				if (spaceIndex == SPACE_NOT_FOUND) {
 					switch (keywordIndex) {
-					case 0: startTimeString = stringFragments[1];
-							break;
-					case 1: endTimeString = stringFragments[1];
-							break;
-					case 2: location = stringFragments[1];
-							break;
+					case 0:
+						startTimeString = stringFragments[1];
+						break;
+					case 1:
+						endTimeString = stringFragments[1];
+						break;
+					case 2:
+						location = stringFragments[1];
+						break;
 					}
-				}
-				else {
+				} else {
 					switch (keywordIndex) {
-						case 0: startTimeString = stringFragments[1].substring(0,spaceIndex);
-								userDate = retrieveDateInTimeString(stringFragments[1]);
-								break;
-						case 1: endTimeString = stringFragments[1].substring(0,spaceIndex);
-								break;
-						case 2: location = stringFragments[1].substring(0,spaceIndex);
-								break;
+					case 0:
+						startTimeString = stringFragments[1].substring(0,
+								spaceIndex);
+						userDate = retrieveDateInTimeString(stringFragments[1]);
+						break;
+					case 1:
+						endTimeString = stringFragments[1].substring(0,
+								spaceIndex);
+						break;
+					case 2:
+						location = stringFragments[1].substring(0, spaceIndex);
+						break;
 					}
 				}
 			}
@@ -117,10 +116,10 @@ public class Controller {
 			userTask.setLocation(location);
 		}
 		list.addToList(userTask);
-		list = fileHandler.updateFile(list);
+		// list = fileHandler.updateFile(list);
 		return userTask;
 	}
-	
+
 	public static Date retrieveDateInTimeString(String input) {
 		String[] parts = input.split(" ");
 		String dateDelimiter = "/";
@@ -130,36 +129,36 @@ public class Controller {
 		}
 		return null;
 	}
-	
+
 	public static Boolean checkForKeywords(String input) {
-		for (int i = 0; i < keywords.length; i++) {
-			if (input.contains(keywords[i])) {
+		for (String keyword : keywords) {
+			if (input.contains(keyword)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public static int getFirstKeyword(String input) {
 		int firstKeywordPos = input.length();
 		int firstKeyword = -1;
-		
+
 		for (int i = 0; i < keywords.length; i++) {
 			if (input.contains(keywords[i])) {
-				if(input.indexOf(keywords[i]) < firstKeywordPos) {
-					firstKeywordPos = input.indexOf(keywords[i]);	
+				if (input.indexOf(keywords[i]) < firstKeywordPos) {
+					firstKeywordPos = input.indexOf(keywords[i]);
 					firstKeyword = i;
 				}
 			}
 		}
 		return firstKeyword;
 	}
-	
+
 	public static String[] splitByKeyword(String input, String keyword) {
-		 String[] splitWords = null;
-		 Pattern pattern = Pattern.compile(Pattern.quote(keyword));
-		 splitWords = pattern.split(input);
-		
+		String[] splitWords = null;
+		Pattern pattern = Pattern.compile(Pattern.quote(keyword));
+		splitWords = pattern.split(input);
+
 		return splitWords;
 	}
 
@@ -171,7 +170,7 @@ public class Controller {
 	 * @return Updated Task
 	 */
 	public static Task processUpdate(String argument) {
-		int index = getTaskIndex(argument);
+		int index = getTaskIndex(argument) - 1;
 		int whichToEdit = findDetailToEdit(argument);
 		if (whichToEdit == -1) {
 			printInvalidEdit();
@@ -186,7 +185,6 @@ public class Controller {
 		return null;
 	}
 
-	
 	/**
 	 * @author linxuan
 	 * @param argument
@@ -274,10 +272,6 @@ public class Controller {
 		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
 	}
 
-	
-
-	
-
 	public static int checkForAtPosition(String input) {
 		String checkForAt = " at ";
 		if (input.indexOf(checkForAt) == -1) {
@@ -342,8 +336,7 @@ public class Controller {
 	}
 
 	/**
-	 * Returns time from user string
-	 * i.e. 19 hours 30 minutes from "1930"
+	 * Returns time from user string i.e. 19 hours 30 minutes from "1930"
 	 * Returns time from user string i.e. 19 hours 30 minutes from "1930"
 	 * 
 	 * @param input
@@ -354,18 +347,16 @@ public class Controller {
 		if (input == null) {
 			return null;
 		}
-		String userHour = input.substring(0,POS_OF_MINUTE);
+		String userHour = input.substring(0, POS_OF_MINUTE);
 		Time userTime = null;
 		if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
 			String userMinute = input.substring(POS_OF_MINUTE);
 			userTime = new Time(Integer.parseInt(userHour),
 					Integer.parseInt(userMinute));
-		}
-		else {
+		} else {
 			userTime = new Time(Integer.parseInt(userHour));
 		}
 		return userTime;
 	}
 
 }
-

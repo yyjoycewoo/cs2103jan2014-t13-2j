@@ -15,7 +15,7 @@ public class ControllerTest {
 		assertEquals("", 19, userTask.getStartTime().getHour());
 		assertEquals("", 30, userTask.getStartTime().getMin());
 	}
-	
+
 	@Test
 	public void testRetrieveDateFromEndTime() {
 		String input = "1420 14/10";
@@ -26,8 +26,9 @@ public class ControllerTest {
 
 	@Test
 	public void testProcessUpdateTime() {
-		Task userTask = Controller.processUpdate("1 time 1300");
-		assertEquals("", userTask.getStartTime(), "1300");
+		Task userTask = Controller.processUpdate("1 time 1330");
+		assertEquals("", userTask.getStartTime().getHour(), "13");
+		assertEquals("", userTask.getStartTime().getMin(), "30");
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class ControllerTest {
 		assertEquals("", 19, checkTime.getHour());
 		assertEquals("", 00, checkTime.getMin());
 	}
-	
+
 	@Test
 	public void testCheckForEmptyAtPosition() {
 		assertEquals("Check Empty", 0, Controller.checkForAtPosition("1234"));
