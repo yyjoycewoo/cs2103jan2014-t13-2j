@@ -17,7 +17,7 @@ public class Controller {
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
 	private static boolean timeFlag = false, descFlag = false;
-	private static String fileLoc = //"C:\\Users\\Hao Eng\\Desktop\\test.txt";
+	private static String fileLoc = "D:\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 	private static String[] keywords = new String[] { " at ", " from ", " in ",
