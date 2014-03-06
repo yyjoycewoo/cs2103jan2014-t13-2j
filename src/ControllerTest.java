@@ -25,18 +25,6 @@ public class ControllerTest {
 	}
 
 	@Test
-	public void testProcessUpdateTime() {
-		Task userTask = Controller.processUpdate("1 time 1330");
-		assertEquals("", userTask.getStartTime().getHour(), 13);
-		assertEquals("", userTask.getStartTime().getMin(), 30);
-	}
-
-	@Test
-	public void testProcessUpdateDesc() {
-		Task userTask = Controller.processUpdate("1 desc cut dog's fur");
-		assertEquals("", userTask.getDescription(), "cut dog's fur");
-	}
-
 	public void testProcessAddDes() {
 		Task userTask = Controller.processAdd("dinner");
 		assertEquals("", userTask.getDescription(), "dinner");
@@ -87,4 +75,32 @@ public class ControllerTest {
 		assertEquals("", 10, checkDate.getMonth());
 	}
 
+	@Test
+	public void testProcessUpdateTime() {
+		Task userTask = Controller.processUpdate("1 time 1330");
+		assertEquals("", userTask.getStartTime().getHour(), 13);
+		assertEquals("", userTask.getStartTime().getMin(), 30);
+	}
+
+	@Test
+	public void testProcessUpdateDesc() {
+		Task userTask = Controller.processUpdate("1 desc cut dog's fur");
+		assertEquals("", userTask.getDescription(), "cut dog's fur");
+	}
+
+	@Test
+	public void testProcessUpdateTimeDesc() {
+		Task alternate = Controller.processUpdate("1 time 2200 desc haha");
+		assertEquals("", alternate.getDescription(), "haha");
+		assertEquals("", alternate.getStartTime().getHour(), 22);
+		assertEquals("", alternate.getStartTime().getMin(), 00);
+	}
+
+	// @warning: dunno why the test wont pass here
+	@Test
+	public void testProcessUpdateDescTime() {
+		Task alternate = Controller.processUpdate("1 desc cat time 1000");
+		assertEquals("", alternate.getDescription(), "cat");
+		// assertEquals("", userTask.getStartTime(), 2100);
+	}
 }

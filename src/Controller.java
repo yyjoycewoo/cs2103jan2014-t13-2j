@@ -15,10 +15,11 @@ public class Controller {
 	private static final int POS_OF_MINUTE = 2;
 	// " time "
 	private static final int noOfCharInTime = 6, noOfCharInDesc = 6;
+	private static boolean timeFlag = false;
+	private static boolean descFlag = false;
 	private static final String INVALID_UPDATE = "No parameter to edit.";
-	private static boolean timeFlag = false, descFlag = false;
-	private static String fileLoc = "D:\\test.txt";
-	// "C:\\Users\\Hao Eng\\Desktop\\test.txt";
+	private static String fileLoc = // "D:\\test.txt";
+	"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 	private static String[] keywords = new String[] { " at ", " from ", " in ",
@@ -164,29 +165,6 @@ public class Controller {
 	}
 
 	/**
-	 * @author Hao Eng
-	 * @param argument
-	 *            : <index of the task> time <startTime e.g. 1300> or <index of
-	 *            the task> desc <description e.g. cut dog's hair>
-	 * @return Updated Task
-	 */
-	public static Task processUpdate(String argument) {
-		int index = getTaskIndex(argument) - 1;
-		int whichToEdit = findDetailToEdit(argument);
-		if (whichToEdit == -1) {
-			printInvalidEdit();
-		} else {
-			if (timeFlag) {
-				return updateTime(index, whichToEdit, argument);
-			}
-			if (descFlag) {
-				return updateDesc(index, whichToEdit, argument);
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * @author linxuan
 	 * @param argument
 	 * @return task at index
@@ -208,6 +186,38 @@ public class Controller {
 	}
 
 	/**
+	 * @author Hao Eng
+	 * @param argument
+	 *            : <index of the task> time <startTime e.g. 1300> or <index of
+	 *            the task> desc <description e.g. cut dog's hair>
+	 * @return Updated Task
+	 */
+	public static Task processUpdate(String argument) {
+		int[] whichToEdit = { -1, -1 };
+		setFlagToFalse();
+		int index = getTaskIndex(argument) - 1;
+		whichToEdit = findDetailToEdit(argument);
+		if ((whichToEdit[0] == -1) && (whichToEdit[1] == -1)) {
+			printInvalidEdit();
+		} else {
+			if (timeFlag && descFlag) {
+				return updateDescAndTime(index, whichToEdit[0], whichToEdit[1],
+						argument);
+			} else if (timeFlag) {
+				return updateTime(index, whichToEdit[0], argument);
+			} else if (descFlag) {
+				return updateDesc(index, whichToEdit[1], argument);
+			}
+		}
+		return null;
+	}
+
+	private static void setFlagToFalse() {
+		timeFlag = false;
+		descFlag = false;
+	}
+
+	/**
 	 * @param index
 	 * @param editTime
 	 * @param argument
@@ -216,7 +226,7 @@ public class Controller {
 	 */
 	private static Task updateTime(int index, int editTime, String argument) {
 		int time = Integer.parseInt(argument.substring(editTime
-				+ noOfCharInTime));
+				+ noOfCharInTime, editTime + noOfCharInTime + 4));
 		int hr = time / 100;
 		int min = time % 100;
 		list.getListItem(index).setStartTime(new Time(hr, min));
@@ -231,8 +241,30 @@ public class Controller {
 	 * @return updated task
 	 */
 	private static Task updateDesc(int index, int editDesc, String argument) {
+		int stopIndex = argument.length();
+		if (argument.contains(" time ")) {
+			stopIndex = argument.indexOf(" time ");
+			if (stopIndex < editDesc) {
+				stopIndex = argument.length();
+			}
+		}
 		list.getListItem(index).setDescription(
-				argument.substring(editDesc + noOfCharInDesc));
+				argument.substring(editDesc + noOfCharInDesc, stopIndex));
+		return list.getListItem(index);
+	}
+
+	/**
+	 * @param index
+	 * @param editDesc
+	 *            & editTime
+	 * @param argument
+	 *            that contains new description
+	 * @return updated task
+	 */
+	private static Task updateDescAndTime(int index, int editTime,
+			int editDesc, String argument) {
+		updateDesc(index, editDesc, argument);
+		updateTime(index, editTime, argument);
 		return list.getListItem(index);
 	}
 
@@ -246,20 +278,23 @@ public class Controller {
 	 *            that contains index, time, date e.g. 1 time 1300 date 03/01
 	 * @return the starting index of which task detail to change
 	 */
-	private static int findDetailToEdit(String argument) {
-		int editTime = argument.indexOf(" time ");
-		if (editTime > -1) {
-			timeFlag = true;
-			return editTime;
-		} else {
-			int editDesc = argument.indexOf(" desc ");
-			if (editDesc > -1) {
-				descFlag = true;
-				return editDesc;
-			} else {
-				return -1;
-			}
+	private static int[] findDetailToEdit(String argument) {
+		int[] edit = { -1, -1 };
+		// time
+		if (argument.contains("time")) {
+			edit[0] = argument.indexOf(" time ");
 		}
+		if (argument.contains("desc")) {
+			// description
+			edit[1] = argument.indexOf(" desc ");
+		}
+		if (edit[0] > -1) {
+			timeFlag = true;
+		}
+		if (edit[1] > -1) {
+			descFlag = true;
+		}
+		return edit;
 	}
 
 	/**
