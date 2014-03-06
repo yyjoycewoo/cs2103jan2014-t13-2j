@@ -117,6 +117,7 @@ public class Controller {
 			userTask.setLocation(location);
 		}
 		list.addToList(userTask);
+		list = fileHandler.updateFile(list);
 		return userTask;
 	}
 	
