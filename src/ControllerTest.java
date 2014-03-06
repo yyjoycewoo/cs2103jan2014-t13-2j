@@ -27,8 +27,8 @@ public class ControllerTest {
 	@Test
 	public void testProcessUpdateTime() {
 		Task userTask = Controller.processUpdate("1 time 1330");
-		assertEquals("", userTask.getStartTime().getHour(), "13");
-		assertEquals("", userTask.getStartTime().getMin(), "30");
+		assertEquals("", userTask.getStartTime().getHour(), 13);
+		assertEquals("", userTask.getStartTime().getMin(), 30);
 	}
 
 	@Test
