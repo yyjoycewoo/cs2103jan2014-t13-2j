@@ -15,7 +15,7 @@ public class Controller {
 	private static final int POS_OF_MINUTE = 2;
 	// " time "
 	private static final int noOfCharInSTime = 11, noOfCharInETime = 9,
-			noOfCharInDesc = 6, noOfCharInDate = 6;
+			noOfCharInLoc = 10, noOfCharInDesc = 6, noOfCharInDate = 6;
 	private static String fileLoc = // "D:\\test.txt";
 	"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
@@ -211,10 +211,10 @@ public class Controller {
 				case 3:
 					updateDate(index, whichToEdit[3], argument);
 					break;
-				/*
-				 * case 4: updateLocation(index, whichToEdit[4], argument);
-				 * break;
-				 */}
+				case 4:
+					updateLocation(index, whichToEdit[4], argument);
+					break;
+				}
 			}
 		}
 		return list.getListItem(index);
@@ -259,9 +259,20 @@ public class Controller {
 		return list.getListItem(index);
 	}
 
-	// private static Task updateLocation(int index, int editLoc, String
-	// argument) {
-	// }
+	private static Task updateLocation(int index, int editLoc, String argument) {
+		int stopIndex = argument.length();
+		if (argument.contains("\\")) {
+			int escChar = argument.indexOf("\\");
+			if (escChar < editLoc) {
+				stopIndex = argument.lastIndexOf("\\");
+			} else {
+				stopIndex = escChar;
+			}
+		}
+		list.getListItem(index).setLocation(
+				argument.substring(editLoc + noOfCharInLoc, stopIndex));
+		return list.getListItem(index);
+	}
 
 	/**
 	 * @param index
@@ -271,8 +282,17 @@ public class Controller {
 	 * @return updated task
 	 */
 	private static Task updateDesc(int index, int editDesc, String argument) {
+		int stopIndex = argument.length();
+		if (argument.contains("\\")) {
+			int escChar = argument.indexOf("\\");
+			if (escChar < editDesc) {
+				stopIndex = argument.lastIndexOf("\\");
+			} else {
+				stopIndex = escChar;
+			}
+		}
 		list.getListItem(index).setDescription(
-				argument.substring(editDesc + noOfCharInDesc));
+				argument.substring(editDesc + noOfCharInDesc, stopIndex));
 		return list.getListItem(index);
 	}
 
