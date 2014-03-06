@@ -77,9 +77,9 @@ public class ControllerTest {
 
 	@Test
 	public void testProcessUpdateTime() {
-		Task userTask = Controller.processUpdate("1 time 1330");
-		assertEquals("", userTask.getStartTime().getHour(), 13);
-		assertEquals("", userTask.getStartTime().getMin(), 30);
+		Task userTask = Controller.processUpdate("1 endtime 1330");
+		assertEquals("", userTask.getEndTime().getHour(), 13);
+		assertEquals("", userTask.getEndTime().getMin(), 30);
 	}
 
 	@Test
@@ -90,17 +90,16 @@ public class ControllerTest {
 
 	@Test
 	public void testProcessUpdateTimeDesc() {
-		Task alternate = Controller.processUpdate("1 time 2200 desc haha");
+		Task alternate = Controller.processUpdate("1 starttime 2200 desc haha");
 		assertEquals("", alternate.getDescription(), "haha");
 		assertEquals("", alternate.getStartTime().getHour(), 22);
 		assertEquals("", alternate.getStartTime().getMin(), 00);
 	}
 
-	// @warning: dunno why the test wont pass here
 	@Test
-	public void testProcessUpdateDescTime() {
-		Task alternate = Controller.processUpdate("1 desc cat time 1000");
-		assertEquals("", alternate.getDescription(), "cat");
-		// assertEquals("", userTask.getStartTime(), 2100);
+	public void testProcessUpdateDate() {
+		Task userTask = Controller.processUpdate("1 date 13/10");
+		assertEquals("", userTask.getDate().getDay(), 13);
+		assertEquals("", userTask.getDate().getMonth(), 10);
 	}
 }
