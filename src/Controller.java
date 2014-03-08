@@ -16,12 +16,12 @@ public class Controller {
 	// " time "
 	private static final int noOfCharInSTime = 11, noOfCharInETime = 9,
 			noOfCharInLoc = 10, noOfCharInDesc = 6, noOfCharInDate = 6;
-	private static String fileLoc = // "D:\\test.txt";
-	"C:\\Users\\Hao Eng\\Desktop\\test.txt";
+	private static String fileLoc =  "D:\\test.txt";
+	//"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
-	private static String[] keywords = new String[] { " at ", " from ", " in ",
-			" due " };
+	private static String[] keywords = new String[] { " at ", " from ", " until ", " to ", " in ",
+			" due "};
 	private static String[] updateKeywords = new String[] { " starttime ",
 			" endtime ", " desc ", " date ", " location " };
 
@@ -30,31 +30,6 @@ public class Controller {
 	 * @param input
 	 * @return Task
 	 * @throws IOException
-	 * 
-	 * 
-	 * 
-	 *             private static final int POS_OF_DATE = 3; private static
-	 *             final int POS_OF_TIME = 2; private static final int
-	 *             NO_OF_PARTS_WITH_DATE_AND_TIME = 4; private static final int
-	 *             NO_OF_PARTS_WITH_TIME = 3; private static final int
-	 *             AT_NOT_FOUND = 0; public static Task processAdd(String input)
-	 *             { // TODO Auto-generated method stub String taskDes =
-	 *             getTaskDes(input); Task userTask = null; if
-	 *             (checkForAtPosition(input) == AT_NOT_FOUND) { userTask = new
-	 *             Task(taskDes); } else { input =
-	 *             input.substring(checkForAtPosition(input)); String[] parts =
-	 *             input.split(" "); if (parts.length ==
-	 *             NO_OF_PARTS_WITH_DATE_AND_TIME) { Date userDate =
-	 *             getDate(parts[POS_OF_DATE]); Time userTime =
-	 *             getTime(parts[POS_OF_TIME]); userTask = new Task(taskDes,
-	 *             userTime, userDate);
-	 * 
-	 *             } else if (parts.length == NO_OF_PARTS_WITH_TIME) { Time
-	 *             userTime = getTime(parts[POS_OF_TIME]); userTask = new
-	 *             Task(taskDes, userTime); } }
-	 *             System.out.print(userTask.toString());
-	 *             list.addToList(userTask); list =
-	 *             fileHandler.updateFile(list); return userTask; }
 	 */
 
 	public static Task processAdd(String input) {
@@ -84,28 +59,45 @@ public class Controller {
 				if (spaceIndex == SPACE_NOT_FOUND) {
 					switch (keywordIndex) {
 					case 0:
+					case 1:
 						startTimeString = stringFragments[1];
 						break;
-					case 1:
+					case 2:
+					case 3:
 						endTimeString = stringFragments[1];
 						break;
-					case 2:
+					case 4:
 						location = stringFragments[1];
+						break;
+					case 5:
+						endTimeString = stringFragments[1];
 						break;
 					}
 				} else {
 					switch (keywordIndex) {
 					case 0:
+					case 1:
 						startTimeString = stringFragments[1].substring(0,
 								spaceIndex);
 						userDate = retrieveDateInTimeString(stringFragments[1]);
 						break;
-					case 1:
+					case 2:
+					case 3:
 						endTimeString = stringFragments[1].substring(0,
 								spaceIndex);
+						userDate = retrieveDateInTimeString(stringFragments[1]);
 						break;
-					case 2:
-						location = stringFragments[1].substring(0, spaceIndex);
+					case 4:
+						if (getFirstKeyword(stringFragments[1]) == -1) {
+							location = stringFragments[1];
+						} else {
+						location = getWordsBeforeNextKeyword(stringFragments[1], 
+								keywords[getFirstKeyword(stringFragments[1])]);
+						}
+						break;
+					case 5:
+						endTimeString = stringFragments[1].substring(0,
+								spaceIndex);
 						break;
 					}
 				}
@@ -118,18 +110,54 @@ public class Controller {
 			userTask.setLocation(location);
 		}
 		list.addToList(userTask);
-		// list = fileHandler.updateFile(list);
+		list = fileHandler.updateFile(list);
 		return userTask;
+	}
+	
+	/**
+	 * @author Daryl
+	 * @param String month, String day
+	 * 
+	 * @return userDate
+	 * @throws IOException
+	 */
+
+	public static String convertDateToStandardForm (String month, String day) {
+		return month + "/" + day;
 	}
 
 	public static Date retrieveDateInTimeString(String input) {
 		String[] parts = input.split(" ");
 		String dateDelimiter = "/";
+		String[] months = new String[]{"Jan", "Feb", "Mar", "Jun", "Jul",
+				"Aug", "Sep", "Oct", "Nov", "Dec"};
+		for (int i = 0; i < months.length; i++) {
+			if (parts.length > 2) {
+				if (parts[1].contains(months[i])) {
+					String standardFormDate = 
+							convertDateToStandardForm(parts[2], String.valueOf(i+1));
+					Date userDate = getDate(standardFormDate);
+					return userDate;
+				}
+				else if (parts[2].contains(months[i])) {
+					String standardFormDate = 
+							convertDateToStandardForm(parts[1], String.valueOf(i+1));
+					Date userDate = getDate(standardFormDate);
+					return userDate;
+				}
+			}
+		}
 		if (parts[1].contains(dateDelimiter)) {
 			Date userDate = getDate(parts[1]);
 			return userDate;
 		}
 		return null;
+	}
+	
+	public static String getWordsBeforeNextKeyword(String input, String keyword) {
+		String wordsBeforeNextKeyword;
+		wordsBeforeNextKeyword = input.substring(0, input.indexOf(keyword));
+		return wordsBeforeNextKeyword;
 	}
 
 	public static Boolean checkForKeywords(String input) {
@@ -340,14 +368,14 @@ public class Controller {
 
 	public static Date getDate(String input) {
 		String delims = "/";
-		String[] tokens = input.split(delims);
-		if (tokens.length == 2) {
-			Date userDate = new Date(Integer.parseInt(tokens[0]),
-					Integer.parseInt(tokens[1]));
+		String[] dateTokens = input.split(delims);
+		if (dateTokens.length == 2) {
+			Date userDate = new Date(Integer.parseInt(dateTokens[0]),
+					Integer.parseInt(dateTokens[1]));
 			return userDate;
-		} else if (tokens.length == 3) {
-			Date userDate = new Date(Integer.parseInt(tokens[0]),
-					Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
+		} else if (dateTokens.length == 3) {
+			Date userDate = new Date(Integer.parseInt(dateTokens[0]),
+					Integer.parseInt(dateTokens[1]), Integer.parseInt(dateTokens[2]));
 			return userDate;
 		} else {
 			return null;
@@ -397,16 +425,47 @@ public class Controller {
 		if (input == null) {
 			return null;
 		}
-		String userHour = input.substring(0, POS_OF_MINUTE);
 		Time userTime = null;
-		if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
-			String userMinute = input.substring(POS_OF_MINUTE);
-			userTime = new Time(Integer.parseInt(userHour),
-					Integer.parseInt(userMinute));
-		} else {
-			userTime = new Time(Integer.parseInt(userHour));
+		int hour = 0, minute = -1;
+		String meridiem[] = new String[] { "am", "pm"};
+		int meridiemIndex = checkMeridiem(input); 
+		if (meridiemIndex != -1) {
+			input = input.substring(0,input.indexOf(meridiem[meridiemIndex]));
+			if (input.length() == 1) {
+				hour = Integer.parseInt(input);
+			} else if (input.length() == 3) {
+				hour = Integer.parseInt(input.substring(0,1));
+				minute = Integer.parseInt(input.substring(POS_OF_MINUTE-1));
+			} else if (input.length() == 4) {
+				hour = Integer.parseInt(input.substring(0,2));
+				minute = Integer.parseInt(input.substring(POS_OF_MINUTE));
+			}
+			if (meridiemIndex == 1) {
+				hour += 12;
+			}
+			userTime = new Time(hour, minute);
+		}
+		else {
+			String userHour = input.substring(0, POS_OF_MINUTE);
+			if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
+				String userMinute = input.substring(POS_OF_MINUTE);
+				userTime = new Time(Integer.parseInt(userHour),
+						Integer.parseInt(userMinute));
+			} else {
+				userTime = new Time(Integer.parseInt(userHour));
+			}
 		}
 		return userTime;
 	}
-
+	
+	public static int checkMeridiem(String input) {
+		String meridiems[] = new String[] {"am", "pm"};
+		for (int i = 0; i < meridiems.length; i++) {
+			if (input.contains(meridiems[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 }
