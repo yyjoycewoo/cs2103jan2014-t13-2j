@@ -1,6 +1,6 @@
 package todomato;
 /**
- * 
+ * Exception class for invalid input
  * @author Joyce
  *
  */
