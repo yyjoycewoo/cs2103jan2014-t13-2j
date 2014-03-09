@@ -499,9 +499,9 @@ public class Controller {
 	}
 
 	/**
-	 * Undo last action
+	 * Undo last action, if possible
 	 * @author Joyce
-	 * @return status message
+	 * @return String representation of list, or status message if no changes to undo
 	 */
 	public static String processUndo() {
 		if (!oldLists.isEmpty()) {

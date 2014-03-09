@@ -1,6 +1,14 @@
 package todomato;
+/**
+ * 
+ * @author Joyce
+ *
+ */
 public class CmdHandler {
 
+	private static final String SUCCESSFUL_UPDATE_MSG = "Updated task to: ";
+	private static final String SUCCESSFUL_DELETE_MSG = "Deleted task: ";
+	private static final String SUCCESSFUL_ADD_MSG = "Added task: ";
 	private static final String ADD_COMMAND = "add";
 	private static final String DELETE_COMMAND = "delete";
 	private static final String UPDATE_COMMAND = "update";
@@ -11,22 +19,28 @@ public class CmdHandler {
 	
 	private static Command command;
 	
-	public static Object processCommand(String userInput) throws InvalidInputException {	
+	/**
+	 * 
+	 * @param userInput
+	 * @return A status message describing the last action completed
+	 * @throws InvalidInputException
+	 */
+	public static String processCommand(String userInput) throws InvalidInputException {	
 		command = new Command(userInput.split(" ", 2));
 		if (command.getAction().equals(EXIT_COMMAND)) {
 			System.exit(0);
 		}			
 		if (command.getAction().equals(DISPLAY_COMMAND)) {
-			return Controller.processDisplay();				
+			return Controller.processDisplay().toString();				
 		}
 		if (command.getAction().equals(UPDATE_COMMAND)) {
-			return Controller.processUpdate(command.getArgument());
+			return SUCCESSFUL_UPDATE_MSG  + Controller.processUpdate(command.getArgument()).toString();
 		}
 		if (command.getAction().equals(DELETE_COMMAND)) {
-			return Controller.processDelete(command.getArgument());					
+			return SUCCESSFUL_DELETE_MSG + Controller.processDelete(command.getArgument());					
 		}
 		if (command.getAction().equals(ADD_COMMAND)) {
-			return Controller.processAdd(command.getArgument());
+			return SUCCESSFUL_ADD_MSG + Controller.processAdd(command.getArgument());
 		}
 		if (command.getAction().equals(UNDO_COMMAND)) {
 			return Controller.processUndo();			
