@@ -20,14 +20,29 @@ public class TaskList {
 	/**
 	 * Add t to the TaskList
 	 * @param t Task to be added
+	 * @return Task that was added
 	 */
-	public void addToList(Task t) {
+	public Task addToList(Task t) {
 		list.add(t);
+		return t;
 	}
 	
-	
-	public void deleteListItem(int i){
+	/**
+	 * Delete Task i from the TaskList
+	 * @param i index of task to be deleted
+	 * @return Task deleted
+	 */
+	public Task deleteListItem(int i){
+		Task taskDeleted = list.get(i);
 		list.remove(i);
+		return taskDeleted;
+	}
+	
+	/**
+	 * Clears all the Tasks in the TaskList
+	 */
+	public void clearList() {
+		list = new ArrayList<Task>();
 	}
 	
 	/**
@@ -47,6 +62,20 @@ public class TaskList {
 			s += t.toString() + LINE_BREAK;
 		}
 		return s;
+	}
+	
+	/**
+	 * Modifies TaskList to be a deep copy of copyList
+	 * @param copyList TaskList to be copied
+	 * @return modified TaskList
+	 */
+	public ArrayList<Task> deepCopy(TaskList copyList) {
+		ArrayList<Task> cList = copyList.getList();
+		list = new ArrayList<Task>();
+		for (Task i : cList) {
+			list.add(i);
+		}
+		return list;
 	}
 	
 	public ArrayList<Task> getList() {
