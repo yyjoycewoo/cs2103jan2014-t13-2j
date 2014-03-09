@@ -16,7 +16,8 @@ public class Controller {
 	// " time "
 	private static final int noOfCharInSTime = 11, noOfCharInETime = 9,
 			noOfCharInLoc = 10, noOfCharInDesc = 6, noOfCharInDate = 6;
-	private static String fileLoc =  "D:\\test.txt";
+	//private static String fileLoc =  "D:\\test.txt";
+	private static String fileLoc =  "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
 	//"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
