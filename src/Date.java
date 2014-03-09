@@ -1,3 +1,8 @@
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Class to store the day, month and year of a date
  * 
@@ -11,6 +16,10 @@ public class Date {
 	private static final char DATE_SEPARATOR = '/';
 	private static final char DATE_PADDING = '0';
 
+	private static final Set<Integer> MONTHS_WITH_31_DAYS = new HashSet<Integer>(Arrays.asList(1, 3, 5, 7, 8, 10, 12));
+	private static final Set<Integer> MONTHS_WITH_30_DAYS = new HashSet<Integer>(Arrays.asList(4, 6, 9, 11));
+	private static final int FEBRUARY = 2;
+	
 	private int year = CURR_YEAR;
 	private int month;
 	private int day;
@@ -23,8 +32,25 @@ public class Date {
 	 *            The day
 	 * @param month
 	 *            The month
+	 * @throws InvalidInputException 
 	 */
-	public Date(int day, int month) {
+	public Date(int day, int month) throws InvalidInputException {
+		if (month < 1 || month > 12)
+			throw new InvalidInputException("invalid month");
+		
+		if (MONTHS_WITH_31_DAYS.contains(month))
+			if (day < 1 || day > 31)
+				throw new InvalidInputException("invalid days for the specified month");
+		
+		if (MONTHS_WITH_30_DAYS.contains(month))
+			if (day < 1 || day > 30)
+				throw new InvalidInputException("invalid days for the specified month");
+		
+		if (month == FEBRUARY)
+			if (day < 1 || day > 28)
+				//TODO: deal with leap years
+				throw new InvalidInputException("invalid days for the specified month");
+				
 		this.setMonth(month);
 		this.setDay(day);
 	}
@@ -38,9 +64,12 @@ public class Date {
 	 *            The month
 	 * @param year
 	 *            The year
+	 * @throws InvalidInputException 
 	 */
-	public Date(int day, int month, int year) {
+	public Date(int day, int month, int year) throws InvalidInputException {
 		this(day, month);
+		if (year < CURR_YEAR)
+			throw new InvalidInputException("date cannot be in the past");
 		this.setYear(year);
 	}
 

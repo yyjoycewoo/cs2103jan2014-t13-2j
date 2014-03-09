@@ -18,8 +18,9 @@ public class Time {
 	/**
 	 * Create a new Time object with the specified hour and 0 minutes
 	 * @param hour The hour
+	 * @throws InvalidInputException 
 	 */
-	public Time(int hour) {
+	public Time(int hour) throws InvalidInputException {
 		this(hour, 0);
 	}
 	
@@ -27,8 +28,13 @@ public class Time {
 	 * Create a new Time object with the specified hour and min
 	 * @param hour The hour
 	 * @param min The minutes
+	 * @throws InvalidInputException 
 	 */
-	public Time(int hour, int min) {
+	public Time(int hour, int min) throws InvalidInputException {
+		if (hour < 0 || hour > 23)
+			throw new InvalidInputException("invalid hour specified: " + hour);
+		if (min < 0 || min > 59)
+			throw new InvalidInputException("invalid minutes specified: " + min);
 		this.setHour(hour);
 		this.setMin(min);
 	}

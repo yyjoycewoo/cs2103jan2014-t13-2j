@@ -16,10 +16,14 @@ public class Todomato {
 		
 		//type "exit" to exit the program
 		while (true) {
-			System.out.print(PROMPT_USER_INPUT);
-			String command = scan.nextLine();
-			String status = CmdHandler.processCommand(command);
-			System.out.println(status);	
+			try {
+				System.out.print(PROMPT_USER_INPUT);
+				String command = scan.nextLine();
+				String status = CmdHandler.processCommand(command);
+				System.out.println(status);
+			} catch (InvalidInputException e) {
+				System.err.println("Invalid input: " + e.getMessage());
+			}	
 		}
 	}
 }

@@ -30,10 +30,12 @@ public class Controller {
 	 * @author Daryl
 	 * @param input
 	 * @return Task
+	 * @throws InvalidInputException 
+	 * @throws NumberFormatException 
 	 * @throws IOException
 	 */
 
-	public static Task processAdd(String input) {
+	public static Task processAdd(String input) throws NumberFormatException, InvalidInputException {
 		boolean taskDesExtracted = false;
 		int keywordIndex = -1;
 		Task userTask = null;
@@ -127,7 +129,7 @@ public class Controller {
 		return month + "/" + day;
 	}
 
-	public static Date retrieveDateInTimeString(String input) {
+	public static Date retrieveDateInTimeString(String input) throws NumberFormatException, InvalidInputException {
 		String[] parts = input.split(" ");
 		String dateDelimiter = "/";
 		String[] months = new String[]{"Jan", "Feb", "Mar", "Jun", "Jul",
@@ -220,8 +222,9 @@ public class Controller {
 	 *            : <index of the task> time <startTime e.g. 1300> or <index of
 	 *            the task> desc <description e.g. cut dog's hair>
 	 * @return Updated Task
+	 * @throws InvalidInputException 
 	 */
-	public static Task processUpdate(String argument) {
+	public static Task processUpdate(String argument) throws InvalidInputException {
 		int[] whichToEdit = { -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		whichToEdit = findDetailToEdit(argument);
@@ -255,9 +258,10 @@ public class Controller {
 	 * @param argument
 	 *            that contains new time 1300
 	 * @return updated task
+	 * @throws InvalidInputException 
 	 */
 	private static Task updateStartTime(int index, int editStartTime,
-			String argument) {
+			String argument) throws InvalidInputException {
 		int time = Integer.parseInt(argument.substring(editStartTime
 				+ noOfCharInSTime, editStartTime + noOfCharInSTime + 4));
 		int hr = time / 100;
@@ -267,7 +271,7 @@ public class Controller {
 	}
 
 	private static Task updateEndTime(int index, int editEndTime,
-			String argument) {
+			String argument) throws InvalidInputException {
 		int time = Integer.parseInt(argument.substring(editEndTime
 				+ noOfCharInETime, editEndTime + noOfCharInETime + 4));
 		int hr = time / 100;
@@ -276,7 +280,7 @@ public class Controller {
 		return list.getListItem(index);
 	}
 
-	private static Task updateDate(int index, int editDate, String argument) {
+	private static Task updateDate(int index, int editDate, String argument) throws InvalidInputException {
 		String date = argument.substring(editDate + noOfCharInDate, editDate
 				+ noOfCharInDate + 5);
 		String[] tokens = date.split("/");
@@ -365,9 +369,11 @@ public class Controller {
 	 * 
 	 * @param input
 	 * @return userDate
+	 * @throws InvalidInputException 
+	 * @throws NumberFormatException 
 	 */
 
-	public static Date getDate(String input) {
+	public static Date getDate(String input) throws NumberFormatException, InvalidInputException {
 		String delims = "/";
 		String[] dateTokens = input.split(delims);
 		if (dateTokens.length == 2) {
@@ -420,9 +426,10 @@ public class Controller {
 	 * 
 	 * @param input
 	 * @return userTime
+	 * @throws InvalidInputException 
 	 */
 
-	public static Time getTime(String input) {
+	public static Time getTime(String input) throws InvalidInputException {
 		if (input == null) {
 			return null;
 		}
