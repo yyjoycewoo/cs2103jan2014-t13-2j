@@ -1,3 +1,4 @@
+package todomato;
 /**
  * Class to store the different components of a user's command: the action, and the argument
  * @author Joyce
