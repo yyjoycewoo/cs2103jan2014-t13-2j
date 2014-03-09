@@ -85,4 +85,8 @@ public class TaskList {
 	public void setList(ArrayList<Task> list) {
 		this.list = list;
 	}
+	
+	public int getSize() {
+		return list.size();
+	}
 }
