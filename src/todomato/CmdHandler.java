@@ -5,6 +5,7 @@ public class CmdHandler {
 	private static final String DELETE_COMMAND = "delete";
 	private static final String UPDATE_COMMAND = "update";
 	private static final String DISPLAY_COMMAND = "display";
+	private static final String UNDO_COMMAND = "undo";
 	private static final String EXIT_COMMAND = "exit";
 	private static final String INVALID_COMMAND_MSG = "Invalid command entered, please try again.";
 	
@@ -12,7 +13,6 @@ public class CmdHandler {
 	
 	public static String processCommand(String userInput) throws InvalidInputException {	
 		command = new Command(userInput.split(" ", 2));
-		//try {
 			if (command.getAction().equals(EXIT_COMMAND)) {
 				System.exit(0);
 			}			
@@ -28,11 +28,9 @@ public class CmdHandler {
 			if (command.getAction().equals(ADD_COMMAND)) {
 				return Controller.processAdd(command.getArgument()).toString();			
 			}
+			if (command.getAction().equals(UNDO_COMMAND)) {
+				return Controller.processUndo(command.getArgument()).toString();			
+			}
 			return INVALID_COMMAND_MSG;
-/*		} catch (InvalidInputException e) {
-			System.err.println("Invalid input: " + e.getMessage());
-		}
-		return "";	
-*/
 	}
 }
