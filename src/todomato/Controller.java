@@ -1,5 +1,6 @@
 package todomato;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -9,6 +10,7 @@ import java.util.regex.Pattern;
  */
 public class Controller {
 
+	private static final String SUCCESSFUL_UNDO_MSG = "Undid last change";
 	// " at "
 	private static final int NO_OF_CHAR_IN_AT = 4;
 	private static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
@@ -22,6 +24,7 @@ public class Controller {
 	//"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
+	private static TaskList oldList = new TaskList();
 	private static String[] keywords = new String[] { " at ", " from ", " until ", " to ", " in ",
 			" due "};
 	private static String[] updateKeywords = new String[] { " starttime ",
@@ -37,6 +40,8 @@ public class Controller {
 	 */
 
 	public static Task processAdd(String input) throws NumberFormatException, InvalidInputException {
+		storeCurrentList();
+		
 		boolean taskDesExtracted = false;
 		int keywordIndex = -1;
 		Task userTask = null;
@@ -116,6 +121,11 @@ public class Controller {
 		list.addToList(userTask);
 		list = fileHandler.updateFile(list);
 		return userTask;
+	}
+
+	private static void storeCurrentList() {
+		//store the current list before modifications for possible undo
+		oldList.deepCopy(list);
 	}
 	
 	/**
@@ -202,6 +212,8 @@ public class Controller {
 	 * @return task at index
 	 */
 	public static Task processDelete(String argument) {
+		storeCurrentList();
+		
 		int index = Integer.parseInt(argument) - 1;
 		Task deletedTask = list.getListItem(index);
 		list.deleteListItem(index);
@@ -226,6 +238,8 @@ public class Controller {
 	 * @throws InvalidInputException 
 	 */
 	public static Task processUpdate(String argument) throws InvalidInputException {
+		storeCurrentList();
+		
 		int[] whichToEdit = { -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		whichToEdit = findDetailToEdit(argument);
@@ -477,9 +491,15 @@ public class Controller {
 		return -1;
 	}
 
-	public static Object processUndo(String argument) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Undo last action
+	 * @author Joyce
+	 * @return status message
+	 */
+	public static String processUndo() {
+		list = oldList;
+		fileHandler.updateFile(list);
+		return SUCCESSFUL_UNDO_MSG;
 	}
-	
+		
 }

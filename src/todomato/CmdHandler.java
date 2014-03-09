@@ -13,24 +13,24 @@ public class CmdHandler {
 	
 	public static String processCommand(String userInput) throws InvalidInputException {	
 		command = new Command(userInput.split(" ", 2));
-			if (command.getAction().equals(EXIT_COMMAND)) {
-				System.exit(0);
-			}			
-			if (command.getAction().equals(DISPLAY_COMMAND)) {
-				return Controller.processDisplay().toString();				
-			}
-			if (command.getAction().equals(UPDATE_COMMAND)) {
-					return Controller.processUpdate(command.getArgument()).toString();
-			}
-			if (command.getAction().equals(DELETE_COMMAND)) {
-				return Controller.processDelete(command.getArgument()).toString();					
-			}
-			if (command.getAction().equals(ADD_COMMAND)) {
-				return Controller.processAdd(command.getArgument()).toString();			
-			}
-			if (command.getAction().equals(UNDO_COMMAND)) {
-				return Controller.processUndo(command.getArgument()).toString();			
-			}
-			return INVALID_COMMAND_MSG;
+		if (command.getAction().equals(EXIT_COMMAND)) {
+			System.exit(0);
+		}			
+		if (command.getAction().equals(DISPLAY_COMMAND)) {
+			return Controller.processDisplay().toString();				
+		}
+		if (command.getAction().equals(UPDATE_COMMAND)) {
+				return Controller.processUpdate(command.getArgument()).toString();
+		}
+		if (command.getAction().equals(DELETE_COMMAND)) {
+			return Controller.processDelete(command.getArgument()).toString();					
+		}
+		if (command.getAction().equals(ADD_COMMAND)) {
+			return Controller.processAdd(command.getArgument()).toString();
+		}
+		if (command.getAction().equals(UNDO_COMMAND)) {
+			return Controller.processUndo().toString();			
+		}
+		return INVALID_COMMAND_MSG;
 	}
 }
