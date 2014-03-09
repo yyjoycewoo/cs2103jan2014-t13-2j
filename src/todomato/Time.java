@@ -9,10 +9,13 @@ package todomato;
  *
  */
 public class Time {
+	private static final String INVALID_MINUTES_SPECIFIED = "invalid minutes specified: ";
+	private static final String INVALID_HOUR_SPECIFIED = "invalid hour specified: ";
+	
 	private static final char TIME_PADDING = '0';
 	private static final char TIME_SEPARATOR = ':';
 	private static final int MAX_ONE_DIGIT_INT = 9;
-	
+
 	private int hour;
 	private int min;
 	
@@ -33,9 +36,9 @@ public class Time {
 	 */
 	public Time(int hour, int min) throws InvalidInputException {
 		if (hour < 0 || hour > 23)
-			throw new InvalidInputException("invalid hour specified: " + hour);
+			throw new InvalidInputException(INVALID_HOUR_SPECIFIED + hour);
 		if (min < 0 || min > 59)
-			throw new InvalidInputException("invalid minutes specified: " + min);
+			throw new InvalidInputException(INVALID_MINUTES_SPECIFIED + min);
 		this.setHour(hour);
 		this.setMin(min);
 	}

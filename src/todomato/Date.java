@@ -11,6 +11,10 @@ import java.util.Set;
  * 
  */
 public class Date {
+	private static final String INVALID_YEAR_SPECIFIED = "year cannot be in the past: ";
+	private static final String INVALID_DAY_SPECIFIED = "invalid day for the specified month: ";
+	private static final String INVALID_MONTH_SPECIFIED = "invalid month specified: ";
+	
 	private static final int CURR_YEAR = 2014;
 	private static final int MAX_ONE_DIGIT_INT = 9;
 
@@ -37,20 +41,20 @@ public class Date {
 	 */
 	public Date(int day, int month) throws InvalidInputException {
 		if (month < 1 || month > 12)
-			throw new InvalidInputException("invalid month");
+			throw new InvalidInputException(INVALID_MONTH_SPECIFIED + month);
 		
 		if (MONTHS_WITH_31_DAYS.contains(month))
 			if (day < 1 || day > 31)
-				throw new InvalidInputException("invalid days for the specified month");
+				throw new InvalidInputException(INVALID_DAY_SPECIFIED + day);
 		
 		if (MONTHS_WITH_30_DAYS.contains(month))
 			if (day < 1 || day > 30)
-				throw new InvalidInputException("invalid days for the specified month");
+				throw new InvalidInputException(INVALID_DAY_SPECIFIED + day);
 		
 		if (month == FEBRUARY)
 			if (day < 1 || day > 28)
 				//TODO: deal with leap years
-				throw new InvalidInputException("invalid days for the specified month");
+				throw new InvalidInputException(INVALID_DAY_SPECIFIED + day);
 				
 		this.setMonth(month);
 		this.setDay(day);
@@ -70,7 +74,7 @@ public class Date {
 	public Date(int day, int month, int year) throws InvalidInputException {
 		this(day, month);
 		if (year < CURR_YEAR)
-			throw new InvalidInputException("date cannot be in the past");
+			throw new InvalidInputException(INVALID_YEAR_SPECIFIED + year);
 		this.setYear(year);
 	}
 
