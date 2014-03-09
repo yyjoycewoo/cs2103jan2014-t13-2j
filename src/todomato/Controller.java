@@ -17,8 +17,11 @@ public class Controller {
 	private static final int SPACE_NOT_FOUND = -1;
 	private static final int POS_OF_MINUTE = 2;
 	// " time "
-	private static final int noOfCharInSTime = 11, noOfCharInETime = 9,
-			noOfCharInLoc = 10, noOfCharInDesc = 6, noOfCharInDate = 6;
+	private static final int NO_OF_CHAR_IN_STIME = 11;
+	private static final int NO_OF_CHAR_IN_ETIME = 9;
+	private static final int NO_OF_CHAR_IN_LOC = 10;
+	private static final int NO_OF_CHAR_IN_DESC = 6;
+	private static final int NO_OF_CHAR_IN_DATE = 6;
 	//private static String fileLoc =  "D:\\test.txt";
 	private static String fileLoc =  "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
 	//"C:\\Users\\Hao Eng\\Desktop\\test.txt";
@@ -278,7 +281,7 @@ public class Controller {
 	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
 		int time = Integer.parseInt(argument.substring(editStartTime
-				+ noOfCharInSTime, editStartTime + noOfCharInSTime + 4));
+				+ NO_OF_CHAR_IN_STIME, editStartTime + NO_OF_CHAR_IN_STIME + 4));
 		int hr = time / 100;
 		int min = time % 100;
 		list.getListItem(index).setStartTime(new Time(hr, min));
@@ -288,7 +291,7 @@ public class Controller {
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
 		int time = Integer.parseInt(argument.substring(editEndTime
-				+ noOfCharInETime, editEndTime + noOfCharInETime + 4));
+				+ NO_OF_CHAR_IN_ETIME, editEndTime + NO_OF_CHAR_IN_ETIME + 4));
 		int hr = time / 100;
 		int min = time % 100;
 		list.getListItem(index).setEndTime(new Time(hr, min));
@@ -296,8 +299,8 @@ public class Controller {
 	}
 
 	private static Task updateDate(int index, int editDate, String argument) throws InvalidInputException {
-		String date = argument.substring(editDate + noOfCharInDate, editDate
-				+ noOfCharInDate + 5);
+		String date = argument.substring(editDate + NO_OF_CHAR_IN_DATE, editDate
+				+ NO_OF_CHAR_IN_DATE + 5);
 		String[] tokens = date.split("/");
 		int day = Integer.parseInt(tokens[0]);
 		int mth = Integer.parseInt(tokens[1]);
@@ -318,7 +321,7 @@ public class Controller {
 			}
 		}
 		list.getListItem(index).setLocation(
-				argument.substring(editLoc + noOfCharInLoc, stopIndex));
+				argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
 		return list.getListItem(index);
 	}
 
@@ -340,7 +343,7 @@ public class Controller {
 			}
 		}
 		list.getListItem(index).setDescription(
-				argument.substring(editDesc + noOfCharInDesc, stopIndex));
+				argument.substring(editDesc + NO_OF_CHAR_IN_DESC, stopIndex));
 		return list.getListItem(index);
 	}
 
