@@ -20,7 +20,7 @@ public class Todomato {
 			try {
 				System.out.print(PROMPT_USER_INPUT);
 				String command = scan.nextLine();
-				String status = CmdHandler.processCommand(command);
+				String status = CmdHandler.processCommand(command).toString();
 				System.out.println(status);
 			} catch (InvalidInputException e) {
 				System.err.println("Invalid input: " + e.getMessage());
