@@ -476,5 +476,10 @@ public class Controller {
 		}
 		return -1;
 	}
+
+	public static Object processUndo(String argument) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
