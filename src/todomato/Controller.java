@@ -1,4 +1,5 @@
 package todomato;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -24,8 +25,9 @@ public class Controller {
 	private static final int NO_OF_CHAR_IN_LOC = 10;
 	private static final int NO_OF_CHAR_IN_DESC = 6;
 	private static final int NO_OF_CHAR_IN_DATE = 6;
-	//private static String fileLoc =  "D:\\test.txt";
-	private static String fileLoc =  "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	private static final String ARGUMENT_CLEAR_ALL = "all";
+	private static String fileLoc =  "D:\\test.txt";
+	//private static String fileLoc =  "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
 	//"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
@@ -216,16 +218,65 @@ public class Controller {
 	/**
 	 * @author linxuan
 	 * @param argument
-	 * @return task at index
+	 * @return TaskList containing deleted tasks
 	 */
-	public static Task processDelete(String argument) {
-		storeCurrentList();
-		
-		int index = Integer.parseInt(argument) - 1;
-		Task deletedTask = list.getListItem(index);
-		list.deleteListItem(index);
+	public static TaskList processDelete(String argument) {
+		String[] indices = argument.split(",");
+		if(indices.length > 1) {
+			return deleteMultiple(indices);
+		} else {
+			if(indices[0].equals(ARGUMENT_CLEAR_ALL)) {
+				return deleteAll();
+			} else {
+				return deleteSingleTask(indices[0]);
+			} 
+		}
+	}
+	
+	private static TaskList deleteAll() {
+		TaskList deletedTasks = new TaskList();
+		while(list.getSize() != 0) {
+			deletedTasks.addToList(list.getListItem(0));
+			list.deleteListItem(0);
+		}
 		fileHandler.updateFile(list);
-		return deletedTask;
+		return deletedTasks;
+	}
+	
+	private static TaskList deleteSingleTask(String indexString) {
+		try {
+			TaskList deletedTasks = new TaskList();
+			int index = Integer.parseInt(indexString) - 1;
+			deletedTasks.addToList(list.getListItem(index));
+			list.deleteListItem(index);
+			fileHandler.updateFile(list);
+			return deletedTasks;
+		} catch(NumberFormatException e) {
+			// TODO
+			return null;
+		} catch(IndexOutOfBoundsException e) {
+			// TODO
+			return null;
+		}
+	}
+	
+	private static TaskList deleteMultiple(String[] indices) {
+		try {
+			TaskList deletedTasks = new TaskList();
+			for (int i = 0; i < indices.length; i++) {
+				int index = Integer.parseInt(indices[i]) - i - 1;
+				deletedTasks.addToList(list.getListItem(index));
+				list.deleteListItem(index);
+			}
+			fileHandler.updateFile(list);
+			return deletedTasks;
+		} catch (NumberFormatException e) {
+			// TODO
+			return null;
+		} catch (IndexOutOfBoundsException e) {
+			// TODO
+			return null;
+		}
 	}
 
 	/**
