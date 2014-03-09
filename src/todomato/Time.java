@@ -1,3 +1,4 @@
+package todomato;
 /**
  * Class that stores the hour and minutes of a time
  * @author Joyce

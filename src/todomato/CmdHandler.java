@@ -1,3 +1,4 @@
+package todomato;
 public class CmdHandler {
 
 	private static final String ADD_COMMAND = "add";
