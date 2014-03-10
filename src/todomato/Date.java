@@ -66,12 +66,15 @@ public class Date {
 	 * 
 	 * @param dateString
 	 *            a standard string representing date 01/01/2001
+	 * @throws InvalidInputException 
 	 */
-	public Date(String dateString) {
+	public Date(String dateString) throws InvalidInputException {
 		String[] dateArray = dateString.split("/");
 		int day = Integer.parseInt(dateArray[0]);
 		int month = Integer.parseInt(dateArray[1]);
 		int year = Integer.parseInt(dateArray[2]);
+		
+		checkIfValidDate(day, month, year);
 		
 		this.setDay(day);
 		this.setMonth(month);
