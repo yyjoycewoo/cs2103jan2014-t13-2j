@@ -146,11 +146,12 @@ public class Task {
 	 */
 	public static Task createTaskFromString(String taskString) {
 		Task task;
-		String description = null;
+		String description = taskString;
 		Time startTime = null;
 		Time endTime = null;
 		Date date = null;
 		String location = null;
+		
 		
 		if (taskString.contains(START_TIME_PREP)) {
 			int startTimeBegins = taskString.lastIndexOf(START_TIME_PREP) + START_TIME_PREP.length();
@@ -191,6 +192,7 @@ public class Task {
 				description = taskString.substring(0, taskString.indexOf(LOCATION_PREP));
 			}
 		}
+		
 		
 		if (description == null && startTime == null && endTime == null && date == null && location == null) {
 			task = null;
