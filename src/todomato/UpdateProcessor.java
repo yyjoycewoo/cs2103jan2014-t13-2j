@@ -28,11 +28,24 @@ public class UpdateProcessor {
 	public static Task processUpdate(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
-
+		printInvalidKeywords(argument);
 		int[] whichToEdit = { -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
+		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
-		for (int i = 0; i < 5; i++) {
+		updater(argument, whichToEdit, index);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * @param argument
+	 * @param whichToEdit
+	 * @param index
+	 * @throws InvalidInputException
+	 */
+	private static void updater(String argument, int[] whichToEdit, int index)
+			throws InvalidInputException {
+		for (int i = 0; i < whichToEdit.length; i++) {
 			if (whichToEdit[i] != -1) {
 				switch (i) {
 				case 0:
@@ -53,7 +66,30 @@ public class UpdateProcessor {
 				}
 			}
 		}
-		return list.getListItem(index);
+	}
+
+	/**
+	 * @param index
+	 * @throws InvalidInputException
+	 */
+	private static void printInvalidIndexMsg(int index)
+			throws InvalidInputException {
+		if (index >= list.getSize()) {
+			throw new InvalidInputException("Index " + index
+					+ " is out of the list.");
+		}
+	}
+
+	/**
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void printInvalidKeywords(String argument)
+			throws InvalidInputException {
+		if (argument.length() <= 2) {
+			throw new InvalidInputException(
+					"Please include any keywords to update i.e. starttime, endtime, location, desc, date");
+		}
 	}
 
 	/**
@@ -161,5 +197,4 @@ public class UpdateProcessor {
 		int spaceAfterIndex = argument.indexOf(" ");
 		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
 	}
-
 }
