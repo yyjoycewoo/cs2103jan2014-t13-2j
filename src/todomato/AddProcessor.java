@@ -1,10 +1,9 @@
 package todomato;
 
 import java.io.IOException;
-import java.util.Stack;
 import java.util.regex.Pattern;
 
-public class AddProcessor {
+public class AddProcessor extends Processor {
 
 	private static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
 	private static final int SPACE_NOT_FOUND = -1;
@@ -27,7 +26,7 @@ public class AddProcessor {
 	 */
 
 	public static Task processAdd(String input) throws NumberFormatException, InvalidInputException {
-		//storeCurrentList();
+		storeCurrentList();
 		
 		boolean taskDesExtracted = false;
 		int keywordIndex = -1;

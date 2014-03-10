@@ -1,6 +1,6 @@
 package todomato;
 
-public class DeleteProcessor {
+public class DeleteProcessor extends Processor {
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 	
 	/**
