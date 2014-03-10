@@ -12,7 +12,6 @@ import todomato.InvalidInputException;
 import todomato.Task;
 import todomato.TaskList;
 import todomato.Time;
-import todomato.*;
 
 
 public class TaskTest {
