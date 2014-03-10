@@ -4,10 +4,6 @@ package todomato;
  * @author Joyce
  *
  */
-/**
- * @author Joyce
- *
- */
 public class Time {
 	private static final String INVALID_MINUTES_SPECIFIED = "invalid minutes specified: ";
 	private static final String INVALID_HOUR_SPECIFIED = "invalid hour specified: ";
@@ -35,23 +31,22 @@ public class Time {
 	 * @throws InvalidInputException 
 	 */
 	public Time(int hour, int min) throws InvalidInputException {
-		if (hour < 0 || hour > 23)
-			throw new InvalidInputException(INVALID_HOUR_SPECIFIED + hour);
-		if (min < 0 || min > 59)
-			throw new InvalidInputException(INVALID_MINUTES_SPECIFIED + min);
+		//throws exception if time is invalid
+		checkIfValidTime(hour, min);
+		
 		this.setHour(hour);
 		this.setMin(min);
-	}
-	
+	}	
 	
 	/**
 	 * Create a new Time object with a standard string
 	 * @param timeString a standard string representing time 00:00
 	 */
-	public Time(String timeString) {
+	public Time(String timeString)  {
 		String[] timeArray = timeString.split(":");
 		int hour = Integer.parseInt(timeArray[0]);
 		int min = Integer.parseInt(timeArray[1]);
+		
 		this.setHour(hour);
 		this.setMin(min);
 	}
@@ -73,6 +68,21 @@ public class Time {
 		}
 		time += String.valueOf(min);
 		return time;
+	}
+	
+	private boolean isValidHour(int hour) {
+		return (hour >= 0 && hour <= 23);
+	}
+	
+	private boolean isValidMin(int min) {
+		return (min >= 0 && min <= 59);
+	}
+	
+	private void checkIfValidTime(int hour, int min) throws InvalidInputException {
+		if (!isValidHour(hour))
+			throw new InvalidInputException(INVALID_HOUR_SPECIFIED + hour);
+		if (!isValidMin(min))
+			throw new InvalidInputException(INVALID_MINUTES_SPECIFIED + min);		
 	}
 	
 	private boolean isOneDigit(int x) {
