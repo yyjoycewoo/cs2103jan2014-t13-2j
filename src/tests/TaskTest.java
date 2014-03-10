@@ -32,7 +32,7 @@ public class TaskTest {
 	}
 	
 	@Test
-	public void test3() throws InvalidInputException {
+	public void test3() {
 		String taskString = "eat in utown";
 		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("eat", "utown").toString()));
 	}
@@ -56,7 +56,7 @@ public class TaskTest {
 	}
 	
 	@Test
-	public void test7() throws InvalidInputException {
+	public void test7() {
 		String taskString = "";
 		assertEquals(true, Task.createTaskFromString(taskString) == null);
 	}
@@ -70,7 +70,7 @@ public class TaskTest {
 	}
 	
 	@Test
-	public void test9() throws IOException, InvalidInputException {
+	public void test9() throws IOException {
 		String outputString = "eat in utown" + "\r\n" + "eat at 08:00 on 14/02/2014" + "\r\n" + "facebooking at 12:00 on 14/02/2014" + "\r\n";
 		TaskList list = f.readFile();
 		String taskString = "facebooking at 12:00 on 14/02/2014";
