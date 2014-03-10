@@ -1,6 +1,6 @@
 package todomato;
 
-public class DisplayProcessor {
+public class DisplayProcessor extends Processor {
 	/**
 	 * @author linxuan
 	 * @return TaskList
