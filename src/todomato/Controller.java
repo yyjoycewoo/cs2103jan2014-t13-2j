@@ -143,11 +143,11 @@ public class Controller {
 	 * @throws IOException
 	 */
 
-	public static String convertDateToStandardForm (String month, String day) {
+	private static String convertDateToStandardForm (String month, String day) {
 		return month + "/" + day;
 	}
 
-	public static Date retrieveDateInTimeString(String input) throws NumberFormatException, InvalidInputException {
+	private static Date retrieveDateInTimeString(String input) throws NumberFormatException, InvalidInputException {
 		String[] parts = input.split(" ");
 		String dateDelimiter = "/";
 		String[] months = new String[]{"Jan", "Feb", "Mar", "Jun", "Jul",
@@ -175,13 +175,13 @@ public class Controller {
 		return null;
 	}
 	
-	public static String getWordsBeforeNextKeyword(String input, String keyword) {
+	private static String getWordsBeforeNextKeyword(String input, String keyword) {
 		String wordsBeforeNextKeyword;
 		wordsBeforeNextKeyword = input.substring(0, input.indexOf(keyword));
 		return wordsBeforeNextKeyword;
 	}
 
-	public static Boolean checkForKeywords(String input) {
+	private static Boolean checkForKeywords(String input) {
 		for (String keyword : keywords) {
 			if (input.contains(keyword)) {
 				return true;
@@ -190,7 +190,7 @@ public class Controller {
 		return false;
 	}
 
-	public static int getFirstKeyword(String input) {
+	private static int getFirstKeyword(String input) {
 		int firstKeywordPos = input.length();
 		int firstKeyword = -1;
 
@@ -205,7 +205,7 @@ public class Controller {
 		return firstKeyword;
 	}
 
-	public static String[] splitByKeyword(String input, String keyword) {
+	private static String[] splitByKeyword(String input, String keyword) {
 		String[] splitWords = null;
 		Pattern pattern = Pattern.compile(Pattern.quote(keyword));
 		splitWords = pattern.split(input);
@@ -426,15 +426,6 @@ public class Controller {
 		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
 	}
 
-	public static int checkForAtPosition(String input) {
-		String checkForAt = " at ";
-		if (input.indexOf(checkForAt) == -1) {
-			return 0;
-		} else {
-			return input.indexOf(checkForAt);
-		}
-	}
-
 	/**
 	 * Retrieves date from user input of the form "19/10"
 	 * 
@@ -444,7 +435,7 @@ public class Controller {
 	 * @throws NumberFormatException 
 	 */
 
-	public static Date getDate(String input) throws NumberFormatException, InvalidInputException {
+	private static Date getDate(String input) throws NumberFormatException, InvalidInputException {
 		String delims = "/";
 		String[] dateTokens = input.split(delims);
 		if (dateTokens.length == 2) {
@@ -500,7 +491,7 @@ public class Controller {
 	 * @throws InvalidInputException 
 	 */
 
-	public static Time getTime(String input) throws InvalidInputException {
+	private static Time getTime(String input) throws InvalidInputException {
 		if (input == null) {
 			return null;
 		}
@@ -537,7 +528,7 @@ public class Controller {
 		return userTime;
 	}
 	
-	public static int checkMeridiem(String input) {
+	private static int checkMeridiem(String input) {
 		String meridiems[] = new String[] {"am", "pm"};
 		for (int i = 0; i < meridiems.length; i++) {
 			if (input.contains(meridiems[i])) {
