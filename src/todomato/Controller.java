@@ -219,6 +219,8 @@ public class Controller {
 	 * @return TaskList containing deleted tasks
 	 */
 	public static TaskList processDelete(String argument) {
+		storeCurrentList();
+		
 		String[] indices = argument.split(",");
 		if(indices.length > 1) {
 			return deleteMultiple(indices);
