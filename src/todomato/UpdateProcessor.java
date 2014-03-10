@@ -7,7 +7,7 @@ package todomato;
  * @author Hao Eng
  * 
  */
-public class UpdateProcessor {
+public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_STIME = 11;
 	private static final int NO_OF_CHAR_IN_ETIME = 9;
 	private static final int NO_OF_CHAR_IN_LOC = 10;

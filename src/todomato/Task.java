@@ -1,4 +1,5 @@
 package todomato;
+
 /**
  * Class that stores a Task description, and optional additional information.
  * @author Joyce
@@ -135,6 +136,18 @@ public class Task {
 	public Task(String description, Time startTime, Time endTime, Date date, String location) {
 		this(description, startTime, endTime, date);
 		this.setLocation(location);
+	}
+	
+	/**
+	 * Create a new Task object that is a deep copy of the Task t
+	 * @param t Task to be copied
+	 */
+	public Task(Task t) {
+		this.setDate(t.getDate());
+		this.setDescription(t.getDescription());
+		this.setStartTime(t.getStartTime());
+		this.setEndTime(t.getEndTime());
+		this.setLocation(t.getLocation());
 	}
 
 	/**

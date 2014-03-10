@@ -41,11 +41,14 @@ public class Time {
 	/**
 	 * Create a new Time object with a standard string
 	 * @param timeString a standard string representing time 00:00
+	 * @throws InvalidInputException 
 	 */
-	public Time(String timeString)  {
+	public Time(String timeString) throws InvalidInputException  {
 		String[] timeArray = timeString.split(":");
 		int hour = Integer.parseInt(timeArray[0]);
 		int min = Integer.parseInt(timeArray[1]);
+		
+		checkIfValidTime(hour, min);
 		
 		this.setHour(hour);
 		this.setMin(min);
