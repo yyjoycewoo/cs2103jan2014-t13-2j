@@ -22,6 +22,9 @@ public class Todomato {
 				System.out.print(PROMPT_USER_INPUT);
 				String command = scan.nextLine();
 				String status = CmdHandler.processCommand(command);
+				
+				// Uncomment the next line to run version using different Processor classes
+				//String status = SplitProcessorsHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {
 				System.out.println(INVALID_INPUT_MSG + e.getMessage());
