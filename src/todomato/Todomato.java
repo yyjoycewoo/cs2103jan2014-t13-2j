@@ -24,7 +24,7 @@ public class Todomato {
 				String status = CmdHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {
-				System.out.println(INVALID_INPUT_MSG + e.getMessage());
+				System.err.println(INVALID_INPUT_MSG + e.getMessage());
 			}	
 		}
 	}
