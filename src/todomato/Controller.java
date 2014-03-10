@@ -5,8 +5,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 /**
- * For the commands such as add, delete, update, display so on
- * 
+ * For the commands such as add, delete, update, display so on 
  * 
  */
 public class Controller {
