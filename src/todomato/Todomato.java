@@ -14,6 +14,14 @@ public class Todomato {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		/**
+		 * Uncomment the next 2 lines to open GUI 
+		 * Make sure the fileLoc in Processor is correct for it to work
+		 * miglayout (http://www.miglayout.com/) must also be added to the build path
+		 */
+		//TodomatoFrame f = new TodomatoFrame();
+		//f.display();
+		
 		System.out.println(WELCOME_MSG);
 		
 		//type "exit" to exit the program
