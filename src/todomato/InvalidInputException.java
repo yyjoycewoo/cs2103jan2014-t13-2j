@@ -4,6 +4,7 @@ package todomato;
  * @author Joyce
  *
  */
+@SuppressWarnings("serial")
 public class InvalidInputException extends Exception {
 
 	public InvalidInputException(String message) {
