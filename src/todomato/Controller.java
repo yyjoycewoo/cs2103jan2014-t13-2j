@@ -24,8 +24,8 @@ public class Controller {
 	private static final int NO_OF_CHAR_IN_DESC = 6;
 	private static final int NO_OF_CHAR_IN_DATE = 6;
 	private static final String ARGUMENT_CLEAR_ALL = "all";
-	//private static String fileLoc =  "D:\\test.txt";
-	private static String fileLoc =  "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	private static String fileLoc =  "D:\\test.txt";
+	//private static String fileLoc =  "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
 	//"C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
@@ -143,11 +143,11 @@ public class Controller {
 	 * @throws IOException
 	 */
 
-	private static String convertDateToStandardForm (String month, String day) {
+	public static String convertDateToStandardForm (String month, String day) {
 		return month + "/" + day;
 	}
 
-	private static Date retrieveDateInTimeString(String input) throws NumberFormatException, InvalidInputException {
+	public static Date retrieveDateInTimeString(String input) throws NumberFormatException, InvalidInputException {
 		String[] parts = input.split(" ");
 		String dateDelimiter = "/";
 		String[] months = new String[]{"Jan", "Feb", "Mar", "Jun", "Jul",
@@ -453,38 +453,8 @@ public class Controller {
 	}
 
 	/**
-	 * Retrieves the task description from user input
-	 * 
-	 * @param input
-	 *            the raw user input after the command word
-	 * @return string with the task description
-	 */
-
-	public static String getTaskDes(String input) {
-		String TaskDes = "";
-		int index = checkForAtPosition(input);
-		TaskDes = input.substring(0, index);
-		return TaskDes;
-	}
-
-	/**
-	 * Retrieves the time and date from user input
-	 * 
-	 * @param input
-	 *            the raw user input after command word
-	 * @return string with time and date
-	 */
-
-	public static String getTimeAndDate(String input) {
-		String checkForAt = " at ";
-		int index = input.indexOf(checkForAt);
-		input = input.substring(index + NO_OF_CHAR_IN_AT);
-		return input;
-	}
-
-	/**
-	 * Returns time from user string i.e. 19 hours 30 minutes from "1930"
-	 * Returns time from user string i.e. 19 hours 30 minutes from "1930"
+	 * Returns time from user string i.e.
+	 * 19 hours 30 minutes from "1930" or "730pm"
 	 * 
 	 * @param input
 	 * @return userTime

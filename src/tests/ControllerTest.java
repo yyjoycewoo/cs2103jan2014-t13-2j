@@ -40,50 +40,6 @@ public class ControllerTest {
 	}
 
 	@Test
-	public void testGetTaskDes() {
-		assertEquals("GetTaskDes", "dinner",
-				Controller.getTaskDes("dinner at 0900 14/10/12"));
-	}
-
-	@Test
-	public void testGetTimeAndDate() {
-		assertEquals("Get Time and Date", "1900 14/10/12",
-				Controller.getTimeAndDate("dinner at 1900 14/10/12"));
-	}
-
-	@Test
-	public void testCheckForAtPosition() {
-		assertEquals("Check for At", 4,
-				Controller.checkForAtPosition("1234 at "));
-	}
-
-	@Test
-	public void testCheckTime() throws InvalidInputException {
-		Time checkTime = Controller.getTime("1930");
-		assertEquals("", 19, checkTime.getHour());
-		assertEquals("", 30, checkTime.getMin());
-	}
-
-	@Test
-	public void testCheckTimeHour() throws InvalidInputException {
-		Time checkTime = Controller.getTime("19");
-		assertEquals("", 19, checkTime.getHour());
-		assertEquals("", 00, checkTime.getMin());
-	}
-
-	@Test
-	public void testCheckForEmptyAtPosition() {
-		assertEquals("Check Empty", 0, Controller.checkForAtPosition("1234"));
-	}
-
-	@Test
-	public void testgetDate() throws NumberFormatException, InvalidInputException {
-		Date checkDate = Controller.getDate("14/10");
-		assertEquals("", 14, checkDate.getDay());
-		assertEquals("", 10, checkDate.getMonth());
-	}
-
-	@Test
 	public void testProcessUpdateTime() throws InvalidInputException {
 		Task userTask = Controller.processUpdate("1 endtime 1330");
 		assertEquals("", userTask.getEndTime().getHour(), 13);
