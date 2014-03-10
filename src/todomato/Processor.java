@@ -15,5 +15,9 @@ public class Processor {
 		lastList.deepCopy(list);
 		oldLists.push(lastList);
 	}
+	
+	public static TaskList getList() {
+		return list;
+	}
 
 }
