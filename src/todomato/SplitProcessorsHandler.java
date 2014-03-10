@@ -34,7 +34,7 @@ public class SplitProcessorsHandler {
 			return DisplayProcessor.processDisplay().toString();		
 		}
 		if (command.getAction().equals(UPDATE_COMMAND)) {
-			return SUCCESSFUL_UPDATE_MSG  + Controller.processUpdate(command.getArgument()).toString();
+			return SUCCESSFUL_UPDATE_MSG  + UpdateProcessor.processUpdate(command.getArgument()).toString();
 		}
 		if (command.getAction().equals(DELETE_COMMAND)) {
 			return SUCCESSFUL_DELETE_MSG + DeleteProcessor.processDelete(command.getArgument());					
