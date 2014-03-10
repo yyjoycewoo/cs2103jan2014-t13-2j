@@ -70,10 +70,9 @@ public class TaskList {
 	 * @return modified TaskList
 	 */
 	public ArrayList<Task> deepCopy(TaskList copyList) {
-		ArrayList<Task> cList = copyList.getList();
 		list = new ArrayList<Task>();
-		for (Task i : cList) {
-			list.add(i);
+		for (Task i : copyList.getList()) {
+			list.add(new Task(i));
 		}
 		return list;
 	}

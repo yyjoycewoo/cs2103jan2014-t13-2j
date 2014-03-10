@@ -21,7 +21,12 @@ public class Todomato {
 			try {
 				System.out.print(PROMPT_USER_INPUT);
 				String command = scan.nextLine();
-				String status = CmdHandler.processCommand(command);
+				
+				/*
+				 * To use all the different Processors, comment out the next line, and uncomment the one after that 
+				 */				
+				String status = CmdHandler.processCommand(command);				
+				//String status = SplitProcessorsHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {
 				System.out.println(INVALID_INPUT_MSG + e.getMessage());
