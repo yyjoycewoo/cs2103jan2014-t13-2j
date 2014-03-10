@@ -143,8 +143,9 @@ public class Task {
 	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
 	 * @return Task object generated from taskString, null if taskString is empty
 	 * @author Yiwen
+	 * @throws InvalidInputException 
 	 */
-	public static Task createTaskFromString(String taskString) {
+	public static Task createTaskFromString(String taskString) throws InvalidInputException {
 		Task task;
 		String description = taskString;
 		Time startTime = null;

@@ -58,7 +58,7 @@ public class TaskList {
 	public String toString() {
 		String s = "";
 		
-		for (Task t : this.list){
+		for (Task t : list){
 			s += t.toString() + LINE_BREAK;
 		}
 		return s;
