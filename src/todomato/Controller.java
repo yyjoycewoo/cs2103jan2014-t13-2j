@@ -1,7 +1,6 @@
 package todomato;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -13,7 +12,6 @@ import java.util.regex.Pattern;
 public class Controller {
 
 	private static final String NO_CHANGES_TO_UNDO_MSG = "No changes to undo";
-	private static final String SUCCESSFUL_UNDO_MSG = "Undid last change";
 	// " at "
 	private static final int NO_OF_CHAR_IN_AT = 4;
 	private static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;

@@ -22,7 +22,6 @@ public class Date {
 
 	private static final Set<Integer> MONTHS_WITH_31_DAYS = new HashSet<Integer>(Arrays.asList(1, 3, 5, 7, 8, 10, 12));
 	private static final Set<Integer> MONTHS_WITH_30_DAYS = new HashSet<Integer>(Arrays.asList(4, 6, 9, 11));
-	private static final int FEBRUARY = 2;
 	
 	private int year;
 	private int month;
