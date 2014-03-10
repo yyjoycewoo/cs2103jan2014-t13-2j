@@ -320,6 +320,7 @@ public class Controller {
 				}
 			}
 		}
+		
 		return list.getListItem(index);
 	}
 

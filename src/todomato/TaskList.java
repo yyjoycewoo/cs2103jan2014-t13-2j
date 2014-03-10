@@ -73,7 +73,8 @@ public class TaskList {
 		ArrayList<Task> cList = copyList.getList();
 		list = new ArrayList<Task>();
 		for (Task i : cList) {
-			list.add(i);
+			Task t = new Task(i);
+			list.add(t);
 		}
 		return list;
 	}
