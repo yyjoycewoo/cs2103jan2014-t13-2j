@@ -23,7 +23,8 @@ public class Controller {
 	private static final int NO_OF_CHAR_IN_DATE = 6;
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 	//private static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
-	private static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	//private static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	private static String fileLoc = "D:\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 	private static Stack<TaskList> oldLists = new Stack<TaskList>();
@@ -57,66 +58,84 @@ public class Controller {
 		if (!checkForKeywords(input)) {
 			taskDes = input;
 			userTask = new Task(taskDes);
-		} else {
-			while (checkForKeywords(input)) {
-				keywordIndex = getFirstKeyword(input);
-				stringFragments = splitByKeyword(input, keywords[keywordIndex]);
-				if (!taskDesExtracted) {
-					taskDes = stringFragments[0];
-					userTask = new Task(taskDes);
-					taskDesExtracted = true;
+		} while (checkForKeywords(input)) {
+			keywordIndex = getFirstKeyword(input);
+			stringFragments = splitByKeyword(input, keywords[keywordIndex]);
+			if (!taskDesExtracted) {
+				taskDes = stringFragments[0];
+				userTask = new Task(taskDes);
+				taskDesExtracted = true;
+			}
+			input = stringFragments[1];
+			int spaceIndex = stringFragments[1].indexOf(" ");
+			if (spaceIndex == SPACE_NOT_FOUND) {
+				switch (keywordIndex) {
+				case 0:
+				case 1:
+					startTimeString = stringFragments[1];
+					if (!isTimePresent(startTimeString)) {
+						userDate = retrieveDateStringFromInput(startTimeString);
+					}
+					break;
+				case 2:
+				case 3:
+					endTimeString = stringFragments[1];
+					break;
+				case 4:
+					location = stringFragments[1];
+					break;
+				case 5:
+					endTimeString = stringFragments[1];
+					break;
 				}
-				input = stringFragments[1];
-				int spaceIndex = stringFragments[1].indexOf(" ");
-				if (spaceIndex == SPACE_NOT_FOUND) {
-					switch (keywordIndex) {
-					case 0:
-					case 1:
-						startTimeString = stringFragments[1];
-						break;
-					case 2:
-					case 3:
-						endTimeString = stringFragments[1];
-						break;
-					case 4:
-						location = stringFragments[1];
-						break;
-					case 5:
-						endTimeString = stringFragments[1];
-						break;
-					}
-				} else {
-					switch (keywordIndex) {
-					case 0:
-					case 1:
-						startTimeString = stringFragments[1].substring(0,
-								spaceIndex);
-						userDate = retrieveDateInTimeString(stringFragments[1]);
-						break;
-					case 2:
-					case 3:
-						endTimeString = stringFragments[1].substring(0,
-								spaceIndex);
-						userDate = retrieveDateInTimeString(stringFragments[1]);
-						break;
-					case 4:
+			} else {
+				switch (keywordIndex) {
+				case 0:
+				case 1:
+					if (isTimePresent(stringFragments[1])) {
 						if (getFirstKeyword(stringFragments[1]) == -1) {
-							location = stringFragments[1];
+							startTimeString = stringFragments[1].substring(0,
+									spaceIndex);
 						} else {
-							location = getWordsBeforeNextKeyword(
-									stringFragments[1],
-									keywords[getFirstKeyword(stringFragments[1])]);
+							startTimeString = stringFragments[1].substring(0,
+									spaceIndex);
+							userDate = retrieveDateStringFromInput(stringFragments[1].substring(spaceIndex+1));
 						}
-						break;
-					case 5:
+					} else {
+						userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(stringFragments[1], keywords[getFirstKeyword(stringFragments[1])]));
+					}
+					break;
+				case 2:
+				case 3:
+					if (isTimePresent(stringFragments[1])) {
+						if (getFirstKeyword(stringFragments[1]) == -1) {
 						endTimeString = stringFragments[1].substring(0,
 								spaceIndex);
-						break;
+						} else { 
+							endTimeString = stringFragments[1].substring(0,
+									spaceIndex);
+							userDate = retrieveDateStringFromInput(stringFragments[1].substring(spaceIndex));
+						}
+					} else {
+						userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(stringFragments[1], keywords[getFirstKeyword(stringFragments[1])]));
 					}
+					break;
+				case 4:
+					if (getFirstKeyword(stringFragments[1]) == -1) {
+						location = stringFragments[1];
+					} else {
+					location = getWordsBeforeNextKeyword(stringFragments[1], 
+							keywords[getFirstKeyword(stringFragments[1])]);
+					}
+					break;
+				case 5:
+					endTimeString = stringFragments[1].substring(0,
+							spaceIndex);
+					break;
 				}
 			}
-			Time endUserTime = getTime(endTimeString);
-			Time startUserTime = getTime(startTimeString);
+			Time endUserTime = parseTimeFromString(endTimeString);
+			Time startUserTime = parseTimeFromString(startTimeString);
 			userTask.setEndTime(endUserTime);
 			userTask.setStartTime(startUserTime);
 			userTask.setDate(userDate);
@@ -158,18 +177,18 @@ public class Controller {
 				if (parts[1].contains(months[i])) {
 					String standardFormDate = convertDateToStandardForm(
 							parts[2], String.valueOf(i + 1));
-					Date userDate = getDate(standardFormDate);
+					Date userDate = parseDateFromString(standardFormDate);
 					return userDate;
 				} else if (parts[2].contains(months[i])) {
 					String standardFormDate = convertDateToStandardForm(
 							parts[1], String.valueOf(i + 1));
-					Date userDate = getDate(standardFormDate);
+					Date userDate = parseDateFromString(standardFormDate);
 					return userDate;
 				}
 			}
 		}
 		if (parts[1].contains(dateDelimiter)) {
-			Date userDate = getDate(parts[1]);
+			Date userDate = parseDateFromString(parts[1]);
 			return userDate;
 		}
 		return null;
@@ -477,7 +496,7 @@ public class Controller {
 	 * @throws NumberFormatException
 	 */
 
-	private static Date getDate(String input) throws NumberFormatException,
+	public static Date parseDateFromString(String input) throws NumberFormatException,
 			InvalidInputException {
 		String delims = "/";
 		String[] dateTokens = input.split(delims);
@@ -495,6 +514,36 @@ public class Controller {
 		}
 
 	}
+	
+	public static Date retrieveDateStringFromInput(String input) {
+		try {
+			String[] parts = input.split(" ");
+			String dateDelimiter = "/";
+			String[] months = new String[]{"Jan", "Feb", "Mar", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+			for (int i = 0; i < months.length; i++) {
+				if (parts.length > 1) {
+					if (parts[0].contains(months[i])) {
+						String standardFormDate = convertDateToStandardForm(parts[1], String.valueOf(i+1));
+						Date userDate = parseDateFromString(standardFormDate);
+						return userDate;
+					}
+					else if (parts[1].contains(months[i])) {
+						String standardFormDate = convertDateToStandardForm(parts[0], String.valueOf(i+1));
+						Date userDate = parseDateFromString(standardFormDate);
+						return userDate;
+					}
+				}
+			}
+			if (parts[0].contains(dateDelimiter)) {
+				Date userDate = parseDateFromString(parts[0]);
+				return userDate;
+			}
+		}
+		catch (InvalidInputException e) {
+			return null;
+		}
+		return null;
+	}
 
 	/**
 	 * Returns time from user string i.e. 19 hours 30 minutes from "1930" or
@@ -505,7 +554,7 @@ public class Controller {
 	 * @throws InvalidInputException
 	 */
 
-	private static Time getTime(String input) throws InvalidInputException {
+	private static Time parseTimeFromString(String input) throws InvalidInputException {
 		if (input == null) {
 			return null;
 		}
@@ -541,6 +590,21 @@ public class Controller {
 		return userTime;
 	}
 
+	
+	private static Boolean isTimePresent(String input) {
+		try {
+			parseTimeFromString(input);
+		}
+		catch (NumberFormatException e1) {
+			return false;
+		}
+		catch (InvalidInputException e2) {
+			return false;
+		}
+		return true;
+	}
+	
+	
 	private static int checkMeridiem(String input) {
 		String meridiems[] = new String[] { "am", "pm" };
 		for (int i = 0; i < meridiems.length; i++) {
