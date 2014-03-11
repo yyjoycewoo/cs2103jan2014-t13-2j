@@ -32,8 +32,8 @@ public class TaskTest {
 	
 	@Test
 	public void test3() throws InvalidInputException {
-		String taskString = "eat in utown";
-		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("eat", "utown").toString()));
+		String taskString = "eat in utown plaza";
+		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("eat", "utown plaza").toString()));
 	}
 	
 	@Test

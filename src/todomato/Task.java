@@ -185,6 +185,7 @@ public class Task {
 			int endTimeIndex = taskStringList.indexOf(END_TIME_KEY) + 1;
 			int dateIndex = taskStringList.indexOf(DATE_KEY) + 1;
 			int locationIndex = taskStringList.indexOf(LOCATION_KEY) + 1;
+			int locationIndexEnd = taskStringList.size();
 			
 			description = taskStringList.get(descriptionIndex);
 			if ( startTimeIndex != 0 ) {
@@ -198,6 +199,9 @@ public class Task {
 			}
 			if ( locationIndex != 0 ) {
 				location = taskStringList.get(locationIndex);
+				for (int i = locationIndex + 1; i < locationIndexEnd; i++ ){
+					location = location + " " + taskStringList.get(i) ;
+				}
 			}
 			task = new Task(description, startTime, endTime, date, location);
 		}
