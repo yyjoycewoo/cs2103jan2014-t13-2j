@@ -1,5 +1,8 @@
 package todomato;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Class that stores a Task description, and optional additional information.
  * @author Joyce
@@ -10,8 +13,11 @@ public class Task {
 	private static final String END_TIME_PREP = " until ";
 	private static final String DATE_PREP = " on ";
 	private static final String LOCATION_PREP = " in ";
-	private static final int TIME_LENGTH = 5;
-	private static final int DATE_LENGTH = 10;
+	private static final String START_TIME_KEY = "at";
+	private static final String END_TIME_KEY = "until";
+	private static final String DATE_KEY = "on";
+	private static final String LOCATION_KEY = "in";
+
 	
 	private String description;
 	private Time startTime;
@@ -160,61 +166,44 @@ public class Task {
 	 */
 	public static Task createTaskFromString(String taskString) throws InvalidInputException {
 		Task task;
-		String description = taskString;
+		String description = null;
 		Time startTime = null;
 		Time endTime = null;
 		Date date = null;
 		String location = null;
 		
 		
-		if (taskString.contains(START_TIME_PREP)) {
-			int startTimeBegins = taskString.lastIndexOf(START_TIME_PREP) + START_TIME_PREP.length();
-			int startTimeEnds = startTimeBegins + TIME_LENGTH;
-			startTime = new Time(taskString.substring(startTimeBegins, startTimeEnds));
-			
-			if (taskString.indexOf(START_TIME_PREP) != 0 && description == null) {
-				description = taskString.substring(0, taskString.indexOf(START_TIME_PREP));
-			}
-		}
-		
-		if (taskString.contains(END_TIME_PREP)) {
-			int endTimeBegins = taskString.lastIndexOf(END_TIME_PREP) + END_TIME_PREP.length();
-			int endTimeEnds = endTimeBegins + TIME_LENGTH;
-			endTime = new Time(taskString.substring(endTimeBegins, endTimeEnds));
-			
-			if (taskString.indexOf(END_TIME_PREP) != 0 && description == null) {
-				description = taskString.substring(0, taskString.indexOf(END_TIME_PREP));
-			}
-		}
-		
-		if (taskString.contains(DATE_PREP)) {
-			int dateBegins = taskString.lastIndexOf(DATE_PREP) + DATE_PREP.length();
-			int dateEnds = dateBegins + DATE_LENGTH;
-			date = new Date(taskString.substring(dateBegins, dateEnds));
-
-			if (taskString.indexOf(DATE_PREP) != 0 && description == null) {
-				description = taskString.substring(0, taskString.indexOf(DATE_PREP));
-			}
-		}
-		
-		if (taskString.contains(LOCATION_PREP)) {
-			int locationBegins = taskString.lastIndexOf(LOCATION_PREP) + LOCATION_PREP.length();
-			int locationEnds = taskString.length();
-			location = taskString.substring(locationBegins, locationEnds);
-			
-			if (taskString.indexOf(LOCATION_PREP) != 0 && description == null) {
-				description = taskString.substring(0, taskString.indexOf(LOCATION_PREP));
-			}
-		}
-		
-		
-		if (description == null && startTime == null && endTime == null && date == null && location == null) {
+		if (taskString.isEmpty()) {
 			task = null;
+			
 		} else {
+			
+			List<String> taskStringList = Arrays.asList(taskString.split(" "));
+			
+			int descriptionIndex = 0;
+			int startTimeIndex = taskStringList.indexOf(START_TIME_KEY) + 1;
+			int endTimeIndex = taskStringList.indexOf(END_TIME_KEY) + 1;
+			int dateIndex = taskStringList.indexOf(DATE_KEY) + 1;
+			int locationIndex = taskStringList.indexOf(LOCATION_KEY) + 1;
+			
+			description = taskStringList.get(descriptionIndex);
+			if ( startTimeIndex != 0 ) {
+				startTime = new Time(taskStringList.get(startTimeIndex));
+			}
+			if ( endTimeIndex != 0 ) {
+				endTime = new Time(taskStringList.get(endTimeIndex));
+			}
+			if ( dateIndex != 0 ) {
+				date = new Date(taskStringList.get(dateIndex));
+			}
+			if ( locationIndex != 0 ) {
+				location = taskStringList.get(locationIndex);
+			}
 			task = new Task(description, startTime, endTime, date, location);
 		}
 		
 		return task;
+
 	}
 	
 	@Override
