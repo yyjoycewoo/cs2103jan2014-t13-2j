@@ -21,7 +21,7 @@ public class TaskTest {
 	@Test
 	public void test() throws InvalidInputException {
 		String taskString = "eat at 05:00 until 07:00 on 16/02/2014 in utown";
-		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("eat", new Time(5,00), new Time(7,00), new Date(16,02,2014), "utown" ).toString()));
+		assertEquals(Task.createTaskFromString(taskString).toString(), new Task("eat", new Time(5,00), new Time(7,00), new Date(16,02,2014), "utown" ).toString());
 	}
 	
 	@Test
@@ -48,16 +48,17 @@ public class TaskTest {
 		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("facebooking", new Time(12,00), new Date(14,02,2014)).toString()));
 	}
 	
+	
 	@Test
 	public void test6() throws InvalidInputException {
-		String taskString = "eat at 08:00 on 14/02/2014";
-		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("eat", new Time(8,00), new Date(14,02,2014)).toString()));
+		String taskString = "";
+		assertEquals(null, Task.createTaskFromString(taskString));
 	}
 	
 	@Test
 	public void test7() throws InvalidInputException {
-		String taskString = "";
-		assertEquals(true, Task.createTaskFromString(taskString) == null);
+		String taskString = "talk";
+		assertEquals(Task.createTaskFromString(taskString).toString(), new Task("talk").toString());
 	}
 	
 
@@ -70,9 +71,9 @@ public class TaskTest {
 	
 	@Test
 	public void test9() throws IOException, InvalidInputException {
-		String outputString = "eat in utown" + "\r\n" + "eat at 08:00 on 14/02/2014" + "\r\n" + "facebooking at 12:00 on 14/02/2014" + "\r\n";
+		String outputString = "eat in utown" + "\r\n" + "eat at 08:00 on 14/02/2014" + "\r\n" + "talk" + "\r\n";
 		TaskList list = f.readFile();
-		String taskString = "facebooking at 12:00 on 14/02/2014";
+		String taskString = "talk";
 		Task t = Task.createTaskFromString(taskString);
 		list.addToList(t);
 		TaskList updatedList = f.updateFile(list);
