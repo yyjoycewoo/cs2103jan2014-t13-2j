@@ -24,8 +24,8 @@ public class Controller {
 	private static final int NO_OF_CHAR_IN_DATE = 6;
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 	//private static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
-	//private static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	private static String fileLoc = "D:\\test.txt";
+	private static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	//private static String fileLoc = "D:\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 	private static Stack<TaskList> oldLists = new Stack<TaskList>();
@@ -659,6 +659,10 @@ public class Controller {
 		} else {
 			return NO_CHANGES_TO_UNDO_MSG;
 		}
+	}
+
+	public static TaskList getList() { 
+		return list;
 	}
 
 }

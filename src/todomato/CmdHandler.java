@@ -45,6 +45,6 @@ public class CmdHandler {
 		if (command.getAction().equals(UNDO_COMMAND)) {
 			return Controller.processUndo();			
 		}
-		return INVALID_COMMAND_MSG;
+		throw new InvalidInputException(INVALID_COMMAND_MSG);
 	}
 }

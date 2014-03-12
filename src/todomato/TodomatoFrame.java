@@ -1,43 +1,61 @@
 package todomato;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
+
 import net.miginfocom.swing.MigLayout;
 
-public class TodomatoFrame  {
-	private JFrame window = new JFrame("Todomato");
+@SuppressWarnings("serial")
+public class TodomatoFrame extends JFrame implements ActionListener {
+	private static final String INVALID_INPUT_MSG = "Invalid input: ";
+
 	private JPanel p = new JPanel();
 	
-	private JButton btnCommand = new JButton("Submit");
 	private JTextField txtCommand = new JTextField(20);
-	private JList<Task> listTasks = new JList<Task>(loadTasks(Processor.getList()));
+	private JList<Task> listTasks = new JList<Task>(loadTasks(Controller.getList()));
+	private JLabel lblStatus = new JLabel(" ");
 	
 	public TodomatoFrame() {
+		//create and set up the window
+		super("Todomato");
+		//setSize only to have window display as centered; does not actually set the size
+		setSize(600,480);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        initDisplay();
+		add(p);
+        
+		//display the window
+		pack();
+		setVisible(true);
 	}
 	
-	private void createAndShowGUI() {
-        //Create and set up the window.
-		p.setLayout(new MigLayout());
-		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	private void initDisplay() {
+		p.setLayout(new MigLayout("nocache"));
 	    
 		p.add(new JScrollPane(listTasks), "wrap, push, grow");
-	    p.add(txtCommand, "split2, pushx, growx");
-	    p.add(btnCommand);
+	    p.add(txtCommand, "wrap, pushx, growx");
+		p.add(lblStatus);
 	    
-	    window.add(p);
-
-        //Display the window.
-	    window.pack();
-	    window.setVisible(true);
-		
-	}
-	
-	public void display() {
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			@Override
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+	    txtCommand.addActionListener(new ActionListener() {
+	    	@Override
+	    	public void actionPerformed(ActionEvent e) {
+				try {
+					String status = CmdHandler.processCommand(txtCommand.getText());
+					//SplitProcessorsHandler.processCommand(txtCommand.getText());
+					listTasks.setListData(loadTasks(Controller.getList()));
+					txtCommand.setText("");
+					lblStatus.setText(status);
+					
+				} catch (InvalidInputException e1) {
+					txtCommand.setText("");
+					lblStatus.setText(INVALID_INPUT_MSG + e1.getMessage());				
+				}	    		
+	    	}
+	    });
 	}
 	
 	private Task[] loadTasks(TaskList l) {
@@ -52,5 +70,11 @@ public class TodomatoFrame  {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
