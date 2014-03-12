@@ -15,12 +15,11 @@ public class Todomato {
 	 */
 	public static void main(String[] args) {
 		/**
-		 * Uncomment the next 2 lines to open GUI 
-		 * Make sure the fileLoc in Processor is correct for it to work
+		 * The next line opens the GUI
+		 * Make sure the fileLoc in Controller is correct for it to work
 		 * miglayout (http://www.miglayout.com/) must also be added to the build path
 		 */
-		//TodomatoFrame f = new TodomatoFrame();
-		//f.display();
+		TodomatoFrame f = new TodomatoFrame();
 		
 		System.out.println(WELCOME_MSG);
 		
