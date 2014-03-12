@@ -15,6 +15,7 @@ public class Controller {
 	private static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
 	private static final int SPACE_NOT_FOUND = -1;
 	private static final int POS_OF_MINUTE = 2;
+	private static final String INVALID_TIME_FORMAT = "Invalid Date Format";
 	// " time "
 	private static final int NO_OF_CHAR_IN_STIME = 11;
 	private static final int NO_OF_CHAR_IN_ETIME = 9;
@@ -102,7 +103,11 @@ public class Controller {
 							userDate = retrieveDateStringFromInput(stringFragments[1].substring(spaceIndex+1));
 						}
 					} else {
+						if (getFirstKeyword(stringFragments[1]) != -1) {
 						userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(stringFragments[1], keywords[getFirstKeyword(stringFragments[1])]));
+						} else {
+							userDate = retrieveDateStringFromInput(stringFragments[1]);
+						}
 					}
 					break;
 				case 2:
@@ -488,7 +493,8 @@ public class Controller {
 	}
 
 	/**
-	 * Retrieves date from user input of the form "19/10"
+	 * Retrieves date from user input of the form DD/MM or DD/MM/YY
+	 * Returns a Date Object with the corresponding day and month
 	 * 
 	 * @param input
 	 * @return userDate
@@ -513,7 +519,17 @@ public class Controller {
 			return null;
 		}
 
-	}
+	}	
+	/**
+	 * Retrieves date from user input of the form DD/MM or DD/MM/YY
+	 * It also allows for "Feb 1" or "1 Feb"
+	 * Returns a Date Object with the corresponding day and month
+	 * 
+	 * @param input
+	 * @return userDate
+	 * @throws InvalidInputException
+	 * @throws NumberFormatException
+	 */
 	
 	public static Date retrieveDateStringFromInput(String input) {
 		try {
@@ -547,7 +563,7 @@ public class Controller {
 
 	/**
 	 * Returns time from user string i.e. 19 hours 30 minutes from "1930" or
-	 * "730pm"
+	 * "730pm" or "0730pm"
 	 * 
 	 * @param input
 	 * @return userTime
@@ -555,41 +571,54 @@ public class Controller {
 	 */
 
 	private static Time parseTimeFromString(String input) throws InvalidInputException {
-		if (input == null) {
-			return null;
-		}
 		Time userTime = null;
-		int hour = 0, minute = -1;
-		String meridiem[] = new String[] { "am", "pm" };
-		int meridiemIndex = checkMeridiem(input);
-		if (meridiemIndex != -1) {
-			input = input.substring(0, input.indexOf(meridiem[meridiemIndex]));
-			if (input.length() == 1) {
-				hour = Integer.parseInt(input);
-			} else if (input.length() == 3) {
-				hour = Integer.parseInt(input.substring(0, 1));
-				minute = Integer.parseInt(input.substring(POS_OF_MINUTE - 1));
-			} else if (input.length() == 4) {
-				hour = Integer.parseInt(input.substring(0, 2));
-				minute = Integer.parseInt(input.substring(POS_OF_MINUTE));
+		try {
+			if (input == null) {
+				return null;
 			}
-			if (meridiemIndex == 1) {
-				hour += 12;
-			}
-			userTime = new Time(hour, minute);
-		} else {
-			String userHour = input.substring(0, POS_OF_MINUTE);
-			if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
-				String userMinute = input.substring(POS_OF_MINUTE);
-				userTime = new Time(Integer.parseInt(userHour),
-						Integer.parseInt(userMinute));
+			int hour = 0, minute = -1;
+			String meridiem[] = new String[] { "am", "pm" };
+			int meridiemIndex = checkMeridiem(input);
+			if (meridiemIndex != -1) {
+				input = input.substring(0, input.indexOf(meridiem[meridiemIndex]));
+				if (input.length() == 1) {
+					hour = Integer.parseInt(input);
+				} else if (input.length() == 3) {
+					hour = Integer.parseInt(input.substring(0, 1));
+					minute = Integer.parseInt(input.substring(POS_OF_MINUTE - 1));
+				} else if (input.length() == 4) {
+					hour = Integer.parseInt(input.substring(0, 2));
+					minute = Integer.parseInt(input.substring(POS_OF_MINUTE));
+				}
+				if (meridiemIndex == 1) {
+					hour += 12;
+				}
+				userTime = new Time(hour, minute);
 			} else {
-				userTime = new Time(Integer.parseInt(userHour));
+				String userHour = null;
+				String userMinute = null;
+				if (input.length() == 1 || input.length() == 2) {
+					userHour = input;
+					userTime = new Time(Integer.parseInt(input));
+				} else if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
+					userHour = input.substring(0, POS_OF_MINUTE);
+					userMinute = input.substring(POS_OF_MINUTE);
+					userTime = new Time(Integer.parseInt(userHour),
+							Integer.parseInt(userMinute));
+				} else if (input.length() == 3) {
+					userHour = input.substring(0,1);
+					userMinute = input.substring(1);
+					userTime = new Time(Integer.parseInt(userHour));
+				} else {
+					throw new InvalidInputException(INVALID_TIME_FORMAT);
+				}
 			}
+		}
+		catch (NumberFormatException e) {
+			return null;
 		}
 		return userTime;
 	}
-
 	
 	private static Boolean isTimePresent(String input) {
 		try {
