@@ -12,16 +12,7 @@ import java.util.regex.Pattern;
 public class Controller {
 
 	private static final String NO_CHANGES_TO_UNDO_MSG = "No changes to undo";
-	private static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
 	private static final int SPACE_NOT_FOUND = -1;
-	private static final int POS_OF_MINUTE = 2;
-	private static final String INVALID_TIME_FORMAT = "Invalid Date Format";
-	// " time "
-	private static final int NO_OF_CHAR_IN_STIME = 11;
-	private static final int NO_OF_CHAR_IN_ETIME = 9;
-	private static final int NO_OF_CHAR_IN_LOC = 10;
-	private static final int NO_OF_CHAR_IN_DESC = 6;
-	private static final int NO_OF_CHAR_IN_DATE = 6;
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 
 	private static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
@@ -32,8 +23,6 @@ public class Controller {
 	private static Stack<TaskList> oldLists = new Stack<TaskList>();
 	private static String[] keywords = new String[] { " at ", " from ",
 			" until ", " to ", " in ", " due " };
-	private static String[] updateKeywords = new String[] { " starttime ",
-			" endtime ", " desc ", " date ", " location " };
 
 	/**
 	 * @author Daryl
@@ -77,7 +66,8 @@ public class Controller {
 				case 1:
 					startTimeString = stringFragments[1];
 					if (!isTimePresent(startTimeString)) {
-						userDate = retrieveDateStringFromInput(startTimeString);
+						userDate = Processor
+								.retrieveDateStringFromInput(startTimeString);
 					}
 					break;
 				case 2:
@@ -102,16 +92,19 @@ public class Controller {
 						} else {
 							startTimeString = stringFragments[1].substring(0,
 									spaceIndex);
-							userDate = retrieveDateStringFromInput(stringFragments[1]
-									.substring(spaceIndex + 1));
+							userDate = Processor
+									.retrieveDateStringFromInput(stringFragments[1]
+											.substring(spaceIndex + 1));
 						}
 					} else {
 						if (getFirstKeyword(stringFragments[1]) != -1) {
-							userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(
-									stringFragments[1],
-									keywords[getFirstKeyword(stringFragments[1])]));
+							userDate = Processor
+									.retrieveDateStringFromInput(getWordsBeforeNextKeyword(
+											stringFragments[1],
+											keywords[getFirstKeyword(stringFragments[1])]));
 						} else {
-							userDate = retrieveDateStringFromInput(stringFragments[1]);
+							userDate = Processor
+									.retrieveDateStringFromInput(stringFragments[1]);
 						}
 					}
 					break;
@@ -124,13 +117,15 @@ public class Controller {
 						} else {
 							endTimeString = stringFragments[1].substring(0,
 									spaceIndex);
-							userDate = retrieveDateStringFromInput(stringFragments[1]
-									.substring(spaceIndex));
+							userDate = Processor
+									.retrieveDateStringFromInput(stringFragments[1]
+											.substring(spaceIndex));
 						}
 					} else {
-						userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(
-								stringFragments[1],
-								keywords[getFirstKeyword(stringFragments[1])]));
+						userDate = Processor
+								.retrieveDateStringFromInput(getWordsBeforeNextKeyword(
+										stringFragments[1],
+										keywords[getFirstKeyword(stringFragments[1])]));
 					}
 					break;
 				case 4:
@@ -147,8 +142,8 @@ public class Controller {
 					break;
 				}
 			}
-			Time endUserTime = parseTimeFromString(endTimeString);
-			Time startUserTime = parseTimeFromString(startTimeString);
+			Time endUserTime = Processor.parseTimeFromString(endTimeString);
+			Time startUserTime = Processor.parseTimeFromString(startTimeString);
 			userTask.setEndTime(endUserTime);
 			userTask.setStartTime(startUserTime);
 			userTask.setDate(userDate);
@@ -166,19 +161,6 @@ public class Controller {
 		oldLists.push(lastList);
 	}
 
-	/**
-	 * @author Daryl
-	 * @param String
-	 *            month, String day
-	 * 
-	 * @return userDate
-	 * @throws IOException
-	 */
-
-	public static String convertDateToStandardForm(String month, String day) {
-		return month + "/" + day;
-	}
-
 	public static Date retrieveDateInTimeString(String input)
 			throws NumberFormatException, InvalidInputException {
 		String[] parts = input.split(" ");
@@ -188,20 +170,24 @@ public class Controller {
 		for (int i = 0; i < months.length; i++) {
 			if (parts.length > 2) {
 				if (parts[1].contains(months[i])) {
-					String standardFormDate = convertDateToStandardForm(
-							parts[2], String.valueOf(i + 1));
-					Date userDate = parseDateFromString(standardFormDate);
+					String standardFormDate = Processor
+							.convertDateToStandardForm(parts[2],
+									String.valueOf(i + 1));
+					Date userDate = Processor
+							.parseDateFromString(standardFormDate);
 					return userDate;
 				} else if (parts[2].contains(months[i])) {
-					String standardFormDate = convertDateToStandardForm(
-							parts[1], String.valueOf(i + 1));
-					Date userDate = parseDateFromString(standardFormDate);
+					String standardFormDate = Processor
+							.convertDateToStandardForm(parts[1],
+									String.valueOf(i + 1));
+					Date userDate = Processor
+							.parseDateFromString(standardFormDate);
 					return userDate;
 				}
 			}
 		}
 		if (parts[1].contains(dateDelimiter)) {
-			Date userDate = parseDateFromString(parts[1]);
+			Date userDate = Processor.parseDateFromString(parts[1]);
 			return userDate;
 		}
 		return null;
@@ -319,333 +305,15 @@ public class Controller {
 		return list;
 	}
 
-	/**
-	 * @author Hao Eng
-	 * @param argument
-	 *            : <index of the task> time <startTime e.g. 1300> or <index of
-	 *            the task> desc <description e.g. cut dog's hair>
-	 * @return Updated Task
-	 * @throws InvalidInputException
-	 */
-	public static Task processUpdate(String argument)
-			throws InvalidInputException {
-		storeCurrentList();
-		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1 };
-		int index = getTaskIndex(argument) - 1;
-		printInvalidIndexMsg(index);
-		whichToEdit = findDetailToEdit(argument);
-		updater(argument, whichToEdit, index);
-
-		return list.getListItem(index);
-	}
-
-	/**
-	 * @param argument
-	 * @param whichToEdit
-	 * @param index
-	 * @throws InvalidInputException
-	 */
-	private static void updater(String argument, int[] whichToEdit, int index)
-			throws InvalidInputException {
-		for (int i = 0; i < whichToEdit.length; i++) {
-			if (whichToEdit[i] != -1) {
-				switch (i) {
-				case 0:
-					updateStartTime(index, whichToEdit[0], argument);
-					break;
-				case 1:
-					updateEndTime(index, whichToEdit[1], argument);
-					break;
-				case 2:
-					updateDesc(index, whichToEdit[2], argument);
-					break;
-				case 3:
-					updateDate(index, whichToEdit[3], argument);
-					break;
-				case 4:
-					updateLocation(index, whichToEdit[4], argument);
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param index
-	 * @throws InvalidInputException
-	 */
-	private static void printInvalidIndexMsg(int index)
-			throws InvalidInputException {
-		if (index >= list.getSize()) {
-			throw new InvalidInputException("Index " + index
-					+ " is out of the list.");
-		}
-	}
-
-	/**
-	 * @param argument
-	 * @throws InvalidInputException
-	 */
-	private static void printInvalidKeywords(String argument)
-			throws InvalidInputException {
-		if (argument.length() <= 2) {
-			throw new InvalidInputException(
-					"Please include any keywords to update i.e. starttime, endtime, location, desc, date");
-		}
-	}
-
-	/**
-	 * @param index
-	 * @param editTime
-	 * @param argument
-	 *            that contains new time 1300
-	 * @return updated task
-	 * @throws InvalidInputException
-	 */
-	private static Task updateStartTime(int index, int editStartTime,
-			String argument) throws InvalidInputException {
-		Time time = parseTimeFromString(argument.substring(editStartTime
-				+ NO_OF_CHAR_IN_STIME));
-		list.getListItem(index).setStartTime(time);
-		fileHandler.updateFile(list);
-		return list.getListItem(index);
-	}
-
-	private static Task updateEndTime(int index, int editEndTime,
-			String argument) throws InvalidInputException {
-		Time time = parseTimeFromString(argument.substring(editEndTime
-				+ NO_OF_CHAR_IN_ETIME));
-		list.getListItem(index).setEndTime(time);
-		fileHandler.updateFile(list);
-		return list.getListItem(index);
-	}
-
-	private static Task updateDate(int index, int editDate, String argument)
-			throws InvalidInputException {
-		Date date = retrieveDateStringFromInput(argument.substring(editDate
-				+ NO_OF_CHAR_IN_DATE));
-		list.getListItem(index).setDate(date);
-		fileHandler.updateFile(list);
-		return list.getListItem(index);
-	}
-
-	private static Task updateLocation(int index, int editLoc, String argument) {
-		int stopIndex = argument.length();
-		if (argument.contains("\\")) {
-			int escChar = argument.indexOf("\\");
-			if (escChar < editLoc) {
-				stopIndex = argument.lastIndexOf("\\");
-			} else {
-				stopIndex = escChar;
-			}
-		}
-		list.getListItem(index).setLocation(
-				argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
-		fileHandler.updateFile(list);
-		return list.getListItem(index);
-	}
-
-	/**
-	 * @param index
-	 * @param editDesc
-	 * @param argument
-	 *            that contains new description
-	 * @return updated task
-	 */
-	private static Task updateDesc(int index, int editDesc, String argument) {
-		int stopIndex = argument.length();
-		if (argument.contains("\\")) {
-			int escChar = argument.indexOf("\\");
-			if (escChar < editDesc) {
-				stopIndex = argument.lastIndexOf("\\");
-			} else {
-				stopIndex = escChar;
-			}
-		}
-		list.getListItem(index).setDescription(
-				argument.substring(editDesc + NO_OF_CHAR_IN_DESC, stopIndex));
-		fileHandler.updateFile(list);
-		return list.getListItem(index);
-	}
-
-	/**
-	 * @param argument
-	 *            that contains index, time, date e.g. 1 time 1300 date 03/01
-	 * @return the starting index of which task detail to change
-	 */
-	private static int[] findDetailToEdit(String argument) {
-		int[] edit = { -1, -1, -1, -1, -1 };
-		for (int i = 0; i < 5; i++) {
-			if (argument.contains(updateKeywords[i])) {
-				edit[i] = argument.indexOf(updateKeywords[i]);
-			}
-		}
-		return edit;
-	}
-
-	/**
-	 * @param argument
-	 * @return task index
-	 * @throws NumberFormatException
-	 */
-	private static int getTaskIndex(String argument)
-			throws NumberFormatException {
-		int spaceAfterIndex = argument.indexOf(" ");
-		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
-	}
-
-	/**
-	 * Retrieves date from user input of the form DD/MM or DD/MM/YY Returns a
-	 * Date Object with the corresponding day and month
-	 * 
-	 * @param input
-	 * @return userDate
-	 * @throws InvalidInputException
-	 * @throws NumberFormatException
-	 */
-
-	public static Date parseDateFromString(String input)
-			throws NumberFormatException, InvalidInputException {
-		String delims = "/";
-		String[] dateTokens = input.split(delims);
-		if (dateTokens.length == 2) {
-			Date userDate = new Date(Integer.parseInt(dateTokens[0]),
-					Integer.parseInt(dateTokens[1]));
-			return userDate;
-		} else if (dateTokens.length == 3) {
-			Date userDate = new Date(Integer.parseInt(dateTokens[0]),
-					Integer.parseInt(dateTokens[1]),
-					Integer.parseInt(dateTokens[2]));
-			return userDate;
-		} else {
-			return null;
-		}
-
-	}
-
-	/**
-	 * Retrieves date from user input of the form DD/MM or DD/MM/YY It also
-	 * allows for "Feb 1" or "1 Feb" Returns a Date Object with the
-	 * corresponding day and month
-	 * 
-	 * @param input
-	 * @return userDate
-	 * @throws InvalidInputException
-	 * @throws NumberFormatException
-	 */
-
-	public static Date retrieveDateStringFromInput(String input) {
-		try {
-			String[] parts = input.split(" ");
-			String dateDelimiter = "/";
-			String[] months = new String[] { "Jan", "Feb", "Mar", "Apr", "May",
-					"Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-			for (int i = 0; i < months.length; i++) {
-				if (parts.length > 1) {
-					if (parts[0].contains(months[i])) {
-						String standardFormDate = convertDateToStandardForm(
-								parts[1], String.valueOf(i + 1));
-						Date userDate = parseDateFromString(standardFormDate);
-						return userDate;
-					} else if (parts[1].contains(months[i])) {
-						String standardFormDate = convertDateToStandardForm(
-								parts[0], String.valueOf(i + 1));
-						Date userDate = parseDateFromString(standardFormDate);
-						return userDate;
-					}
-				}
-			}
-			if (parts[0].contains(dateDelimiter)) {
-				Date userDate = parseDateFromString(parts[0]);
-				return userDate;
-			}
-		} catch (InvalidInputException e) {
-			return null;
-		}
-		return null;
-	}
-
-	/**
-	 * Returns time from user string i.e. 19 hours 30 minutes from "1930" or
-	 * "730pm" or "0730pm"
-	 * 
-	 * @param input
-	 * @return userTime
-	 * @throws InvalidInputException
-	 */
-
-	private static Time parseTimeFromString(String input)
-			throws InvalidInputException {
-		Time userTime = null;
-		try {
-			if (input == null) {
-				return null;
-			}
-			int hour = 0, minute = -1;
-			String meridiem[] = new String[] { "am", "pm" };
-			int meridiemIndex = checkMeridiem(input);
-			if (meridiemIndex != -1) {
-				input = input.substring(0,
-						input.indexOf(meridiem[meridiemIndex]));
-				if (input.length() == 1) {
-					hour = Integer.parseInt(input);
-				} else if (input.length() == 3) {
-					hour = Integer.parseInt(input.substring(0, 1));
-					minute = Integer.parseInt(input
-							.substring(POS_OF_MINUTE - 1));
-				} else if (input.length() == 4) {
-					hour = Integer.parseInt(input.substring(0, 2));
-					minute = Integer.parseInt(input.substring(POS_OF_MINUTE));
-				}
-				if (meridiemIndex == 1) {
-					hour += 12;
-				}
-				userTime = new Time(hour, minute);
-			} else {
-				String userHour = null;
-				String userMinute = null;
-				if ((input.length() == 1) || (input.length() == 2)) {
-					userHour = input;
-					userTime = new Time(Integer.parseInt(input));
-				} else if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
-					userHour = input.substring(0, POS_OF_MINUTE);
-					userMinute = input.substring(POS_OF_MINUTE);
-					userTime = new Time(Integer.parseInt(userHour),
-							Integer.parseInt(userMinute));
-				} else if (input.length() == 3) {
-					userHour = input.substring(0, 1);
-					userMinute = input.substring(1);
-					userTime = new Time(Integer.parseInt(userHour));
-				} else {
-					throw new InvalidInputException(INVALID_TIME_FORMAT);
-				}
-			}
-		} catch (NumberFormatException e) {
-			return null;
-		}
-		return userTime;
-	}
-
 	private static Boolean isTimePresent(String input) {
 		try {
-			parseTimeFromString(input);
+			Processor.parseTimeFromString(input);
 		} catch (NumberFormatException e1) {
 			return false;
 		} catch (InvalidInputException e2) {
 			return false;
 		}
 		return true;
-	}
-
-	private static int checkMeridiem(String input) {
-		String meridiems[] = new String[] { "am", "pm" };
-		for (int i = 0; i < meridiems.length; i++) {
-			if (input.contains(meridiems[i])) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	/**
