@@ -34,6 +34,7 @@ public class UpdateProcessor extends Processor {
 		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
 		updater(argument, whichToEdit, index);
+
 		return list.getListItem(index);
 	}
 
@@ -102,36 +103,28 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
-		int time = Integer
-				.parseInt(argument.substring(editStartTime
-						+ NO_OF_CHAR_IN_STIME, editStartTime
-						+ NO_OF_CHAR_IN_STIME + 4));
-		int hr = time / 100;
-		int min = time % 100;
-		list.getListItem(index).setStartTime(new Time(hr, min));
+		Time time = Processor.parseTimeFromString(argument
+				.substring(editStartTime + NO_OF_CHAR_IN_STIME));
+		list.getListItem(index).setStartTime(time);
+		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		int time = Integer.parseInt(argument.substring(editEndTime
-				+ NO_OF_CHAR_IN_ETIME, editEndTime + NO_OF_CHAR_IN_ETIME + 4));
-		int hr = time / 100;
-		int min = time % 100;
-		list.getListItem(index).setEndTime(new Time(hr, min));
+		Time time = parseTimeFromString(argument.substring(editEndTime
+				+ NO_OF_CHAR_IN_ETIME));
+		list.getListItem(index).setEndTime(time);
+		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
 	private static Task updateDate(int index, int editDate, String argument)
 			throws InvalidInputException {
-		String date = argument.substring(editDate + NO_OF_CHAR_IN_DATE,
-				editDate + NO_OF_CHAR_IN_DATE + 5);
-		String[] tokens = date.split("/");
-		int day = Integer.parseInt(tokens[0]);
-		int mth = Integer.parseInt(tokens[1]);
-		if (tokens.length == 2) {
-			list.getListItem(index).setDate(new Date(day, mth));
-		}
+		Date date = retrieveDateStringFromInput(argument.substring(editDate
+				+ NO_OF_CHAR_IN_DATE));
+		list.getListItem(index).setDate(date);
+		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
@@ -147,6 +140,7 @@ public class UpdateProcessor extends Processor {
 		}
 		list.getListItem(index).setLocation(
 				argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
+		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
@@ -169,6 +163,7 @@ public class UpdateProcessor extends Processor {
 		}
 		list.getListItem(index).setDescription(
 				argument.substring(editDesc + NO_OF_CHAR_IN_DESC, stopIndex));
+		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
