@@ -20,8 +20,8 @@ public class TaskTest {
 
 	@Test
 	public void test() throws InvalidInputException {
-		String taskString = "eat at 05:00 until 07:00 on 16/02/2014 in utown";
-		assertEquals(Task.createTaskFromString(taskString).toString(), new Task("eat", new Time(5,00), new Time(7,00), new Date(16,02,2014), "utown" ).toString());
+		String taskString = "hate eat at 05:00 until 07:00 on 16/02/2014 in utown";
+		assertEquals(Task.createTaskFromString(taskString).toString(), new Task("hate eat", new Time(5,00), new Time(7,00), new Date(16,02,2014), "utown" ).toString());
 	}
 	
 	@Test
@@ -32,7 +32,7 @@ public class TaskTest {
 	
 	@Test
 	public void test3() throws InvalidInputException {
-		String taskString = "eat in utown plaza";
+		String taskString = "hate eat in utown plaza";
 		assertEquals(true, Task.createTaskFromString(taskString).toString().equals(new Task("eat", "utown plaza").toString()));
 	}
 	
