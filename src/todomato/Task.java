@@ -1,6 +1,7 @@
 package todomato;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -187,7 +188,15 @@ public class Task {
 			int locationIndex = taskStringList.indexOf(LOCATION_KEY) + 1;
 			int locationIndexEnd = taskStringList.size();
 			
+			int[] indexes = {startTimeIndex, endTimeIndex, dateIndex, locationIndex};
+	        Arrays.sort(indexes);
+	        int descriptionIndexEnd = indexes[0] - 1;
+
 			description = taskStringList.get(descriptionIndex);
+			for (int i = descriptionIndex + 1; i < descriptionIndexEnd; i++ ){
+				description = description + " " + taskStringList.get(i) ;
+			}
+			
 			if ( startTimeIndex != 0 ) {
 				startTime = new Time(taskStringList.get(startTimeIndex));
 			}
