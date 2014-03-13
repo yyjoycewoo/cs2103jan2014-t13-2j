@@ -8,7 +8,7 @@ public class DisplayProcessor extends Processor {
 	private static TaskList notify = new TaskList();
 
 	public static TaskList processDisplay() {
-
+		notify.clearList();
 		// for notification checking
 		for (int i = 0; i < list.getSize(); i++) {
 			Task item = list.getListItem(i);
@@ -18,11 +18,10 @@ public class DisplayProcessor extends Processor {
 				String deadline = day + "/0" + item.getDate().getMonth() + "/"
 						+ item.getDate().getYear();
 				// ******************************************************/
+				// notification will pop out on that day itself & the day after
 				if (deadline.contains(CurrentDate.date())
-						|| item.getDate().equals(CurrentDate.date())) {
-					System.out.println("deadline: " + deadline + ".. curdate: "
-							+ CurrentDate.date() + "item: " + item.getDate());
-					System.out.println(item.getDescription());
+						|| item.getDate().toString()
+								.contains(CurrentDate.date())) {
 					notify.addToList(item);
 				}
 			}
