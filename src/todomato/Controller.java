@@ -174,20 +174,20 @@ public class Controller {
 							.convertDateToStandardForm(parts[2],
 									String.valueOf(i + 1));
 					Date userDate = Processor
-							.parseDateFromString(standardFormDate);
+							.parseDateFromStandardForm(standardFormDate);
 					return userDate;
 				} else if (parts[2].contains(months[i])) {
 					String standardFormDate = Processor
 							.convertDateToStandardForm(parts[1],
 									String.valueOf(i + 1));
 					Date userDate = Processor
-							.parseDateFromString(standardFormDate);
+							.parseDateFromStandardForm(standardFormDate);
 					return userDate;
 				}
 			}
 		}
 		if (parts[1].contains(dateDelimiter)) {
-			Date userDate = Processor.parseDateFromString(parts[1]);
+			Date userDate = Processor.parseDateFromStandardForm(parts[1]);
 			return userDate;
 		}
 		return null;
