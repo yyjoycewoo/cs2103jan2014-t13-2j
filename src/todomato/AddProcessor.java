@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class AddProcessor extends Processor {
 
 	private static String[] keywords = new String[] { " at ", " from ",
-			" until ", " to ", " in ", " due " };
+			" until ", " to ", " in ", " due ",  " on "};
 
 	/**
 	 * @author Daryl
@@ -18,6 +18,8 @@ public class AddProcessor extends Processor {
 	 */
 
 	public static Task processAdd(String input) throws NumberFormatException {
+		
+		storeCurrentList();
 
 		boolean taskDesExtracted = false;
 		int keywordIndex = -1;
@@ -47,9 +49,6 @@ public class AddProcessor extends Processor {
 				case 0:
 				case 1:
 					startTimeString = stringFragments[1];
-					if (!isTimePresent(startTimeString)) {
-						userDate = retrieveDateStringFromInput(startTimeString);
-					}
 					break;
 				case 2:
 				case 3:
@@ -61,48 +60,20 @@ public class AddProcessor extends Processor {
 				case 5:
 					endTimeString = stringFragments[1];
 					break;
+				case 6:
+					System.out.print(stringFragments[1]);
+					userDate = retrieveDateStringFromInput(stringFragments[1]);
+					break;
 				}
 			} else {
 				switch (keywordIndex) {
 				case 0:
 				case 1:
-					if (isTimePresent(stringFragments[1])) {
-						if (getFirstKeyword(stringFragments[1]) == -1) {
-							startTimeString = stringFragments[1].substring(0,
-									spaceIndex);
-						} else {
-							startTimeString = stringFragments[1].substring(0,
-									spaceIndex);
-							userDate = retrieveDateStringFromInput(stringFragments[1]
-									.substring(spaceIndex + 1));
-						}
-					} else {
-						if (getFirstKeyword(stringFragments[1]) != -1) {
-							userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(
-									stringFragments[1],
-									keywords[getFirstKeyword(stringFragments[1])]));
-						} else {
-							userDate = retrieveDateStringFromInput(stringFragments[1]);
-						}
-					}
+					startTimeString = (stringFragments[1].substring(0, spaceIndex));
 					break;
 				case 2:
 				case 3:
-					if (isTimePresent(stringFragments[1])) {
-						if (getFirstKeyword(stringFragments[1]) == -1) {
-							endTimeString = stringFragments[1].substring(0,
-									spaceIndex);
-						} else {
-							endTimeString = stringFragments[1].substring(0,
-									spaceIndex);
-							userDate = retrieveDateStringFromInput(stringFragments[1]
-									.substring(spaceIndex));
-						}
-					} else {
-						userDate = retrieveDateStringFromInput(getWordsBeforeNextKeyword(
-								stringFragments[1],
-								keywords[getFirstKeyword(stringFragments[1])]));
-					}
+					endTimeString = stringFragments[1].substring(0,spaceIndex);
 					break;
 				case 4:
 					if (getFirstKeyword(stringFragments[1]) == -1) {
@@ -115,6 +86,9 @@ public class AddProcessor extends Processor {
 					break;
 				case 5:
 					endTimeString = stringFragments[1].substring(0, spaceIndex);
+					break;
+				case 6:
+					userDate = retrieveDateStringFromInput(stringFragments[1]);
 					break;
 				}
 			}
@@ -172,14 +146,4 @@ public class AddProcessor extends Processor {
 		return splitWords;
 	}
 
-	private static Boolean isTimePresent(String input) {
-		try {
-			parseTimeFromString(input);
-		} catch (NumberFormatException e1) {
-			return false;
-		} catch (InvalidInputException e2) {
-			return false;
-		}
-		return true;
-	}
 }

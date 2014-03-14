@@ -36,7 +36,7 @@ public class Processor {
 	 * @throws NumberFormatException
 	 */
 
-	protected static Date parseDateFromString(String input)
+	protected static Date parseDateFromStandardForm(String input)
 			throws NumberFormatException, InvalidInputException {
 		String delims = "/";
 		String[] dateTokens = input.split(delims);
@@ -78,18 +78,18 @@ public class Processor {
 					if (parts[0].contains(months[i])) {
 						String standardFormDate = convertDateToStandardForm(
 								parts[1], String.valueOf(i + 1));
-						Date userDate = parseDateFromString(standardFormDate);
+						Date userDate = parseDateFromStandardForm(standardFormDate);
 						return userDate;
 					} else if (parts[1].contains(months[i])) {
 						String standardFormDate = convertDateToStandardForm(
 								parts[0], String.valueOf(i + 1));
-						Date userDate = parseDateFromString(standardFormDate);
+						Date userDate = parseDateFromStandardForm(standardFormDate);
 						return userDate;
 					}
 				}
 			}
 			if (parts[0].contains(dateDelimiter)) {
-				Date userDate = parseDateFromString(parts[0]);
+				Date userDate = parseDateFromStandardForm(parts[0]);
 				return userDate;
 			}
 		} catch (InvalidInputException e) {
@@ -99,9 +99,9 @@ public class Processor {
 	}
 
 	/**
+	 * Converts "2" "1" to "2/1"
 	 * @author Daryl
-	 * @param String
-	 *            month, String day
+	 * @param String month, String day
 	 * 
 	 * @return userDate
 	 * @throws IOException
