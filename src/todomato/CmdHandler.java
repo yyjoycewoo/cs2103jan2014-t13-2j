@@ -34,13 +34,13 @@ public class CmdHandler {
 			return Controller.processDisplay().toString();				
 		}
 		if (command.getAction().equals(UPDATE_COMMAND)) {
-			return SUCCESSFUL_UPDATE_MSG  + Controller.processUpdate(command.getArgument()).toString();
+			return SUCCESSFUL_UPDATE_MSG  + UpdateProcessor.processUpdate(command.getArgument()).toString();
 		}
 		if (command.getAction().equals(DELETE_COMMAND)) {
 			return SUCCESSFUL_DELETE_MSG + Controller.processDelete(command.getArgument());					
 		}
 		if (command.getAction().equals(ADD_COMMAND)) {
-			return SUCCESSFUL_ADD_MSG + Controller.processAdd(command.getArgument());
+			return SUCCESSFUL_ADD_MSG + AddProcessor.processAdd(command.getArgument());
 		}
 		if (command.getAction().equals(UNDO_COMMAND)) {
 			return Controller.processUndo();			

@@ -55,7 +55,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					// .getText());
 					String status = SplitProcessorsHandler
 							.processCommand(txtCommand.getText());
-					listTasks.setListData(loadTasks(Controller.getList()));
+					listTasks.setListData(loadTasks(Processor.getList()));
 					txtCommand.setText("");
 					lblStatus.setText(status);
 
