@@ -37,32 +37,4 @@ public class ControllerTest {
 		assertEquals("", userTask.getDescription(), "dinner");
 		assertNull("", userTask.getDate());
 	}
-
-	@Test
-	public void testProcessUpdateTime() throws InvalidInputException {
-		Task userTask = Controller.processUpdate("1 endtime 1330");
-		assertEquals("", userTask.getEndTime().getHour(), 13);
-		assertEquals("", userTask.getEndTime().getMin(), 30);
-	}
-
-	@Test
-	public void testProcessUpdateDesc() throws InvalidInputException {
-		Task userTask = Controller.processUpdate("1 desc cut dog's fur");
-		assertEquals("", userTask.getDescription(), "cut dog's fur");
-	}
-
-	@Test
-	public void testProcessUpdateTimeDesc() throws InvalidInputException {
-		Task alternate = Controller.processUpdate("1 starttime 2200 desc haha");
-		assertEquals("", alternate.getDescription(), "haha");
-		assertEquals("", alternate.getStartTime().getHour(), 22);
-		assertEquals("", alternate.getStartTime().getMin(), 00);
-	}
-
-	@Test
-	public void testProcessUpdateDate() throws InvalidInputException {
-		Task userTask = Controller.processUpdate("1 date 13/10");
-		assertEquals("", userTask.getDate().getDay(), 13);
-		assertEquals("", userTask.getDate().getMonth(), 10);
-	}
 }

@@ -15,9 +15,9 @@ public class Controller {
 	private static final int SPACE_NOT_FOUND = -1;
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 
-	private static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
+	//private static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	// "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	// private static String fileLoc = "D:\\test.txt";
+	private static String fileLoc = "D:\\test.txt";
 	private static FileHandler fileHandler = new FileHandler(fileLoc);
 	private static TaskList list = fileHandler.readFile();
 	private static Stack<TaskList> oldLists = new Stack<TaskList>();

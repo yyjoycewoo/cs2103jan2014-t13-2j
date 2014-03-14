@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Stack;
 
 public class Processor {
-	protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
+	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	// "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	// protected static String fileLoc = "D:\\test.txt";
+	protected static String fileLoc = "D:\\test.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskList list = fileHandler.readFile();
 	protected static Stack<TaskList> oldLists = new Stack<TaskList>();
@@ -68,10 +68,11 @@ public class Processor {
 
 	protected static Date retrieveDateStringFromInput(String input) {
 		try {
+			input = input.toLowerCase();
 			String[] parts = input.split(" ");
 			String dateDelimiter = "/";
-			String[] months = new String[] { "Jan", "Feb", "Mar", "Apr", "May",
-					"Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+			String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
+					"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 			for (int i = 0; i < months.length; i++) {
 				if (parts.length > 1) {
 					if (parts[0].contains(months[i])) {
@@ -134,6 +135,7 @@ public class Processor {
 						input.indexOf(meridiem[meridiemIndex]));
 				if (input.length() == 1) {
 					hour = Integer.parseInt(input);
+					minute = 0;
 				} else if (input.length() == 3) {
 					hour = Integer.parseInt(input.substring(0, 1));
 					minute = Integer.parseInt(input
@@ -141,6 +143,8 @@ public class Processor {
 				} else if (input.length() == 4) {
 					hour = Integer.parseInt(input.substring(0, 2));
 					minute = Integer.parseInt(input.substring(POS_OF_MINUTE));
+				} else {
+					throw new InvalidInputException(INVALID_TIME_FORMAT);
 				}
 				if (meridiemIndex == 1) {
 					hour += 12;
