@@ -1,72 +1,91 @@
 package todomato;
 
+import java.util.Arrays;
+
 public class DeleteProcessor extends Processor {
 	private static final String ARGUMENT_CLEAR_ALL = "all";
-	
+	private static final String TASKS = " tasks";
+	private static final String SUCCESSFUL_DELETE = "Deleted: ";
+	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
+	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	/**
+	 * Format:
+	 * delete <index>
+	 * delete <index>,<index>,<index>
+	 * delete all
 	 * @author linxuan
 	 * @param argument
-	 * @return TaskList containing deleted tasks
+	 * @return String of success/error message accordingly 
 	 */
-	public static TaskList processDelete(String argument) {
-		storeCurrentList();
-		
-		String[] indices = argument.split(",");
-		if(indices.length > 1) {
-			return deleteMultiple(indices);
-		} else {
-			if(indices[0].equals(ARGUMENT_CLEAR_ALL)) {
-				return deleteAll();
+	public static String processDelete(String argument) {
+		try { 
+			storeCurrentList();
+			
+			String[] indices = argument.split(",");
+			if(indices.length > 1) {
+				return SUCCESSFUL_DELETE + deleteMultiple(indices) + TASKS;
 			} else {
-				return deleteSingleTask(indices[0]);
-			} 
-		}
-	}
-	
-	private static TaskList deleteAll() {
-		TaskList deletedTasks = new TaskList();
-		while(list.getSize() != 0) {
-			deletedTasks.addToList(list.getListItem(0));
-			list.deleteListItem(0);
-		}
-		fileHandler.updateFile(list);
-		return deletedTasks;
-	}
-	
-	private static TaskList deleteSingleTask(String indexString) {
-		try {
-			TaskList deletedTasks = new TaskList();
-			int index = Integer.parseInt(indexString) - 1;
-			deletedTasks.addToList(list.getListItem(index));
-			list.deleteListItem(index);
-			fileHandler.updateFile(list);
-			return deletedTasks;
+				if(indices[0].equals(ARGUMENT_CLEAR_ALL)) {
+					return SUCCESSFUL_DELETE + deleteAll() + TASKS;
+				} else {
+					return SUCCESSFUL_DELETE + deleteSingleTask(indices[0]);
+				} 
+			}
 		} catch(NumberFormatException e) {
 			// TODO
-			return null;
+			return ERROR_MESSAGE_NUMBER_FORMAT;
 		} catch(IndexOutOfBoundsException e) {
 			// TODO
-			return null;
+			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;
 		}
 	}
 	
-	private static TaskList deleteMultiple(String[] indices) {
-		try {
-			TaskList deletedTasks = new TaskList();
-			for (int i = 0; i < indices.length; i++) {
-				int index = Integer.parseInt(indices[i]) - i - 1;
-				deletedTasks.addToList(list.getListItem(index));
-				list.deleteListItem(index);
-			}
-			fileHandler.updateFile(list);
-			return deletedTasks;
-		} catch (NumberFormatException e) {
-			// TODO
-			return null;
-		} catch (IndexOutOfBoundsException e) {
-			// TODO
-			return null;
+	private static String deleteAll() {
+		//TaskList deletedTasks = new TaskList();
+		int numberOfTasksDeleted = 0;
+		while(list.getSize() != 0) {
+			//deletedTasks.addToList(list.getListItem(0));
+			list.deleteListItem(0);
+			numberOfTasksDeleted++;
+		}
+		fileHandler.updateFile(list);
+		//return deletedTasks;
+		return Integer.toString(numberOfTasksDeleted);
+	}
+	
+	private static String deleteSingleTask(String indexString) {
+		//TaskList deletedTasks = new TaskList();
+		int index = Integer.parseInt(indexString) - 1;
+		//deletedTasks.addToList(list.getListItem(index));
+		Task deletedTask = list.getListItem(index);
+		list.deleteListItem(index);
+		fileHandler.updateFile(list);
+		return deletedTask.toString();
+	}
+	
+	private static String deleteMultiple(String[] strIndices) {
+		//TaskList deletedTasks = new TaskList();
+		int[] intIndices = new int[strIndices.length];
+		for (int i = 0; i < strIndices.length; i++) {
+			intIndices[i] = Integer.parseInt(strIndices[i]);
+			//deletedTasks.addToList(list.getListItem(index));
+			//list.deleteListItem(index);
+		}
+		Arrays.sort(intIndices);
+		reverse(intIndices);
+		for (int i = 0; i < intIndices.length; i++) {
+			list.deleteListItem(intIndices[i] - 1);
+		}
+		fileHandler.updateFile(list);
+		return Integer.toString(strIndices.length);
+	}
+	
+	private static void reverse(int[] intIndices) {
+		int length = intIndices.length;
+		for (int i = 0; i < length/2; i++) {
+			int t = intIndices[i];
+			intIndices[i] = intIndices[length - 1 - i];
+			intIndices[length - 1 - i] = t;
 		}
 	}
-
 }
