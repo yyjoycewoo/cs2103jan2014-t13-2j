@@ -7,6 +7,7 @@ public class DeleteProcessor extends Processor {
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 	private static final String TASKS = " tasks";
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
+	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	/**
@@ -19,12 +20,15 @@ public class DeleteProcessor extends Processor {
 	 * @param argument
 	 * @return String of success/error message accordingly 
 	 */
-	public static String processDelete(String argument) {
-		try { 
-			storeCurrentList();
-			
-			String[] indices = argument.split(indicesDelimiter);
-			
+	public static String processDelete(String argument) throws InvalidInputException {
+		if (list.getSize() == 0) {
+			throw new InvalidInputException(INVALID_INPUT_EMPTY_LIST);
+		}
+		
+		storeCurrentList();
+		
+		String[] indices = argument.split(indicesDelimiter);
+		try {	
 			if(indices.length > 1) {
 				return SUCCESSFUL_DELETE + deleteMultiple(indices) + TASKS;
 			} else {
