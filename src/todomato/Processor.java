@@ -12,8 +12,8 @@ import java.util.Stack;
  */
 public class Processor {
 	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
-	protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	//protected static String fileLoc = "D:\\test.txt";
+	//protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	protected static String fileLoc = "D:\\test.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
 	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();
@@ -107,15 +107,23 @@ public class Processor {
 	}
 
 	/**
-	 * Converts "2" "1" to "2/1"
+	 * Converts "2" "1" to "YYYY-MM-DD"
 	 * @author Daryl
 	 * @param String month, String day
 	 * 
 	 * @return userDate
 	 * @throws IOException
 	 */
+
 	protected static String convertDateToStandardForm(String month, String day) {
-		return month + "/" + day;
+		String year = Integer.toString(DateTime.now(TimeZone.getTimeZone("GMT+8:00")).getYear());
+		if (month.length() == 1) {
+			month = "0" + month;
+		}
+		if (day.length() == 1) {
+			day = "0" + day;
+		}
+		return year + "-" + month + "-" + day;
 	}
 
 	/**
@@ -203,9 +211,14 @@ public class Processor {
 	 * @return standardFormDate
 	 * @throws InvalidInputException
 	 */
-	protected static String parseDateString(String input) throws InvalidInputException {
+	protected static String parseDateString(String input) {
+		if (DateTime.isParseable(input)) {
+			return input;
+		}
+		if (input == null) {
+			return null;
+		}
 		input = input.toLowerCase();
-		System.out.print(input);
 		String[] parts = input.split(" ");
 		String standardFormDate = null;
 		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
@@ -275,9 +288,15 @@ public class Processor {
 			userHour = "0" + userHour;
 		}
 		TimeString = userHour + ":" + userMinute;
-		//System.out.print(TimeString);
 		return TimeString;
 	}
+	
+	/**
+	 * Converts strings of form YYYY-MM-DD or
+	 * HH:MM to DateTime format
+	 * @param input
+	 * @return DateTime
+	 */
 	
 	protected static DateTime convertStringToDateTime(String input) {
 		DateTime userDateTime = null;
