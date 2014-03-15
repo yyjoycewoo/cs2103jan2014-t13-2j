@@ -73,7 +73,6 @@ public class AddProcessor extends Processor {
 	 * @return Task
 	 * @throws InvalidInputException
 	 */
-
 	public static TaskDT parseTask(String input) throws InvalidInputException {
 		Arrays.fill(taskDetails,null);
 		boolean taskDesExtracted = false;
