@@ -19,8 +19,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private JPanel p = new JPanel();
 
 	private JTextField txtCommand = new JTextField(20);
-	private JList<Task> listTasks = new JList<Task>(
-			loadTasks(Controller.getList()));
+	private JList<TaskDT> listTasks = new JList<TaskDT>(
+			loadTasks(Processor.getList()));
 	private JLabel lblStatus = new JLabel(" ");
 
 	public TodomatoFrame() {
@@ -67,12 +67,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		});
 	}
 
-	private Task[] loadTasks(TaskList l) {
-		Task[] list = { new Task("You currently have no tasks.") };
+	private TaskDT[] loadTasks(TaskDTList l) {
+		TaskDT[] list = { new TaskDT("You currently have no tasks.") };
 		if (l.getSize() == 0) {
 			return list;
 		} else {
-			list = new Task[l.getSize()];
+			list = new TaskDT[l.getSize()];
 			for (int i = 0; i < l.getSize(); i++) {
 				list[i] = l.getListItem(i);
 			}
