@@ -1,6 +1,7 @@
 package todomato;
 /**
- * Class to handle user commands, calls the appropriate methods depending on command
+ * This class handles user commands by calling the processing method depending
+ * on the action specified.
  * @author Joyce
  *
  */

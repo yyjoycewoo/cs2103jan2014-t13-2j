@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Class to store the day, month and year of a date
+ * This class stores the day, month and year of a date.
  * 
  * @author Joyce
  * 
@@ -139,7 +139,8 @@ public class Date {
 		return year;
 	}
 
-	public void setYear(int year) {
+	public void setYear(int year) throws InvalidInputException {
+		checkIfValidDate(day, month, year);
 		this.year = year;
 	}
 
@@ -147,7 +148,8 @@ public class Date {
 		return month;
 	}
 
-	public void setMonth(int month) {
+	public void setMonth(int month) throws InvalidInputException {
+		checkIfValidDate(day, month, year);
 		this.month = month;
 	}
 
@@ -155,7 +157,8 @@ public class Date {
 		return day;
 	}
 
-	public void setDay(int day) {
+	public void setDay(int day) throws InvalidInputException {
+		checkIfValidDate(day, month, year);
 		this.day = day;
 	}
 }

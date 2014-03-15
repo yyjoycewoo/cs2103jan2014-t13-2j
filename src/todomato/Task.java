@@ -5,7 +5,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Class that stores a Task description, and optional additional information.
+ * This class stores a Task description, and optional additional attributes.
+ * The attributes can be the following:
+ * <ul>
+ * <li>start time
+ * <li>end time
+ * <li>date
+ * <li>location
+ * </ul>
+ * 
+ * <p>
+ * A Task may be constructed with any subset of the possible additional
+ * information, as long as it has a description.
  * @author Joyce
  *
  */

@@ -2,6 +2,22 @@ package todomato;
 
 import java.util.Arrays;
 
+/**
+ * This class contains methods to process delete commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * The following ways to delete are supported:
+ * <ul>
+ * <li> delete a single task by specifying the index
+ * <ul> <li> "delete 1" </ul>
+ * <li> delete multiple tasks with indices in order
+ * <ul> <li> "delete 1,2,3" </ul>
+ * <li> delete all tasks
+ * <ul> <li> "delete all" </ul>
+ * </ul>
+ *
+ */
 public class DeleteProcessor extends Processor {
 	private static final String indicesDelimiter = "\\s*(,| )\\s*";
 	private static final String ARGUMENT_CLEAR_ALL = "all";
@@ -10,6 +26,7 @@ public class DeleteProcessor extends Processor {
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
+	
 	/**
 	 * Allowed format:
 	 * delete <index>
