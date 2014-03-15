@@ -5,13 +5,13 @@ public class DisplayProcessor extends Processor {
 	 * @author linxuan
 	 * @return TaskList
 	 */
-	private static TaskList notify = new TaskList();
+	private static TaskDTList notify = new TaskDTList();
 
-	public static TaskList processDisplay() {
+	public static TaskDTList processDisplay() {
 		notify.clearList();
 		// for notification checking
 		for (int i = 0; i < list.getSize(); i++) {
-			Task item = list.getListItem(i);
+			TaskDT item = list.getListItem(i);
 			if (item.getDate() != null) {
 				// ***********need to have a better Date API*************/
 				int day = item.getDate().getDay() - 1;

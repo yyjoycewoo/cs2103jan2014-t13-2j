@@ -64,7 +64,7 @@ public class DeleteProcessor extends Processor {
 		//TaskList deletedTasks = new TaskList();
 		int index = Integer.parseInt(indexString) - 1;
 		//deletedTasks.addToList(list.getListItem(index));
-		Task deletedTask = list.getListItem(index);
+		TaskDT deletedTask = list.getListItem(index);
 		list.deleteListItem(index);
 		fileHandler.updateFile(list);
 		return deletedTask.toString();

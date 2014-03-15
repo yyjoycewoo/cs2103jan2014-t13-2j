@@ -1,5 +1,7 @@
 package todomato;
 
+import hirondelle.date4j.DateTime;
+
 import java.io.IOException;
 import java.util.Stack;
 
@@ -8,8 +10,8 @@ public class Processor {
 	// "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
 	protected static String fileLoc = "D:\\test.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
-	protected static TaskList list = fileHandler.readFile();
-	protected static Stack<TaskList> oldLists = new Stack<TaskList>();
+	protected static TaskDTList list = fileHandler.readFile();
+	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();
 	protected static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
 	protected static final int POS_OF_MINUTE = 2;
 	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
@@ -17,12 +19,12 @@ public class Processor {
 
 	protected static void storeCurrentList() {
 		// store the current list before modifications for possible undo
-		TaskList lastList = new TaskList();
+		TaskDTList lastList = new TaskDTList();
 		lastList.deepCopy(list);
 		oldLists.push(lastList);
 	}
 
-	public static TaskList getList() {
+	public static TaskDTList getList() {
 		return list;
 	}
 
@@ -174,6 +176,13 @@ public class Processor {
 		}
 		return userTime;
 	}
+	
+	/**
+	 * Checks whether "am" or "pm" is in the string
+	 * @param input
+	 * @return integer indicating which meridiem is present
+	 * -1 if there is not one
+	 */
 
 	protected static int checkMeridiem(String input) {
 		String meridiems[] = new String[] { "am", "pm" };
@@ -184,4 +193,100 @@ public class Processor {
 		}
 		return -1;
 	}
+	/**
+	 * Converts "Jan 1" to "YYYY-MM-DD" (DateTime format)
+	 * @param input
+	 * @return standardFormDate
+	 * @throws InvalidInputException
+	 */
+	protected static String parseDateString(String input) throws InvalidInputException {
+		input = input.toLowerCase();
+		System.out.print(input);
+		String[] parts = input.split(" ");
+		String standardFormDate = null;
+		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
+				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+		for (int i = 0; i < months.length; i++) {
+			if (parts.length > 1) {
+				if (parts[0].contains(months[i])) {
+					standardFormDate = convertDateToStandardForm(
+							parts[1], String.valueOf(i + 1));
+				} else if (parts[1].contains(months[i])) {
+					standardFormDate = convertDateToStandardForm(
+							parts[0], String.valueOf(i + 1));
+				}
+			}
+		}
+		
+		return standardFormDate;
+	}
+	
+	/**
+	 * Converts "930pm" to HH:MM (DateTime Format)
+	 * @param input
+	 * @return standardFormDate
+	 * @throws InvalidInputException
+	 */
+	
+	protected static String parseTimeStringFromInput(String input) {
+		String TimeString = null;
+		if (input == null) {
+			return "";
+		}
+		String meridiem[] = new String[] { "am", "pm" };
+		String userHour = null;
+		String userMinute = "00";
+		int meridiemIndex = checkMeridiem(input);
+		if (meridiemIndex != -1) {
+			input = input.substring(0,
+					input.indexOf(meridiem[meridiemIndex]));
+			if (input.length() == 1) {
+				userHour = input;
+			} else if (input.length() == 3) {
+				userHour = input.substring(0, 1);
+				userMinute = input.substring(POS_OF_MINUTE - 1);
+			} else if (input.length() == 4) {
+				userHour = input.substring(0, 2);
+				userMinute = input.substring(POS_OF_MINUTE - 2);
+			}
+			if (meridiemIndex == 1) {
+				userHour = Integer.toString(Integer.parseInt(userHour) + 12);
+			}
+		} else {
+			if (input.length() == 5 && input.contains(":")) {
+				return input;
+			} else {
+				if ((input.length() == 1) || (input.length() == 2)) {
+					userHour = input;
+				} else if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
+					userHour = input.substring(0, POS_OF_MINUTE);
+					userMinute = input.substring(POS_OF_MINUTE);
+				} else if (input.length() == 3) {
+					userHour = input.substring(0, 1);
+					userMinute = input.substring(1);
+				}
+			}
+		}
+		if (userHour.length() == 1) {
+			userHour = "0" + userHour;
+		}
+		TimeString = userHour + ":" + userMinute;
+		//System.out.print(TimeString);
+		return TimeString;
+	}
+	
+	protected static DateTime convertStringToDateTime(String input) {
+		DateTime userDateTime = null;
+		if (input == null) {
+			return null;
+		} else {
+			if (!DateTime.isParseable(input)) {
+				return null;
+			} else {
+				userDateTime = new DateTime(input);
+			}
+		}
+		return userDateTime;
+	}
+	
 }

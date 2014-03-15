@@ -3,6 +3,8 @@
  */
 package todomato;
 
+import hirondelle.date4j.DateTime;
+
 /**
  * @author Hao Eng
  * 
@@ -25,7 +27,7 @@ public class UpdateProcessor extends Processor {
 	 * @return Updated Task
 	 * @throws InvalidInputException
 	 */
-	public static Task processUpdate(String argument)
+	public static TaskDT processUpdate(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
@@ -101,34 +103,34 @@ public class UpdateProcessor extends Processor {
 	 * @return updated task
 	 * @throws InvalidInputException
 	 */
-	private static Task updateStartTime(int index, int editStartTime,
+	private static TaskDT updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
-		Time time = Processor.parseTimeFromString(argument
-				.substring(editStartTime + NO_OF_CHAR_IN_STIME));
+		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
+				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
 		list.getListItem(index).setStartTime(time);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
-	private static Task updateEndTime(int index, int editEndTime,
+	private static TaskDT updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		Time time = parseTimeFromString(argument.substring(editEndTime
-				+ NO_OF_CHAR_IN_ETIME));
+		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument.substring(editEndTime
+				+ NO_OF_CHAR_IN_ETIME)));
 		list.getListItem(index).setEndTime(time);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
-	private static Task updateDate(int index, int editDate, String argument)
+	private static TaskDT updateDate(int index, int editDate, String argument)
 			throws InvalidInputException {
-		Date date = retrieveDateStringFromInput(argument.substring(editDate
-				+ NO_OF_CHAR_IN_DATE));
+		DateTime date = convertStringToDateTime(parseDateString(argument.substring(editDate
+				+ NO_OF_CHAR_IN_DATE)));
 		list.getListItem(index).setDate(date);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
-	private static Task updateLocation(int index, int editLoc, String argument) {
+	private static TaskDT updateLocation(int index, int editLoc, String argument) {
 		int stopIndex = argument.length();
 		if (argument.contains("\\")) {
 			int escChar = argument.indexOf("\\");
@@ -151,7 +153,7 @@ public class UpdateProcessor extends Processor {
 	 *            that contains new description
 	 * @return updated task
 	 */
-	private static Task updateDesc(int index, int editDesc, String argument) {
+	private static TaskDT updateDesc(int index, int editDesc, String argument) {
 		int stopIndex = argument.length();
 		if (argument.contains("\\")) {
 			int escChar = argument.indexOf("\\");
