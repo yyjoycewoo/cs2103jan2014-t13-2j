@@ -14,7 +14,7 @@ import java.util.TimeZone;
 public class Processor {
 	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
 	//protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	protected static String fileLoc = "D:\\test.txt";
+	//protected static String fileLoc = "D:\\test.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
 	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();
@@ -115,7 +115,6 @@ public class Processor {
 	 * @return userDate
 	 * @throws IOException
 	 */
-
 	protected static String convertDateToStandardForm(String month, String day) {
 		String year = Integer.toString(DateTime.now(TimeZone.getTimeZone("GMT+8:00")).getYear());
 		if (month.length() == 1) {

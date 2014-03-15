@@ -15,8 +15,8 @@ public class DisplayProcessor extends Processor {
 	private static TaskDTList notify = new TaskDTList();
 
 	/**
-	public static TaskDTList processDisplay() {
 	 * @return
+	 */
 	 */
 	public static TaskDTList processDisplay() {
 		notify.clearList();
