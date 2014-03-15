@@ -5,10 +5,15 @@ import hirondelle.date4j.DateTime;
 import java.io.IOException;
 import java.util.Stack;
 
+/**
+ * This class stores information needed to process a user's command,
+ * and contains methods to parse a command's arguments. 
+ * 
+ */
 public class Processor {
 	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
-	// "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	protected static String fileLoc = "D:\\test.txt";
+	protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
+	//protected static String fileLoc = "D:\\test.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
 	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();
@@ -17,8 +22,11 @@ public class Processor {
 	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
 	protected static final int SPACE_NOT_FOUND = -1;
 
+	/**
+	 * This stores a copy of the current list before modifications are made
+	 * for possible undo operations in the future.
+	 */
 	protected static void storeCurrentList() {
-		// store the current list before modifications for possible undo
 		TaskDTList lastList = new TaskDTList();
 		lastList.deepCopy(list);
 		oldLists.push(lastList);
@@ -37,7 +45,6 @@ public class Processor {
 	 * @throws InvalidInputException
 	 * @throws NumberFormatException
 	 */
-
 	protected static Date parseDateFromStandardForm(String input)
 			throws NumberFormatException, InvalidInputException {
 		String delims = "/";
@@ -67,7 +74,6 @@ public class Processor {
 	 * @throws InvalidInputException
 	 * @throws NumberFormatException
 	 */
-
 	protected static Date retrieveDateStringFromInput(String input) {
 		try {
 			input = input.toLowerCase();
@@ -108,7 +114,6 @@ public class Processor {
 	 * @return userDate
 	 * @throws IOException
 	 */
-
 	protected static String convertDateToStandardForm(String month, String day) {
 		return month + "/" + day;
 	}
@@ -121,7 +126,6 @@ public class Processor {
 	 * @return userTime
 	 * @throws InvalidInputException
 	 */
-
 	protected static Time parseTimeFromString(String input)
 			throws InvalidInputException {
 		Time userTime = null;

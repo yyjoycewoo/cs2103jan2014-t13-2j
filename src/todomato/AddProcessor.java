@@ -6,6 +6,49 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+/**
+ * This class contains methods to process add commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * It can process commands with a description, a start time, an end
+ * time, a date and a location. Only a description is mandatory.
+ * 
+ * <p>
+ * The following keywords are necessary, while the order is flexible:
+ * <ul>
+ * <li>" at " or " from " keyword for the start time
+ * <li>" to ", " until ", " due " for the end time
+ * <li>" on " for the date
+ * <li>" in " for the keyword
+ * </ul>
+ * 
+ * <p>
+ * Example: "add dinner with bob at 1900 on mar 3 in uTown"
+ * 
+ * <p>
+ * The following time formats are supported:
+ * <ul>
+ * <li>930am/pm
+ * <li>9am/pm
+ * <li>1230
+ * <li>0730
+ * <li>0730pm
+ * </ul>
+ * 
+ * <p>
+ * The following date formats are supported (case does not matter):
+ * <ul>
+ * <li>jan 1
+ * <li>1 january
+ * <li>january 1
+ * <li>DD/MM
+ * <li>DD/MM/YY
+ * </ul>
+ * 
+ * @author Daryl
+ * 
+ */
 public class AddProcessor extends Processor {
 
 	private static String[] keywords = new String[] { " at ", " from ",
@@ -60,7 +103,6 @@ public class AddProcessor extends Processor {
 	 * @throws NumberFormatException
 	 * @throws IOException
 	 */
-
 	public static String processAdd(String input) throws NumberFormatException {
 		TaskDT userTask = null;
 		try {

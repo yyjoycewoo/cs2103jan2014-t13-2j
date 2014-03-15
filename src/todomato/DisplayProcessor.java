@@ -1,5 +1,12 @@
 package todomato;
 
+/**
+ * This class contains methods to process display commands by the user.
+ * It is used to display all of a user's tasks when using the command line,
+ * but the GUI automatically displays the user's tasks after each command.
+ * It also creates notifications about upcoming tasks.
+ *
+ */
 public class DisplayProcessor extends Processor {
 	/**
 	 * @author linxuan
@@ -7,7 +14,11 @@ public class DisplayProcessor extends Processor {
 	 */
 	private static TaskDTList notify = new TaskDTList();
 
+	/**
 	public static TaskDTList processDisplay() {
+	 * @return
+	 */
+	public static TaskList processDisplay() {
 		notify.clearList();
 		// for notification checking
 		for (int i = 0; i < list.getSize(); i++) {

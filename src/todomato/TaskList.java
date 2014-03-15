@@ -2,7 +2,7 @@ package todomato;
 import java.util.ArrayList;
 
 /**
- * Class to store a list of all Tasks that the user wants to keep track of
+ * This class stores a list of all Tasks that the user wants to keep track of.
  * @author Joyce
  *
  */
