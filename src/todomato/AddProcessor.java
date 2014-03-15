@@ -66,6 +66,13 @@ public class AddProcessor extends Processor {
 	private static int INDEX_OF_LOCATION_STRING = 4;
 	private static int NO_OF_TASK_DETAILS = 5;
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
+	
+	/**
+	 * Parses Task from a String
+	 * @param input
+	 * @return Task
+	 * @throws InvalidInputException
+	 */
 
 	public static TaskDT parseTask(String input) throws InvalidInputException {
 		Arrays.fill(taskDetails,null);
@@ -172,7 +179,7 @@ public class AddProcessor extends Processor {
 	}
 	
 	/**
-	 * Retrieves the first word in input
+	 * Retrieves the start time (first word) from input in the DateTime format (HH:MM)
 	 * @param input
 	 * @param spaceIndex
 	 * @return startTimeString
@@ -184,11 +191,25 @@ public class AddProcessor extends Processor {
 		return startTimeString;
 	}
 	
+	/**
+	 * Retrieves the end time (first word) from input in the DateTime format (HH:MM)
+	 * @param input
+	 * @param spaceIndex
+	 * @return endTimeString
+	 */
+	
 	private static String retrieveEndTime (String input, int spaceIndex) {
 		String endTimeString = (input.substring(0, spaceIndex));
 		endTimeString = parseTimeStringFromInput(endTimeString);
 		return endTimeString;
 	}
+	
+	/**
+	 * Retrieves location from input
+	 * @param input
+	 * @param spaceIndex
+	 * @return startTimeString
+	 */
 	
 	private static String retrieveLocation (String input) {
 		String location = null;
@@ -201,14 +222,19 @@ public class AddProcessor extends Processor {
 		return location;
 	}
 	
+	/**
+	 * Retrieves the Date from input in the DateTime format (YYYY-MM-DD)
+	 * @param input
+	 * @param spaceIndex
+	 * @return dateString
+	 */
+	
 	private static String retrieveDate (String input) throws InvalidInputException {
 		String dateString = parseDateString(input);
 		return dateString;
 	}
 	
 
-
-	
 	/**
 	 * Returns words before the specified keyword
 	 * @param input
