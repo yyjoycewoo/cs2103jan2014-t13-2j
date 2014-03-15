@@ -18,6 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 /**
+ * This class creates a pop up notification to appear on the desktop.
+ * 
  * @author Hao Eng
  * @source from
  *         http://www.javacodegeeks.com/2012/10/create-new-message-notification
@@ -25,6 +27,9 @@ import javax.swing.WindowConstants;
  */
 public class Notification {
 
+	/**
+	 * @param taskToDo
+	 */
 	protected static void popUpNotice(String taskToDo) {
 		String msg = "You have a new notification.";
 		final int waitfor = 20000;

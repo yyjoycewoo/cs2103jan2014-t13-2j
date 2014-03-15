@@ -1,5 +1,11 @@
 package todomato;
 
+/** 
+ * This class contains methods to process undo commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * @author Joyce
+ *
+ */
 public class UndoProcessor extends Processor {
 	private static final String NO_CHANGES_TO_UNDO_MSG = "No changes to undo";
 	

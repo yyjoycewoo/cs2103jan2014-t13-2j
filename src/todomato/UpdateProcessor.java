@@ -6,28 +6,34 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 /**
+ * This class contains methods to process update commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * It can process commands that update a description, a start time, an end
+ * time, a date and a location. Any subset of the possible attributes
+ * can be updated.
+ * 
+ * <p>
+ * To update a task, start by typing "update," followed by a valid index.
+ * The following keywords are necessary for the attributes, while the order
+ * is flexible:
+ * <ul>
+ * <li>"starttime" for the start time
+ * <li>"endtime" for the end time
+ * <li>"desc" for the description, followed by '\' afterwards
+ * <li>"location" for the location, followed by '\' afterwards
+ * <li> "date" for the date
  * </ul>
  * 
  * <p>
- * The following time formats are supported:
- * <ul>
- * <li>930am/pm
- * <li>9am/pm
- * <li>1230
- * <li>0730
- * <li>0730pm
- * </ul>
+ * Each keyword should be proceeded by the new attribute.
  * 
  * <p>
- * The following date formats are supported (case does not matter):
+ * Examples:
  * <ul>
- * <li>jan 1
- * <li>1 january
- * <li>january 1
- * <li>DD/MM
- * <li>DD/MM/YY
- * </ul>
- * 
+ * <li>"update 2 date 04/01/14"
+ * <li>"update 1 starttime 1900 desc dinner with parents\ location home\
  * @author Hao Eng
  * 
  */
