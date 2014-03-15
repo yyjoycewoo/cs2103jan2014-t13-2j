@@ -6,6 +6,28 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 /**
+ * </ul>
+ * 
+ * <p>
+ * The following time formats are supported:
+ * <ul>
+ * <li>930am/pm
+ * <li>9am/pm
+ * <li>1230
+ * <li>0730
+ * <li>0730pm
+ * </ul>
+ * 
+ * <p>
+ * The following date formats are supported (case does not matter):
+ * <ul>
+ * <li>jan 1
+ * <li>1 january
+ * <li>january 1
+ * <li>DD/MM
+ * <li>DD/MM/YY
+ * </ul>
+ * 
  * @author Hao Eng
  * 
  */
