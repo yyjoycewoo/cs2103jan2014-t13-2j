@@ -7,7 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Class to read/write/update local data file
+ * This class reads, writes, and updates a local data file stored
+ * on the user's computer. It reads in tasks as Task objects.
  * @author Yiwen
  *
  */
@@ -18,6 +19,9 @@ public class FileHandler {
 	private String fileLocation;
 	private File file;
 	
+	/**
+	 * @param fileLoc
+	 */
 	public FileHandler (String fileLoc) {
 		this.fileLocation = fileLoc;
 		this.file = new File (fileLocation);

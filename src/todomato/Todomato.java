@@ -2,6 +2,12 @@ package todomato;
 
 import java.util.Scanner;
 
+/**
+ * This class is the driver for the Todomato application. It creates the GUI,
+ * and repeatedly obtains user input until the user in the main method, until
+ * the user wants to exit. 
+ *
+ */
 public class Todomato {
 
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
@@ -15,7 +21,7 @@ public class Todomato {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		/**
+		/*
 		 * The next line opens the GUI Make sure the fileLoc in Controller is
 		 * correct for it to work miglayout (http://www.miglayout.com/) must
 		 * also be added to the build path

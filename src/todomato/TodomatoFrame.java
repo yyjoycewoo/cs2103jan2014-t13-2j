@@ -12,6 +12,11 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
+/**
+ * This class is the JFrame for the GUI of the application.
+ * @author Joyce
+ *
+ */
 @SuppressWarnings("serial")
 public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
@@ -20,9 +25,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 	private JTextField txtCommand = new JTextField(20);
 	private JList<Task> listTasks = new JList<Task>(
-			loadTasks(Controller.getList()));
+			loadTasks(Processor.getList()));
 	private JLabel lblStatus = new JLabel(" ");
 
+	/**
+	 * This constructor creates a JFrame for the application Todomato.
+	 */
 	public TodomatoFrame() {
 		// create and set up the window
 		super("Todomato");

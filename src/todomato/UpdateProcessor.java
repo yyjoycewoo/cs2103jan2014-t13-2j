@@ -4,6 +4,34 @@
 package todomato;
 
 /**
+ * This class contains methods to process update commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * It can process commands that update a description, a start time, an end
+ * time, a date and a location. Any subset of the possible attributes
+ * can be updated.
+ * 
+ * <p>
+ * To update a task, start by typing "update," followed by a valid index.
+ * The following keywords are necessary for the attributes, while the order
+ * is flexible:
+ * <ul>
+ * <li>"starttime" for the start time
+ * <li>"endtime" for the end time
+ * <li>"desc" for the description, followed by '\' afterwards
+ * <li>"location" for the location, followed by '\' afterwards
+ * <li> "date" for the date
+ * </ul>
+ * 
+ * <p>
+ * Each keyword should be proceeded by the new attribute.
+ * 
+ * <p>
+ * Examples:
+ * <ul>
+ * <li>"update 2 date 04/01/14"
+ * <li>"update 1 starttime 1900 desc dinner with parents\ location home\
  * @author Hao Eng
  * 
  */
