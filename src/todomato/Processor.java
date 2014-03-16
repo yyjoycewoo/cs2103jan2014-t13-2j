@@ -37,76 +37,7 @@ public class Processor {
 		return list;
 	}
 
-	/**
-	 * Retrieves date from user input of the form DD/MM or DD/MM/YY Returns a
-	 * Date Object with the corresponding day and month
-	 * 
-	 * @param input
-	 * @return userDate
-	 * @throws InvalidInputException
-	 * @throws NumberFormatException
-	 */
-	protected static Date parseDateFromStandardForm(String input)
-			throws NumberFormatException, InvalidInputException {
-		String delims = "/";
-		String[] dateTokens = input.split(delims);
-		if (dateTokens.length == 2) {
-			Date userDate = new Date(Integer.parseInt(dateTokens[0]),
-					Integer.parseInt(dateTokens[1]));
-			return userDate;
-		} else if (dateTokens.length == 3) {
-			Date userDate = new Date(Integer.parseInt(dateTokens[0]),
-					Integer.parseInt(dateTokens[1]),
-					Integer.parseInt(dateTokens[2]));
-			return userDate;
-		} else {
-			return null;
-		}
-
-	}
-
-	/**
-	 * Retrieves date from user input of the form DD/MM or DD/MM/YY It also
-	 * allows for "Feb 1" or "1 Feb" Returns a Date Object with the
-	 * corresponding day and month
-	 * 
-	 * @param input
-	 * @return userDate
-	 * @throws InvalidInputException
-	 * @throws NumberFormatException
-	 */
-	protected static Date retrieveDateStringFromInput(String input) {
-		try {
-			input = input.toLowerCase();
-			String[] parts = input.split(" ");
-			String dateDelimiter = "/";
-			String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
-					"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
-			for (int i = 0; i < months.length; i++) {
-				if (parts.length > 1) {
-					if (parts[0].contains(months[i])) {
-						String standardFormDate = convertDateToStandardForm(
-								parts[1], String.valueOf(i + 1));
-						Date userDate = parseDateFromStandardForm(standardFormDate);
-						return userDate;
-					} else if (parts[1].contains(months[i])) {
-						String standardFormDate = convertDateToStandardForm(
-								parts[0], String.valueOf(i + 1));
-						Date userDate = parseDateFromStandardForm(standardFormDate);
-						return userDate;
-					}
-				}
-			}
-			if (parts[0].contains(dateDelimiter)) {
-				Date userDate = parseDateFromStandardForm(parts[0]);
-				return userDate;
-			}
-		} catch (InvalidInputException e) {
-			return null;
-		}
-		return null;
-	}
-
+	
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"
 	 * @author Daryl
@@ -123,7 +54,7 @@ public class Processor {
 		if (day.length() == 1) {
 			day = "0" + day;
 		}
-		return year + "-" + month + "-" + day;
+		return year + "-" + day + "-" + month;
 	}
 
 	/**
