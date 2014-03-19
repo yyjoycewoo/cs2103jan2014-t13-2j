@@ -12,9 +12,8 @@ import java.util.TimeZone;
  * 
  */
 public class Processor {
-	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
-	//protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	protected static String fileLoc = "D:\\test.txt";
+
+	protected static String fileLoc = "data.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
 	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();

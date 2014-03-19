@@ -24,7 +24,22 @@ public class FileHandler {
 	 */
 	public FileHandler (String fileLoc) {
 		this.fileLocation = fileLoc;
-		this.file = new File (fileLocation);
+		this.file = createNewFileWhenNotExist(new File (fileLocation));
+		System.out.println(file);
+		
+	}
+	
+	public File createNewFileWhenNotExist (File f) {
+		File dataFile = f;
+		if(!f.exists()) {
+			try {
+				FileWriter fw = new FileWriter(f.getAbsoluteFile());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return dataFile;
 	}
 
 	/**
@@ -38,9 +53,9 @@ public class FileHandler {
 			String currentLine;
 			TaskDT currentTask;
 			TaskDTList taskList = new TaskDTList();
-	
+			System.out.println(file.getAbsoluteFile());
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsoluteFile()));
-	
+			
 			while ((currentLine = bufferedReader.readLine()) != null) {
 				currentTask = readTask(currentLine);
 				taskList.addToList(currentTask);
@@ -71,6 +86,7 @@ public class FileHandler {
 			
 			FileWriter fileWriter = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			
 	
 			if (!file.exists()) {
 				file.createNewFile();
@@ -84,6 +100,7 @@ public class FileHandler {
 			bufferedWriter.close();
 			
 			TaskDTList updatedList = readFile();
+			
 			
 			return updatedList;
 		
