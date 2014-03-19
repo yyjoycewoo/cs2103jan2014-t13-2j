@@ -24,9 +24,7 @@ public class FileHandler {
 	 */
 	public FileHandler (String fileLoc) {
 		this.fileLocation = fileLoc;
-		this.file = createNewFileWhenNotExist(new File (fileLocation));
-		System.out.println(file);
-		
+		this.file = createNewFileWhenNotExist(new File (fileLocation));	
 	}
 	
 	public File createNewFileWhenNotExist (File f) {
@@ -53,7 +51,6 @@ public class FileHandler {
 			String currentLine;
 			TaskDT currentTask;
 			TaskDTList taskList = new TaskDTList();
-			System.out.println(file.getAbsoluteFile());
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsoluteFile()));
 			
 			while ((currentLine = bufferedReader.readLine()) != null) {
