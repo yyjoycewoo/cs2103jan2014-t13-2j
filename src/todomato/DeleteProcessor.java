@@ -1,6 +1,8 @@
 package todomato;
 
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class contains methods to process delete commands by the user.
@@ -27,6 +29,8 @@ public class DeleteProcessor extends Processor {
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	
+	private static final Logger logger = Logger.getLogger(DeleteProcessor.class.getName());
+	
 	/**
 	 * Allowed format:
 	 * delete <index>
@@ -38,7 +42,9 @@ public class DeleteProcessor extends Processor {
 	 * @return String of success/error message accordingly 
 	 */
 	public static String processDelete(String argument) throws InvalidInputException {
+		logger.log(Level.INFO, "processing delete");
 		if (list.getSize() == 0) {
+			logger.log(Level.INFO, "exited due to empty list");
 			throw new InvalidInputException(INVALID_INPUT_EMPTY_LIST);
 		}
 		
@@ -46,7 +52,7 @@ public class DeleteProcessor extends Processor {
 		
 		String[] indices = argument.split(indicesDelimiter);
 		String statusMessage;
-		try {	
+		try {
 			if(indices.length > 1) {
 				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(indices) + TASKS;
 			} else {
@@ -57,14 +63,17 @@ public class DeleteProcessor extends Processor {
 				} 
 			}
 			fileHandler.updateFile(list);
+			logger.log(Level.INFO, "end of processing");
 			return statusMessage;
 		} catch(NumberFormatException e) {
 			// TODO
+			logger.log(Level.WARNING, "exited due to non-number");
 			return ERROR_MESSAGE_NUMBER_FORMAT;
 		} catch(IndexOutOfBoundsException e) {
 			// TODO
+			logger.log(Level.WARNING, "exited due to index out of bound");
 			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;
-		}
+		}		
 	}
 	
 	private static String deleteAll() {
