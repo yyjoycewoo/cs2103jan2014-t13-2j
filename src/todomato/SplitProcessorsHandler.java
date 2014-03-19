@@ -8,7 +8,6 @@ package todomato;
 public class SplitProcessorsHandler {
 
 	private static final String SUCCESSFUL_UPDATE_MSG = "Updated task to: ";
-	//private static final String SUCCESSFUL_DELETE_MSG = "Deleted task(s): ";
 	private static final String SUCCESSFUL_ADD_MSG = "Added task: ";
 	private static final String ADD_COMMAND = "add";
 	private static final String DELETE_COMMAND = "delete";
@@ -32,13 +31,12 @@ public class SplitProcessorsHandler {
 			System.exit(0);
 		}			
 		if (command.getAction().equals(DISPLAY_COMMAND)) {
-			return DisplayProcessor.processDisplay().toString();		
+			return DisplayProcessor.processDisplay(command.getArgument()).toString();		
 		}
 		if (command.getAction().equals(UPDATE_COMMAND)) {
 			return SUCCESSFUL_UPDATE_MSG  + UpdateProcessor.processUpdate(command.getArgument()).toString();
 		}
 		if (command.getAction().equals(DELETE_COMMAND)) {
-			//return SUCCESSFUL_DELETE_MSG + DeleteProcessor.processDelete(command.getArgument());
 			return DeleteProcessor.processDelete(command.getArgument());
 		}
 		if (command.getAction().equals(ADD_COMMAND)) {
