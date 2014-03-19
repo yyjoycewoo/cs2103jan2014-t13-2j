@@ -1,5 +1,6 @@
 package todomato;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Class to store a list of all TaskDTs that the user wants to keep track of
@@ -58,7 +59,6 @@ public class TaskDTList {
 	public String toString() {
 		String s = "";
 		int i = 0;
-		
 		for (TaskDT t : list){
 			s += Integer.toString(i+1) + ": " + t.toString() + LINE_BREAK;
 			i++;
@@ -89,5 +89,9 @@ public class TaskDTList {
 	
 	public int getSize() {
 		return list.size();
+	}
+	
+	public void swap(int i, int j) {
+		Collections.swap(list, i, j);
 	}
 }
