@@ -59,10 +59,10 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					// String status = CmdHandler.processCommand(txtCommand
-					// .getText());
 					String status = SplitProcessorsHandler
 							.processCommand(txtCommand.getText());
+					assert status != null;
+					
 					listTasks.setListData(loadTasks(Processor.getList()));
 					txtCommand.setText("");
 					lblStatus.setText(status);
