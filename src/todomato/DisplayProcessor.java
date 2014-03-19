@@ -1,11 +1,11 @@
 package todomato;
 
 /**
- * This class contains methods to process display commands by the user.
- * It is used to display all of a user's tasks when using the command line,
- * but the GUI automatically displays the user's tasks after each command.
- * It also creates notifications about upcoming tasks.
- *
+ * This class contains methods to process display commands by the user. It is
+ * used to display all of a user's tasks when using the command line, but the
+ * GUI automatically displays the user's tasks after each command. It also
+ * creates notifications about upcoming tasks.
+ * 
  */
 public class DisplayProcessor extends Processor {
 	private static final String ARGUMENT_SORT_BY_DATE = "by date";
