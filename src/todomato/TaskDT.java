@@ -1,6 +1,7 @@
 package todomato;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
 
@@ -10,12 +11,14 @@ public class TaskDT {
 	private static final String END_TIME_PREP = " until ";
 	private static final String LOCATION_PREP = " in ";
 	private static final String DATE_PREP = " on ";
+	private static final String SEPERATOR = "#";
 	
 	private String description;
 	private DateTime startTime;
 	private DateTime endTime;
 	private DateTime date;
 	private String location;
+	private int recurrencePeriod;
 	
 	public TaskDT(String userDes) {
 		description = userDes;
@@ -27,6 +30,16 @@ public class TaskDT {
 		date = userDate;
 		endTime = userEnd;
 		location = userLocation;
+		recurrencePeriod = 0;
+	}
+	
+	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation, int userRecurrencePeriod) {
+		description = userDes;
+		startTime = userStart;
+		date = userDate;
+		endTime = userEnd;
+		location = userLocation;
+		recurrencePeriod = userRecurrencePeriod;
 	}
 	
 	public TaskDT(TaskDT copy) {
@@ -35,6 +48,18 @@ public class TaskDT {
 		endTime = copy.getEndTime();
 		date = copy.getDate();
 		location = copy.getLocation();
+		recurrencePeriod = copy.getRecurrencePeriod();
+	}
+	
+	public static boolean isEqual(String string1, String string2) {
+	    return string1 == string2 || (string1 != null && string1.equals(string2));
+	}
+	
+	public Boolean compareDescAndLocation(TaskDT task) {
+		if (isEqual(this.description,task.getDescription()) && isEqual(this.location,task.getLocation())) {
+			return true;
+		}
+		return false;
 	}
 	
 	public String toString() {
@@ -51,8 +76,47 @@ public class TaskDT {
 		if (location != null) {
 			task += LOCATION_PREP + location;
 		}
+		if (recurrencePeriod != 0) {
+			task += " recurring every "  + recurrencePeriod + " days";
+		}
 			
 		return task;
+	}
+	
+	public String toFileString() {
+		String task = description;
+		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + date + SEPERATOR +location + SEPERATOR + recurrencePeriod;
+		return task;
+	}
+	
+	public static TaskDT createTaskFromFileString(String fileInput) {
+		String[] parts = fileInput.split(SEPERATOR);
+		String description = parts[0];
+		DateTime startTime = null;
+		DateTime endTime = null;
+		DateTime date = null;
+		String location = null;
+		if (DateTime.isParseable(parts[1])) {
+			startTime = new DateTime(parts[1]);
+		}
+		if (DateTime.isParseable(parts[2])) {
+			endTime = new DateTime(parts[2]);
+		}
+		if (DateTime.isParseable(parts[3])) {
+			date = new DateTime(parts[3]);
+		}
+		if (!parts[4].equals("null")) {
+			location = parts[4];
+		}
+		int recurrencePeriod = Integer.parseInt(parts[5]);
+		
+		TaskDT userTask = new TaskDT(description);
+		userTask.setStartTime(startTime);
+		userTask.setEndTime(endTime);
+		userTask.setDate(date);
+		userTask.setLocation(location);
+		userTask.setRecurrencePeriod(recurrencePeriod);
+		return userTask;
 	}
 	
 	/**
@@ -114,5 +178,13 @@ public class TaskDT {
 	
 	public DateTime getDate() {
 		return date;
+	}
+
+	public int getRecurrencePeriod() {
+		return recurrencePeriod;
+	}
+	
+	public void setRecurrencePeriod(int recurrencePeriod) {
+		this.recurrencePeriod = recurrencePeriod;
 	}
 }

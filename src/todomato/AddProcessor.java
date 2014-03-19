@@ -4,6 +4,7 @@ import hirondelle.date4j.DateTime;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 /**
@@ -52,20 +53,57 @@ import java.util.regex.Pattern;
 public class AddProcessor extends Processor {
 
 	private static String[] keywords = new String[] { " at ", " from ",
-			" until ", " to ", " in ", " due ",  " on "};
+			" until ", " to ", " in ", " due ",  " on ", " recur "};
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
 	private static int NOT_FOUND = -1;
 	//private static String INVALID_DATE = "Invalid date format";
 	//private static String INVALID_TIME = "Invalid time format";
 	private static String INVALID_INPUT = "Invalid input format";
+	private static String RECUR_KEYWORD = "recur";
 	private static int INDEX_OF_DESC = 0;
 	private static int INDEX_OF_START_TIME_STRING = 1;
 	private static int INDEX_OF_END_TIME_STRING = 2;
 	private static int INDEX_OF_DATE_STRING = 3;
 	private static int INDEX_OF_LOCATION_STRING = 4;
-	private static int NO_OF_TASK_DETAILS = 5;
+	private static int NO_OF_TASK_DETAILS = 6;
+	private static int INDEX_OF_RECUR_STRING = 5;
+	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
+	
+
+
+	/**
+	 * @author Daryl
+	 * Adds Task to the list and writes to file the updated list
+	 * @param input
+	 * @return Task
+	 * @throws InvalidInputException
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
+	public static String processAdd(String input) throws NumberFormatException {
+		TaskDT userTask = null;
+		if (input.equals(RECUR_KEYWORD)) {
+			for (int i = 0; i < list.getSize(); i++){
+				addsRecurringTask(list.getListItem(i));
+				}
+			fileHandler.updateFile(list);
+			return RECURRING_TASKS_ADDED;
+		}
+		else {
+			try {
+				userTask = parseTask(input);
+			} catch (InvalidInputException e) {
+				return INVALID_INPUT;
+			}
+			list.addToList(userTask);
+		}
+		fileHandler.updateFile(list);
+		return userTask.toString();
+	}
+	
+	
 	
 	/**
 	 * Parses Task from a String
@@ -76,7 +114,7 @@ public class AddProcessor extends Processor {
 	public static TaskDT parseTask(String input) throws InvalidInputException {
 		Arrays.fill(taskDetails,null);
 		boolean taskDesExtracted = false;
-		int keywordIndex = -1;
+		int keywordIndex = NOT_FOUND;
 		TaskDT userTaskDT = null;
 		String[] stringFragments = null;
 		
@@ -99,27 +137,6 @@ public class AddProcessor extends Processor {
 		
 		return userTaskDT;
 	}
-
-	/**
-	 * @author Daryl
-	 * Adds Task to the list and writes to file the updated list
-	 * @param input
-	 * @return Task
-	 * @throws InvalidInputException
-	 * @throws NumberFormatException
-	 * @throws IOException
-	 */
-	public static String processAdd(String input) throws NumberFormatException {
-		TaskDT userTask = null;
-		try {
-			userTask = parseTask(input);
-		} catch (InvalidInputException e) {
-			return INVALID_INPUT;
-		}
-		list.addToList(userTask);
-		fileHandler.updateFile(list);
-		return userTask.toString();
-	}
 	
 	/**
 	 * Creates and sets userTask with all the information stored in
@@ -133,10 +150,22 @@ public class AddProcessor extends Processor {
 		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME_STRING]);
 		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME_STRING]);
 		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE_STRING]);
+		int recurPeriod = 0;
+		try {
+			if (date != null) {
+				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR_STRING]);
+			} else {
+				System.out.print("Cannot set recurring period without setting date");
+			}
+		}
+		catch (NumberFormatException e) {
+			System.out.print(INVALID_INPUT);
+		}
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
 		userTask.setDate(date);
 		userTask.setLocation(taskDetails[INDEX_OF_LOCATION_STRING]);
+		userTask.setRecurrencePeriod(recurPeriod);
 		return userTask;
 	}
 	
@@ -172,9 +201,24 @@ public class AddProcessor extends Processor {
 			case 6:
 				taskDetails[INDEX_OF_DATE_STRING] = retrieveDate(input);
 				break;
+			case 7:
+				taskDetails[INDEX_OF_RECUR_STRING] = retrieveRecurPeriod(input, spaceIndex);
+				break;
 		}
 
 		return taskDetails;
+	}
+
+	/**
+	 * Retrieves the recurring period (first word) from input
+	 * @param input
+	 * @param spaceIndex
+	 * @return recurPeriod
+	 */
+	
+	private static String retrieveRecurPeriod (String input, int spaceIndex) {
+		String recurPeriod = (input.substring(0, spaceIndex));
+		return recurPeriod;
 	}
 	
 	/**
@@ -296,5 +340,60 @@ public class AddProcessor extends Processor {
 		splitWords = pattern.split(input);
 
 		return splitWords;
+	}
+	
+	/**
+	 * Adds tasks that have expired and needs to be recurred
+	 * @param task
+	 */
+	
+
+	protected static void addsRecurringTask(TaskDT task) {
+		if (needsToBeRecurred(task)) {
+			TaskDT newTask = new TaskDT(task);
+			newTask.setDate(task.getDate().plusDays(task.getRecurrencePeriod()));
+			list.addToList(newTask);
+		}
+	}
+	/**
+	 * Checks if there will be a duplicate task
+	 * @param task
+	 * @return Boolean
+	 */
+	protected static Boolean checkIfDuplicateRecurTaskExist (TaskDT task) {
+
+		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
+		for (int i = 0; i < list.getSize(); i++) {
+			if (list.getListItem(i).getDate().equals(recurDate)) {
+				if (list.getListItem(i).compareDescAndLocation(task)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if the task needs to be readded to the list
+	 * These are the two conditions for recurrence:
+	 * Task must have expired
+	 * There must not be another task with the same description
+	 * and location on the date it is set to be recurred
+	 * @param task
+	 * @return Boolean
+	 */
+
+	protected static Boolean needsToBeRecurred(TaskDT task) {
+		if (task.getRecurrencePeriod() == 0) {
+			return false;
+		}
+		TimeZone SGT = TimeZone.getTimeZone("GMT+8");
+		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
+		if (DateTime.today(SGT).numDaysFrom(recurDate) < task.getRecurrencePeriod()) {
+			if (!checkIfDuplicateRecurTaskExist(task)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

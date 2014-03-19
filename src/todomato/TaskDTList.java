@@ -57,9 +57,11 @@ public class TaskDTList {
 	@Override
 	public String toString() {
 		String s = "";
+		int i = 0;
 		
 		for (TaskDT t : list){
-			s += t.toString() + LINE_BREAK;
+			s += Integer.toString(i+1) + ": " + t.toString() + LINE_BREAK;
+			i++;
 		}
 		return s;
 	}
