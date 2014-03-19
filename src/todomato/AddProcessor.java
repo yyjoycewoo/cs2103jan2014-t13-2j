@@ -152,7 +152,7 @@ public class AddProcessor extends Processor {
 		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE_STRING]);
 		int recurPeriod = 0;
 		try {
-			if (date != null) {
+			if (date != null && taskDetails[INDEX_OF_RECUR_STRING] != null) {
 				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR_STRING]);
 			} else {
 				System.out.print("Cannot set recurring period without setting date");
