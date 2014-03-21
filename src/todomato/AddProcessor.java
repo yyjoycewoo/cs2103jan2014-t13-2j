@@ -69,6 +69,7 @@ public class AddProcessor extends Processor {
 	private static int NO_OF_TASK_DETAILS = 6;
 	private static int INDEX_OF_RECUR_STRING = 5;
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
+	private static String CANNOT_RECUR_WITHOUT_DATE = "Cannot set recurring period without setting date";
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
 	
 
@@ -152,10 +153,10 @@ public class AddProcessor extends Processor {
 		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE_STRING]);
 		int recurPeriod = 0;
 		try {
-			if (date != null && taskDetails[INDEX_OF_RECUR_STRING] != null) {
+			if (date == null && taskDetails[INDEX_OF_RECUR_STRING] != null) {
+				System.out.print(CANNOT_RECUR_WITHOUT_DATE);
+			} else if (taskDetails[INDEX_OF_RECUR_STRING] != null && date != null){
 				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR_STRING]);
-			} else {
-				System.out.print("Cannot set recurring period without setting date");
 			}
 		}
 		catch (NumberFormatException e) {
