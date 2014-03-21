@@ -13,11 +13,11 @@ import java.util.TimeZone;
  */
 public class Processor {
 
-	//protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	protected static String fileLoc = "D:\\test.txt";
+	protected static String fileLoc = "tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
-	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();
+	protected static Stack<TaskDTList> undoList = new Stack<TaskDTList>();
+	protected static Stack<TaskDTList> redoList = new Stack<TaskDTList>();
 	protected static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
 	protected static final int POS_OF_MINUTE = 2;
 	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
@@ -30,7 +30,7 @@ public class Processor {
 	protected static void storeCurrentList() {
 		TaskDTList lastList = new TaskDTList();
 		lastList.deepCopy(list);
-		oldLists.push(lastList);
+		undoList.push(lastList);
 	}
 
 	public static TaskDTList getList() {

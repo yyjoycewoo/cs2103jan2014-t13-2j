@@ -15,6 +15,7 @@ public class SplitProcessorsHandler {
 	private static final String DISPLAY_COMMAND = "display";
 	private static final String UNDO_COMMAND = "undo";
 	private static final String EXIT_COMMAND = "exit";
+	private static final Object REDO_COMMAND = "redo";
 	private static final String INVALID_COMMAND_MSG = "Invalid command entered, please try again.";
 	
 	private static Command command;
@@ -44,6 +45,9 @@ public class SplitProcessorsHandler {
 		}
 		if (command.getAction().equals(UNDO_COMMAND)) {
 			return UndoProcessor.processUndo();
+		}
+		if (command.getAction().equals(REDO_COMMAND)) {
+			return RedoProcessor.processRedo();
 		}
 		return INVALID_COMMAND_MSG;
 	}
