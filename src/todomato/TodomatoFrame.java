@@ -8,7 +8,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.AbstractTableModel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -21,16 +23,116 @@ import net.miginfocom.swing.MigLayout;
 public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
 
+	private static String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
+	private static Object[][] data = loadData(Processor.getList());
+	static JTable table = new JTable(data, columnNames);
+	JScrollPane tableDisplay = new JScrollPane(table);
 	private JPanel p = new JPanel();
-
 	private JTextField txtCommand = new JTextField(20);
-	private JList<TaskDT> listTasks = new JList<TaskDT>(
-			loadTasks(Processor.getList()));
 	private JLabel lblStatus = new JLabel(" ");
+	//private JList<TaskDT> listTasks = new JList<TaskDT>(loadTasks(Processor.getList()));
+
+	
+	public TodomatoFrame() {
+		super("Todomato");
+		setSize(600,480);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		initDisplay();
+		add(p);
+		pack();
+		setVisible(true);
+	}
+	
+	
+	 class CustModel extends AbstractTableModel {
+			private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
+			private Object[][] data = loadData(Processor.getList());
+
+	        public CustModel(Object[][] data) {
+	            this.data = data;
+	        }
+	        public int getColumnCount() {
+	            return columnNames.length;
+	        }
+
+	        public int getRowCount() {
+	            return data.length;
+	        }
+
+	        public String getColumnName(int col) {
+	            return columnNames[col];
+	        }
+
+	        public Object getValueAt(int row, int col) {
+	        	if (getColumnCount() == 0 || getRowCount() == 0) {
+	        		return null;
+	        	}
+	            return data[row][col];
+	        }
+
+	 }
+	 
+	private void initDisplay() {
+		p.setLayout(new MigLayout("nocache"));
+		p.add(tableDisplay, "wrap,push, grow");
+		p.add(txtCommand, "wrap, pushx, growx");
+		p.add(lblStatus);
+		
+		txtCommand.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String status = SplitProcessorsHandler.processCommand(txtCommand.getText());
+					assert status != null;
+					//listTasks.setListData(loadTasks(Processor.getList()));
+					data = loadData(Processor.getList());
+					table.setModel(new CustModel(data));
+			        table.setAutoCreateRowSorter(true);
+					txtCommand.setText("");
+					lblStatus.setText(status);
+
+				} catch (InvalidInputException e1) {
+					txtCommand.setText("");
+					lblStatus.setText(INVALID_INPUT_MSG + e1.getMessage());
+				}
+			}
+		});
+	}
+		
+
+	private static Object[][] loadData(TaskDTList l) {
+		Object[][] list = new Object[1][6];
+		if (l.getSize() == 0) {
+			list[0][0] = 0;
+			list[0][1] = "(Empty)";
+		} else {
+			list = new Object[l.getSize()][6];
+			for (int i = 0; i < l.getSize(); i++) {
+				list[i][0] = i+1;
+				list[i][1] = l.getListItem(i).getDescription();
+				list[i][2] = l.getListItem(i).getStartTime();
+				list[i][3] = l.getListItem(i).getEndTime();
+				list[i][4] = l.getListItem(i).getDate();
+				list[i][5] = l.getListItem(i).getLocation();
+			}
+		}
+		return list;
+	}
+
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	
 
 	/**
 	 * This constructor creates a JFrame for the application Todomato.
-	 */
+	 *
 	public TodomatoFrame() {
 		// create and set up the window
 		super("Todomato");
@@ -93,4 +195,5 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		// TODO Auto-generated method stub
 
 	}
+	*/
 }
