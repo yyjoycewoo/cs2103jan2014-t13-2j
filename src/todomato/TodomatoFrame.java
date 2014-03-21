@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,16 +56,27 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 
 	private void initShortcuts() {
-	    String UNDO = "undo action key";
+		String UNDO = "undo action key";
+		String REDO = "redo action key";
 
-	    Action undoAction = new AbstractAction() {
-	        public void actionPerformed(ActionEvent e) {
-            	updateData("undo");
-	        }
-	    };
-	    
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), UNDO);
-        panel.getActionMap().put(UNDO, undoAction);
+		Action undoAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				updateData("undo");
+			}
+		};
+
+		Action redoAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				updateData("redo");
+			}
+		};
+
+
+		panel.getActionMap().put(UNDO, undoAction);
+		panel.getActionMap().put(REDO, redoAction);		
+
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), UNDO);
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), REDO);
 
 	}
 
