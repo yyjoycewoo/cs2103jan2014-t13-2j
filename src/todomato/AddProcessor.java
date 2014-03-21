@@ -84,6 +84,7 @@ public class AddProcessor extends Processor {
 	 * @throws IOException
 	 */
 	public static String processAdd(String input) throws NumberFormatException {
+		storeCurrentList();
 		TaskDT userTask = null;
 		if (input.equals(RECUR_KEYWORD)) {
 			for (int i = 0; i < list.getSize(); i++){
