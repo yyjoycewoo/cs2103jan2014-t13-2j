@@ -2,14 +2,22 @@ package todomato;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.AbstractTableModel;
 
 import net.miginfocom.swing.MigLayout;
@@ -27,79 +35,100 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static Object[][] data = loadData(Processor.getList());
 	static JTable table = new JTable(data, columnNames);
 	JScrollPane tableDisplay = new JScrollPane(table);
-	private JPanel p = new JPanel();
+	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
 	private JLabel lblStatus = new JLabel(" ");
 	//private JList<TaskDT> listTasks = new JList<TaskDT>(loadTasks(Processor.getList()));
 
-	
+
 	public TodomatoFrame() {
 		super("Todomato");
 		setSize(600,480);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		initDisplay();
-		add(p);
+		initShortcuts();
+		add(panel);
 		pack();
 		setVisible(true);
 	}
-	
-	
-	 class CustModel extends AbstractTableModel {
-			private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
-			private Object[][] data = loadData(Processor.getList());
 
-	        public CustModel(Object[][] data) {
-	            this.data = data;
-	        }
-	        public int getColumnCount() {
-	            return columnNames.length;
-	        }
 
-	        public int getRowCount() {
-	            return data.length;
-	        }
+	private void initShortcuts() {
+	    String UNDO = "undo action key";
 
-	        public String getColumnName(int col) {
-	            return columnNames[col];
+	    Action undoAction = new AbstractAction() {
+	        public void actionPerformed(ActionEvent e) {
+            	updateData("undo");
 	        }
+	    };
+	    
+        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), UNDO);
+        panel.getActionMap().put(UNDO, undoAction);
 
-	        public Object getValueAt(int row, int col) {
-	        	if (getColumnCount() == 0 || getRowCount() == 0) {
-	        		return null;
-	        	}
-	            return data[row][col];
-	        }
+	}
 
-	 }
-	 
+
+	class CustModel extends AbstractTableModel {
+		private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
+		private Object[][] data = loadData(Processor.getList());
+
+		public CustModel(Object[][] data) {
+			this.data = data;
+		}
+		public int getColumnCount() {
+			return columnNames.length;
+		}
+
+		public int getRowCount() {
+			return data.length;
+		}
+
+		public String getColumnName(int col) {
+			return columnNames[col];
+		}
+
+		public Object getValueAt(int row, int col) {
+			if (getColumnCount() == 0 || getRowCount() == 0) {
+				return null;
+			}
+			return data[row][col];
+		}
+
+	}
+
 	private void initDisplay() {
-		p.setLayout(new MigLayout("nocache"));
-		p.add(tableDisplay, "wrap,push, grow");
-		p.add(txtCommand, "wrap, pushx, growx");
-		p.add(lblStatus);
-		
+		panel.setLayout(new MigLayout("nocache"));
+		panel.add(tableDisplay, "wrap,push, grow");
+		panel.add(txtCommand, "wrap, pushx, growx");
+		panel.add(lblStatus);
+
 		txtCommand.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					String status = SplitProcessorsHandler.processCommand(txtCommand.getText());
-					assert status != null;
-					//listTasks.setListData(loadTasks(Processor.getList()));
-					data = loadData(Processor.getList());
-					table.setModel(new CustModel(data));
-			        table.setAutoCreateRowSorter(true);
-					txtCommand.setText("");
-					lblStatus.setText(status);
-
-				} catch (InvalidInputException e1) {
-					txtCommand.setText("");
-					lblStatus.setText(INVALID_INPUT_MSG + e1.getMessage());
-				}
+				updateData(txtCommand.getText());
 			}
 		});
 	}
-		
+
+
+	private void updateData(String command) {
+		String status;
+		try {
+			status = SplitProcessorsHandler.processCommand(command);
+			assert status != null;
+			//listTasks.setListData(loadTasks(Processor.getList()));
+			data = loadData(Processor.getList());
+			table.setModel(new CustModel(data));
+			table.setAutoCreateRowSorter(true);
+			txtCommand.setText("");
+			lblStatus.setText(status);
+		} catch (InvalidInputException e) {
+			txtCommand.setText("");
+			lblStatus.setText(INVALID_INPUT_MSG + e.getMessage());
+		}
+	}
+
 
 	private static Object[][] loadData(TaskDTList l) {
 		Object[][] list = new Object[1][6];
@@ -124,11 +153,11 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
-	
+
+
+
 
 	/**
 	 * This constructor creates a JFrame for the application Todomato.
@@ -164,7 +193,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					String status = SplitProcessorsHandler
 							.processCommand(txtCommand.getText());
 					assert status != null;
-					
+
 					listTasks.setListData(loadTasks(Processor.getList()));
 					txtCommand.setText("");
 					lblStatus.setText(status);
@@ -179,6 +208,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 	private TaskDT[] loadTasks(TaskDTList l) {
 		TaskDT[] list = { new TaskDT("You currently have no tasks.") };
+		assert l != null;
 		if (l.getSize() == 0) {
 			return list;
 		} else {
@@ -195,5 +225,5 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		// TODO Auto-generated method stub
 
 	}
-	*/
+	 */
 }
