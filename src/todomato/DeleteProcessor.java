@@ -63,6 +63,9 @@ public class DeleteProcessor extends Processor {
 				} 
 			}
 			fileHandler.updateFile(list);
+
+			displayList = list;
+			
 			logger.log(Level.INFO, "end of processing");
 			return statusMessage;
 		} catch(NumberFormatException e) {

@@ -70,6 +70,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				
 				updateData("find" + txtCommand.getText());
+				System.out.println(txtCommand.getText());
 			}
 		};
 
@@ -134,7 +135,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			status = SplitProcessorsHandler.processCommand(command);
 			assert status != null;
 			//listTasks.setListData(loadTasks(Processor.getList()));
-			data = loadData(Processor.getList());
+			data = loadData(Processor.getDisplayList());
 			table.setModel(new CustModel(data));
 			table.setAutoCreateRowSorter(true);
 			txtCommand.setText("");

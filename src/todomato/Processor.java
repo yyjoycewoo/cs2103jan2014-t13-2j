@@ -16,6 +16,7 @@ public class Processor {
 	protected static String fileLoc = "tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
+	protected static TaskDTList displayList = list;
 	protected static Stack<TaskDTList> undoList = new Stack<TaskDTList>();
 	protected static Stack<TaskDTList> redoList = new Stack<TaskDTList>();
 	protected static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
@@ -181,5 +182,9 @@ public class Processor {
 
 	public static TaskDTList getList() {
 		return list;
+	}
+
+	public static TaskDTList getDisplayList() {
+		return displayList;
 	}
 }
