@@ -32,11 +32,6 @@ public class Processor {
 		lastList.deepCopy(list);
 		undoList.push(lastList);
 	}
-
-	public static TaskDTList getList() {
-		return list;
-	}
-
 	
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"
@@ -184,6 +179,7 @@ public class Processor {
 		return userDateTime;
 	}
 
-	
-	
+	public static TaskDTList getList() {
+		return list;
+	}
 }
