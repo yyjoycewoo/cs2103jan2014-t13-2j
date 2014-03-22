@@ -79,16 +79,28 @@ public class TaskDTList {
 		return list;
 	}
 	
+	/**
+	 * Checks to see if the list is empty
+	 * @return true iff the list is empty
+	 */
+	public boolean isEmpty() {
+		return getSize() == 0;
+	}
+	
+	/**
+	 * Finds the size of the list
+	 * @return the size of the list
+	 */
+	public int getSize() {
+		return list.size();
+	}
+	
 	public ArrayList<TaskDT> getList() {
 		return list;
 	} 
 
 	public void setList(ArrayList<TaskDT> list) {
 		this.list = list;
-	}
-	
-	public int getSize() {
-		return list.size();
 	}
 	
 	public void swap(int i, int j) {
