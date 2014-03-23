@@ -19,7 +19,12 @@ public class Processor {
 	protected static TaskDTList displayList = list;
 	protected static Stack<TaskDTList> undoList = new Stack<TaskDTList>();
 	protected static Stack<TaskDTList> redoList = new Stack<TaskDTList>();
-	protected static final int NO_OF_CHAR_IN_HOUR_AND_MINUTE = 4;
+	protected static final int PM = 1;
+	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR = 1;
+	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
+	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES = 3;
+	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES = 4;
+	protected static final int POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR = 1;
 	protected static final int POS_OF_MINUTE = 2;
 	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
 	protected static final int NOT_FOUND = -1;
@@ -125,19 +130,20 @@ public class Processor {
 		if (meridiemIndex != NOT_FOUND) {
 			input = input.substring(0,
 					input.indexOf(meridiem[meridiemIndex]));
-			if (input.length() == 1) {
+			if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
 				userHour = input;
-			} else if (input.length() == 2) {
+			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR) {
 				userHour = input;
-			} else if (input.length() == 3) {
-				userHour = input.substring(0, 1);
-				userMinute = input.substring(POS_OF_MINUTE - 1);
-			} else if (input.length() == 4) {
-				userHour = input.substring(0, 2);
-				userMinute = input.substring(POS_OF_MINUTE - 2);
+			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE);
+				userMinute = input.substring(POS_OF_MINUTE);
 			}
-			if (meridiemIndex == 1) {
+			if (meridiemIndex == PM) {
 				if (Integer.parseInt(userHour) != 12) {
+					//Adds 12 hours to the hour if there is PM
 					userHour = Integer.toString(Integer.parseInt(userHour) + 12);
 				}
 			}
@@ -145,18 +151,20 @@ public class Processor {
 			if (input.length() == 5 && input.contains(":")) {
 				return input;
 			} else {
-				if ((input.length() == 1) || (input.length() == 2)) {
+				if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) 
+						|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
 					userHour = input;
-				} else if (input.length() == NO_OF_CHAR_IN_HOUR_AND_MINUTE) {
+				} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
 					userHour = input.substring(0, POS_OF_MINUTE);
 					userMinute = input.substring(POS_OF_MINUTE);
-				} else if (input.length() == 3) {
-					userHour = input.substring(0, 1);
-					userMinute = input.substring(1);
+				} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+					userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+					userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
 				}
 			}
 		}
-		if (userHour.length() == 1) {
+		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
+			//pads a single digit hour to fit the DateTime format
 			userHour = "0" + userHour;
 		}
 		TimeString = userHour + ":" + userMinute;

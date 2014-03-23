@@ -13,6 +13,7 @@ public class TaskDT {
 	private static final String DATE_PREP = " on ";
 	private static final String SEPERATOR = "#";
 	private static final String PRIORITY_LOW = "LOW";
+	private static final String IS_TRUE = "true";
 		
 	private String description;
 	private DateTime startTime;
@@ -108,7 +109,8 @@ public class TaskDT {
 		String task = description;
 		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + 
 				date + SEPERATOR +location + SEPERATOR + recurrencePeriod + 
-				SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR + priorityLevel;
+				SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR + priorityLevel
+				+ SEPERATOR + isCompleted;
 		return task;
 	}
 	
@@ -135,7 +137,10 @@ public class TaskDT {
 		int id = Integer.parseInt(parts[6]);
 		DateTime timeCreated = new DateTime(parts[7]);
 		String prioritylevel = parts[8];
-		
+		Boolean isComplete = false;
+		if (parts[9].equals(IS_TRUE)){
+			isComplete = true;
+		}
 		TaskDT userTask = new TaskDT(description);
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
@@ -145,6 +150,7 @@ public class TaskDT {
 		userTask.setId(id);
 		userTask.setTimeCreated(timeCreated);
 		userTask.setPriorityLevel(prioritylevel);
+		userTask.setCompleted(isComplete);
 		return userTask;
 	}
 	
