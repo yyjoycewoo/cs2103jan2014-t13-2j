@@ -57,10 +57,10 @@ public class TaskDT {
 		date = copy.getDate();
 		location = copy.getLocation();
 		recurrencePeriod = copy.getRecurrencePeriod();
-		timeCreated = DateTime.now(TimeZone.getDefault());
-		id = timeCreated.toString().hashCode();
+		timeCreated = copy.getTimeCreated();
+		id = copy.getId();
 	}
-	
+
 	public static boolean isEqual(String string1, String string2) {
 	    return string1 == string2 || (string1 != null && string1.equals(string2));
 	}
@@ -137,7 +137,6 @@ public class TaskDT {
 	
 	/**
 	 * Create a new Task object from a standard taskString (from data file) 
-	 * TODO: need to Refractor
 	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
 	 * @return Task object generated from taskString, null if taskString is empty
 	 * @author Yiwen
@@ -204,8 +203,16 @@ public class TaskDT {
 		this.recurrencePeriod = recurrencePeriod;
 	}
 	
+	public int getId() {
+		return id;
+	}
+	
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public DateTime getTimeCreated() {
+		return timeCreated;
 	}
 	
 	public void setTimeCreated(DateTime timeCreated) {
