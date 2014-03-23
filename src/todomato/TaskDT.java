@@ -12,7 +12,10 @@ public class TaskDT {
 	private static final String LOCATION_PREP = " in ";
 	private static final String DATE_PREP = " on ";
 	private static final String SEPERATOR = "#";
-	
+	private static final String PRIORITY_LOW = "LOW";
+	private static final String PRIORITY_MED = "MEDIUM";
+	private static final String PRIORITY_HIGH = "HIGH";
+		
 	private String description;
 	private DateTime startTime;
 	private DateTime endTime;
@@ -20,12 +23,14 @@ public class TaskDT {
 	private String location;
 	private int recurrencePeriod;
 	private int id;
+	private String priorityLevel;
 	private DateTime timeCreated;
 	
 	public TaskDT(String userDes) {
 		description = userDes;
 		timeCreated = DateTime.now(TimeZone.getDefault());
 		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
 	}
 	
 	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation) {
@@ -37,6 +42,7 @@ public class TaskDT {
 		recurrencePeriod = 0;
 		timeCreated = DateTime.now(TimeZone.getDefault());
 		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
 	}
 	
 	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation, int userRecurrencePeriod) {
@@ -48,6 +54,7 @@ public class TaskDT {
 		recurrencePeriod = userRecurrencePeriod;
 		timeCreated = DateTime.now(TimeZone.getDefault());
 		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
 	}
 	
 	public TaskDT(TaskDT copy) {
@@ -59,6 +66,7 @@ public class TaskDT {
 		recurrencePeriod = copy.getRecurrencePeriod();
 		timeCreated = copy.getTimeCreated();
 		id = copy.getId();
+		priorityLevel = copy.getPriorityLevel();
 	}
 
 	public static boolean isEqual(String string1, String string2) {
@@ -97,7 +105,7 @@ public class TaskDT {
 		String task = description;
 		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + 
 				date + SEPERATOR +location + SEPERATOR + recurrencePeriod + 
-				SEPERATOR + id + SEPERATOR + timeCreated;
+				SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR + priorityLevel;
 		return task;
 	}
 	
@@ -123,6 +131,7 @@ public class TaskDT {
 		int recurrencePeriod = Integer.parseInt(parts[5]);
 		int id = Integer.parseInt(parts[6]);
 		DateTime timeCreated = new DateTime(parts[7]);
+		String prioritylevel = parts[8];
 		
 		TaskDT userTask = new TaskDT(description);
 		userTask.setStartTime(startTime);
@@ -132,6 +141,7 @@ public class TaskDT {
 		userTask.setRecurrencePeriod(recurrencePeriod);
 		userTask.setId(id);
 		userTask.setTimeCreated(timeCreated);
+		userTask.setPriorityLevel(prioritylevel);
 		return userTask;
 	}
 	
@@ -201,6 +211,14 @@ public class TaskDT {
 	
 	public void setRecurrencePeriod(int recurrencePeriod) {
 		this.recurrencePeriod = recurrencePeriod;
+	}
+	
+	public String getPriorityLevel() {
+		return priorityLevel;
+	}
+	
+	public void setPriorityLevel(String priorityLevel) {
+		this.priorityLevel = priorityLevel;
 	}
 	
 	public int getId() {
