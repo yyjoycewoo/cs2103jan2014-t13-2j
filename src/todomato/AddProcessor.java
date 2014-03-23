@@ -123,12 +123,17 @@ public class AddProcessor extends Processor {
 		TaskDT userTaskDT = null;
 		String[] stringFragments = null;
 		
+		if (checkForInvertedCommas(input)) {
+			input = setDescWithWordsInsideInvertedCommas(input);
+			taskDesExtracted = true;
+		}
+		
 		if (checkForTodayAndTomorrowStrings(input)) {
 			//Removes today and tomorrow from the string so that it does not appear in description
 			input = setDateForTodayAndTomorrow(input);
 		}
 		
-		if (!keywordIsInString(input)) {
+		if (!keywordIsInString(input) && !taskDesExtracted) {
 			taskDetails[INDEX_OF_DESC] = input;
 		}
 		
@@ -454,6 +459,35 @@ public class AddProcessor extends Processor {
 			taskDetails[INDEX_OF_DATE_STRING] = currentDate.plusDays(1).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW2)) + input.substring(input.indexOf(TOMORROW2) + TOMORROW2.length());
 		}
+		return input;
+	}
+	
+	/**
+	 * Checks if the string has two inverted commas
+	 * @param input
+	 * @return
+	 */
+	
+	private static Boolean checkForInvertedCommas (String input) {
+		if (input.contains("\"")) {
+			if (input.substring(input.indexOf("\"")+1).contains("\"")) {
+			return true;
+			}
+		} 
+		return false;
+	}
+	
+	/**
+	 * Sets the task detail containing description with the words within the inverted commas
+	 * @param input
+	 * @return input without the description
+	 */
+	
+	private static String setDescWithWordsInsideInvertedCommas (String input) {
+		int firstIndex = input.indexOf("\"");
+		int secondIndex = input.lastIndexOf("\"");
+		taskDetails[INDEX_OF_DESC] = input.substring(1, secondIndex - firstIndex);
+		input = input.substring(secondIndex);
 		return input;
 	}
 }

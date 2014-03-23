@@ -44,7 +44,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		initDisplay();
 		initShortcuts();
 		add(panel);
-		pack();
+		//pack();
 		setVisible(true);
 	}
 
