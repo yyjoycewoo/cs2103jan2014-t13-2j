@@ -43,8 +43,6 @@ import java.util.regex.Pattern;
  * <li>jan 1
  * <li>1 january
  * <li>january 1
- * <li>DD/MM
- * <li>DD/MM/YY
  * </ul>
  * 
  * @author Daryl
