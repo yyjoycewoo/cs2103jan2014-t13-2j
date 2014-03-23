@@ -13,8 +13,6 @@ public class TaskDT {
 	private static final String DATE_PREP = " on ";
 	private static final String SEPERATOR = "#";
 	private static final String PRIORITY_LOW = "LOW";
-	private static final String PRIORITY_MED = "MEDIUM";
-	private static final String PRIORITY_HIGH = "HIGH";
 		
 	private String description;
 	private DateTime startTime;
@@ -25,12 +23,14 @@ public class TaskDT {
 	private int id;
 	private String priorityLevel;
 	private DateTime timeCreated;
+	private Boolean isCompleted;
 	
 	public TaskDT(String userDes) {
 		description = userDes;
 		timeCreated = DateTime.now(TimeZone.getDefault());
 		id = timeCreated.toString().hashCode();
 		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
 	}
 	
 	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation) {
@@ -43,6 +43,7 @@ public class TaskDT {
 		timeCreated = DateTime.now(TimeZone.getDefault());
 		id = timeCreated.toString().hashCode();
 		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
 	}
 	
 	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation, int userRecurrencePeriod) {
@@ -55,6 +56,7 @@ public class TaskDT {
 		timeCreated = DateTime.now(TimeZone.getDefault());
 		id = timeCreated.toString().hashCode();
 		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
 	}
 	
 	public TaskDT(TaskDT copy) {
@@ -67,6 +69,7 @@ public class TaskDT {
 		timeCreated = copy.getTimeCreated();
 		id = copy.getId();
 		priorityLevel = copy.getPriorityLevel();
+		isCompleted = false;
 	}
 
 	public static boolean isEqual(String string1, String string2) {
@@ -236,4 +239,12 @@ public class TaskDT {
 	public void setTimeCreated(DateTime timeCreated) {
 		this.timeCreated = timeCreated;
 	}
-}
+	
+	public Boolean getCompleted() {
+		return isCompleted;
+	}
+	
+	public void setCompleted(Boolean isCompleted) {
+		this.isCompleted = isCompleted;
+	}
+	}

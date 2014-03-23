@@ -159,7 +159,9 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 				list[i][1] = l.getListItem(i).getDescription();
 				list[i][2] = l.getListItem(i).getStartTime();
 				list[i][3] = l.getListItem(i).getEndTime();
-				list[i][4] = l.getListItem(i).getDate();
+				if (l.getListItem(i).getDate() != null) {
+					list[i][4] = l.getListItem(i).getDate().format("DD-MM-YYYY");
+				}
 				list[i][5] = l.getListItem(i).getLocation();
 				list[i][6] = l.getListItem(i).getPriorityLevel();
 			}

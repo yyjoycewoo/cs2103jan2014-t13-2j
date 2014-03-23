@@ -224,6 +224,14 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 	
+	/**
+	 * 
+	 * @param index
+	 * @param recurDesc
+	 * @param argument that contains recurrence period
+	 * @return updated task
+	 */
+	
 	private static TaskDT updateRecur(int index, int recurDesc, String argument) {
 		int stopIndex = argument.length();
 		int userRecurrence = Integer.parseInt(argument.substring(recurDesc + NO_OF_CHAR_IN_RECUR, stopIndex));
