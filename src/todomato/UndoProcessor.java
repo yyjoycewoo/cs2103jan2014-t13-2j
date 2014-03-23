@@ -8,17 +8,24 @@ package todomato;
  */
 public class UndoProcessor extends Processor {
 	private static final String NO_CHANGES_TO_UNDO_MSG = "No changes to undo";
+	private static final String SUCCESS_MSG = "Last action undone";
 	
 	/**
 	 * Undo last action, if possible
 	 * @author Joyce
-	 * @return String representation of list, or status message if no changes to undo
+	 * @return Status message telling user if there were changes to undo
 	 */
 	public static String processUndo() {
-		if (!oldLists.isEmpty()) {
-			list = oldLists.pop();	
+		displayList = list;
+		
+		//add current list to redoList
+		redoList.push(list);
+		
+		if (!undoList.isEmpty()) {
+			//get latest list from undoList
+			list = undoList.pop();	
 			fileHandler.updateFile(list);
-			return list.toString();
+			return SUCCESS_MSG;
 		} else {
 			return NO_CHANGES_TO_UNDO_MSG;
 		}
