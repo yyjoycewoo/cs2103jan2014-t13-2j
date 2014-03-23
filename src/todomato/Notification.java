@@ -31,8 +31,9 @@ public class Notification {
 	 * @param taskToDo
 	 */
 	protected static void popUpNotice(String taskToDo) {
-		String msg = "You have a new notification.";
-		final int waitfor = 20000;
+		String msg = "~~~Reminder! Do now or never!~~~";
+		// pop up disappeared after 7sec
+		final int waitfor = 7000;
 		// create and set up the window
 		final JFrame frame = new JFrame("Reminder");
 		// change the window location to bottom right corner of the screen

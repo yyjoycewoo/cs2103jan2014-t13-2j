@@ -53,12 +53,10 @@ import java.util.regex.Pattern;
 public class AddProcessor extends Processor {
 
 	private static String[] keywords = new String[] { " at ", " from ",
-			" until ", " to ", " in ", " due ",  " on ", " recur "};
+			" until ", " to ", " in ", " due ",  " on ", " recur ", " priority "};
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
 	private static int NOT_FOUND = -1;
-	//private static String INVALID_DATE = "Invalid date format";
-	//private static String INVALID_TIME = "Invalid time format";
 	private static String INVALID_INPUT = "Invalid input format";
 	private static String RECUR_KEYWORD = "recur";
 	private static int INDEX_OF_DESC = 0;
@@ -66,8 +64,9 @@ public class AddProcessor extends Processor {
 	private static int INDEX_OF_END_TIME_STRING = 2;
 	private static int INDEX_OF_DATE_STRING = 3;
 	private static int INDEX_OF_LOCATION_STRING = 4;
-	private static int NO_OF_TASK_DETAILS = 6;
 	private static int INDEX_OF_RECUR_STRING = 5;
+	private static int INDEX_OF_PRIORITY_STRING = 6;
+	private static int NO_OF_TASK_DETAILS = 7;
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	private static String CANNOT_RECUR_WITHOUT_DATE = "Cannot set recurring period without setting date";
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
@@ -169,6 +168,7 @@ public class AddProcessor extends Processor {
 		userTask.setDate(date);
 		userTask.setLocation(taskDetails[INDEX_OF_LOCATION_STRING]);
 		userTask.setRecurrencePeriod(recurPeriod);
+		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY_STRING]));
 		return userTask;
 	}
 	
@@ -206,6 +206,9 @@ public class AddProcessor extends Processor {
 				break;
 			case 7:
 				taskDetails[INDEX_OF_RECUR_STRING] = retrieveRecurPeriod(input, spaceIndex);
+				break;
+			case 8:
+				taskDetails[INDEX_OF_PRIORITY_STRING] = retrievePriority(input,spaceIndex);
 				break;
 		}
 
@@ -278,6 +281,19 @@ public class AddProcessor extends Processor {
 	private static String retrieveDate (String input) throws InvalidInputException {
 		String dateString = parseDateString(input);
 		return dateString;
+	}
+	
+
+	/**
+	 * Retrieves the priority
+	 * @param input
+	 * @param spaceIndex
+	 * @return priorityString
+	 */
+	
+	private static String retrievePriority(String input, int spaceIndex) {
+		String priorityString = input.substring(0, spaceIndex);
+		return priorityString;
 	}
 	
 
