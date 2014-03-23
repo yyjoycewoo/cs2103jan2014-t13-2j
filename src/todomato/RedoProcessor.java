@@ -17,11 +17,10 @@ public class RedoProcessor extends Processor {
 		 * @return Status message telling user if there were changes to redo
 		 */
 		public static String processRedo() {
-			displayList = list;
-			
 			if (!redoList.isEmpty()) {
 				list = redoList.pop();	
 				fileHandler.updateFile(list);
+				displayList = list;
 				return SUCCESS_MSG;
 			} else {
 				return NO_CHANGES_TO_REDO_MSG;
