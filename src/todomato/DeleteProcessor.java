@@ -1,5 +1,7 @@
 package todomato;
 
+import hirondelle.date4j.DateTime;
+
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,11 +19,14 @@ import java.util.logging.Logger;
  * <ul> <li> "delete 1,2,3" </ul>
  * <li> delete all tasks
  * <ul> <li> "delete all" </ul>
+ * <li> delete tasks that fall on a date
+ * <ul> <li> "delete date 1 jan" </ul>
  * </ul>
  *
  */
 public class DeleteProcessor extends Processor {
-	private static final String indicesDelimiter = "\\s*(,| )\\s*";
+	private static final String argDelimiter = "\\s*(,| )\\s*";
+	private static final String ARGUMENT_DATE = "date";
 	private static final String ARGUMENT_CLEAR_ALL = "all";
 	private static final String TASKS = " task(s)";
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
@@ -31,12 +36,8 @@ public class DeleteProcessor extends Processor {
 	
 	private static final Logger logger = Logger.getLogger(DeleteProcessor.class.getName());
 	
+	
 	/**
-	 * Allowed format:
-	 * delete <index>
-	 * delete <index>,<index>,<index>
-	 * delete <index> <index>
-	 * delete all
 	 * @author linxuan
 	 * @param argument
 	 * @return String of success/error message accordingly 
@@ -50,16 +51,20 @@ public class DeleteProcessor extends Processor {
 		
 		storeCurrentList();
 		
-		String[] indices = argument.split(indicesDelimiter);
+		String[] arg = argument.split(argDelimiter);
 		String statusMessage;
 		try {
-			if(indices.length > 1) {
-				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(indices) + TASKS;
+			if(arg.length > 1) {
+				if(arg[0].equalsIgnoreCase(ARGUMENT_DATE)) {
+					statusMessage = SUCCESSFUL_DELETE + deleteDate(arg) + TASKS;
+				} else {
+					statusMessage = SUCCESSFUL_DELETE + deleteMultiple(arg) + TASKS;
+				}
 			} else {
-				if(indices[0].equals(ARGUMENT_CLEAR_ALL)) {
+				if(arg[0].equals(ARGUMENT_CLEAR_ALL)) {
 					statusMessage = SUCCESSFUL_DELETE + deleteAll() + TASKS;
 				} else {
-					statusMessage = SUCCESSFUL_DELETE + deleteSingleTask(indices[0]);
+					statusMessage = SUCCESSFUL_DELETE + deleteSingleTask(arg[0]);
 				} 
 			}
 			fileHandler.updateFile(list);
@@ -79,6 +84,32 @@ public class DeleteProcessor extends Processor {
 		}		
 	}
 	
+	private static String deleteDate(String[] arg) {
+		// TODO Auto-generated method stub
+		int numberOfTasksDeleted = 0;
+		String date = arg[1] + " " + arg[2];
+		date = parseDateString(date);
+		DateTime dateDT = convertStringToDateTime(date);
+		for (int i = list.getSize() - 1; i >= 0; i--) {
+			if(isSameDate(i,dateDT)) {
+				list.deleteListItem(i);
+				numberOfTasksDeleted++;
+			}
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+
+	private static boolean isSameDate(int i, DateTime dateDT) {
+		// TODO Auto-generated method stub
+		if (list.getListItem(i).getDate() == null) {
+			return false;
+		}
+		if (list.getListItem(i).getDate().isSameDayAs(dateDT)) {
+			return true;
+		}
+		return false;
+	}
+
 	private static String deleteAll() {
 		int numberOfTasksDeleted = 0;
 		while(list.getSize() != 0) {
