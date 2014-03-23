@@ -26,7 +26,7 @@ import net.miginfocom.swing.MigLayout;
 public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
 
-	private static String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
+	private static String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority"};
 	private static Object[][] data = loadData(Processor.getList());
 	static JTable table = new JTable(data, columnNames);
 	JScrollPane tableDisplay = new JScrollPane(table);
@@ -87,7 +87,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 
 	class CustModel extends AbstractTableModel {
-		private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
+		private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority"};
 		private Object[][] data = loadData(Processor.getList());
 
 		public CustModel(Object[][] data) {
@@ -148,12 +148,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 
 	private static Object[][] loadData(TaskDTList l) {
-		Object[][] list = new Object[1][6];
+		Object[][] list = new Object[1][7];
 		if (l.getSize() == 0) {
 			list[0][0] = 0;
 			list[0][1] = "(Empty)";
 		} else {
-			list = new Object[l.getSize()][6];
+			list = new Object[l.getSize()][7];
 			for (int i = 0; i < l.getSize(); i++) {
 				list[i][0] = i+1;
 				list[i][1] = l.getListItem(i).getDescription();
@@ -161,6 +161,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 				list[i][3] = l.getListItem(i).getEndTime();
 				list[i][4] = l.getListItem(i).getDate();
 				list[i][5] = l.getListItem(i).getLocation();
+				list[i][6] = l.getListItem(i).getPriorityLevel();
 			}
 		}
 		return list;

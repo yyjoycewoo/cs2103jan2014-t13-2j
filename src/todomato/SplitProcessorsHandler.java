@@ -39,13 +39,13 @@ public class SplitProcessorsHandler {
 		}
 		if (command.getAction().equals(UNDO_COMMAND)) {
 			return UndoProcessor.processUndo();
-		}
+		}/*
 		if (command.getAction().equals(REDO_COMMAND)) {
 			return RedoProcessor.processRedo();
 		}
 		if (command.getAction().equals(FIND_COMMAND)) {
 			return FindProcessor.processFind(command.getArgument());
-		}
+		}*/
 		//Treat as an add command if no action is specified
 		return AddProcessor.processAdd(command.getArgument());
 	}
