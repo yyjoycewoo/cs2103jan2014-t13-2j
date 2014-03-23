@@ -13,8 +13,8 @@ import java.util.TimeZone;
  */
 public class Processor {
 
-	//protected static String fileLoc = "C:\\Users\\Joyce\\Documents\\Year 2\\test.txt";
-	protected static String fileLoc = "D:\\test.txt";
+	protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\test.txt";
+	// protected static String fileLoc = "D:\\test.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskDTList list = fileHandler.readFile();
 	protected static Stack<TaskDTList> oldLists = new Stack<TaskDTList>();
@@ -37,7 +37,6 @@ public class Processor {
 		return list;
 	}
 
-	
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"
 	 * 
@@ -122,12 +121,13 @@ public class Processor {
 		}
 		return userTime;
 	}
-	
+
 	/**
 	 * Checks whether "am" or "pm" is in the string
+	 * 
 	 * @param input
-	 * @return integer indicating which meridiem is present
-	 * -1 if there is not one
+	 * @return integer indicating which meridiem is present -1 if there is not
+	 *         one
 	 */
 
 	protected static int checkMeridiem(String input) {
@@ -139,8 +139,10 @@ public class Processor {
 		}
 		return -1;
 	}
+
 	/**
 	 * Converts "Jan 1" to "YYYY-MM-DD" (DateTime format)
+	 * 
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -160,25 +162,26 @@ public class Processor {
 		for (int i = 0; i < months.length; i++) {
 			if (parts.length > 1) {
 				if (parts[0].contains(months[i])) {
-					standardFormDate = convertDateToStandardForm(
-							parts[1], String.valueOf(i + 1));
+					standardFormDate = convertDateToStandardForm(parts[1],
+							String.valueOf(i + 1));
 				} else if (parts[1].contains(months[i])) {
-					standardFormDate = convertDateToStandardForm(
-							parts[0], String.valueOf(i + 1));
+					standardFormDate = convertDateToStandardForm(parts[0],
+							String.valueOf(i + 1));
 				}
 			}
 		}
-		
+
 		return standardFormDate;
 	}
-	
+
 	/**
 	 * Converts "930pm" to HH:MM (DateTime Format)
+	 * 
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
 	 */
-	
+
 	protected static String parseTimeStringFromInput(String input) {
 		String TimeString = null;
 		if (input == null) {
@@ -189,8 +192,7 @@ public class Processor {
 		String userMinute = "00";
 		int meridiemIndex = checkMeridiem(input);
 		if (meridiemIndex != NOT_FOUND) {
-			input = input.substring(0,
-					input.indexOf(meridiem[meridiemIndex]));
+			input = input.substring(0, input.indexOf(meridiem[meridiemIndex]));
 			if (input.length() == 1) {
 				userHour = input;
 			} else if (input.length() == 2) {
@@ -204,11 +206,12 @@ public class Processor {
 			}
 			if (meridiemIndex == 1) {
 				if (Integer.parseInt(userHour) != 12) {
-					userHour = Integer.toString(Integer.parseInt(userHour) + 12);
+					userHour = Integer
+							.toString(Integer.parseInt(userHour) + 12);
 				}
 			}
 		} else {
-			if (input.length() == 5 && input.contains(":")) {
+			if ((input.length() == 5) && input.contains(":")) {
 				return input;
 			} else {
 				if ((input.length() == 1) || (input.length() == 2)) {
@@ -228,14 +231,14 @@ public class Processor {
 		TimeString = userHour + ":" + userMinute;
 		return TimeString;
 	}
-	
+
 	/**
-	 * Converts strings of form YYYY-MM-DD or
-	 * HH:MM to DateTime format
+	 * Converts strings of form YYYY-MM-DD or HH:MM to DateTime format
+	 * 
 	 * @param input
 	 * @return DateTime
 	 */
-	
+
 	protected static DateTime convertStringToDateTime(String input) {
 		DateTime userDateTime = null;
 		if (input == null) {
@@ -250,6 +253,4 @@ public class Processor {
 		return userDateTime;
 	}
 
-	
-	
 }
