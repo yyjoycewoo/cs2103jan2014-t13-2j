@@ -124,6 +124,7 @@ public class AddProcessor extends Processor {
 		String[] stringFragments = null;
 		
 		if (checkForTodayAndTomorrowStrings(input)) {
+			//Removes today and tomorrow from the string so that it does not appear in description
 			input = setDateForTodayAndTomorrow(input);
 		}
 		
