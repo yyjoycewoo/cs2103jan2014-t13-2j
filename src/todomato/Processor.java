@@ -23,6 +23,10 @@ public class Processor {
 	protected static final int POS_OF_MINUTE = 2;
 	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
 	protected static final int NOT_FOUND = -1;
+	private static final String PRIORITY_LOW = "LOW";
+	private static final String PRIORITY_MED = "MEDIUM";
+	private static final String PRIORITY_HIGH = "HIGH";
+	
 
 	/**
 	 * This stores a copy of the current list before modifications are made
@@ -178,6 +182,27 @@ public class Processor {
 			}
 		}
 		return userDateTime;
+	}
+	
+	protected static String parsePriorityFromString (String input) {
+		if (input == null) {
+			return PRIORITY_LOW;
+		}
+		input = input.toLowerCase();
+		String priorityLevels[] = new String[] { "low", "med", "high"};
+		for (int i = 0; i < priorityLevels.length; i++) {
+			if (input.contains(priorityLevels[i])) {
+				switch (i) {
+					case 0:
+							return PRIORITY_LOW;
+					case 1:
+							return PRIORITY_MED;
+					case 2:
+							return PRIORITY_HIGH;
+				}
+			}
+		}
+		return PRIORITY_LOW;
 	}
 
 	public static TaskDTList getList() {
