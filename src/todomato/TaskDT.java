@@ -19,9 +19,13 @@ public class TaskDT {
 	private DateTime date;
 	private String location;
 	private int recurrencePeriod;
+	private int id;
+	private DateTime timeCreated;
 	
 	public TaskDT(String userDes) {
 		description = userDes;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
 	}
 	
 	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation) {
@@ -31,6 +35,8 @@ public class TaskDT {
 		endTime = userEnd;
 		location = userLocation;
 		recurrencePeriod = 0;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
 	}
 	
 	public TaskDT(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation, int userRecurrencePeriod) {
@@ -40,6 +46,8 @@ public class TaskDT {
 		endTime = userEnd;
 		location = userLocation;
 		recurrencePeriod = userRecurrencePeriod;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
 	}
 	
 	public TaskDT(TaskDT copy) {
@@ -49,8 +57,10 @@ public class TaskDT {
 		date = copy.getDate();
 		location = copy.getLocation();
 		recurrencePeriod = copy.getRecurrencePeriod();
+		timeCreated = copy.getTimeCreated();
+		id = copy.getId();
 	}
-	
+
 	public static boolean isEqual(String string1, String string2) {
 	    return string1 == string2 || (string1 != null && string1.equals(string2));
 	}
@@ -85,7 +95,9 @@ public class TaskDT {
 	
 	public String toFileString() {
 		String task = description;
-		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + date + SEPERATOR +location + SEPERATOR + recurrencePeriod;
+		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + 
+				date + SEPERATOR +location + SEPERATOR + recurrencePeriod + 
+				SEPERATOR + id + SEPERATOR + timeCreated;
 		return task;
 	}
 	
@@ -109,6 +121,8 @@ public class TaskDT {
 			location = parts[4];
 		}
 		int recurrencePeriod = Integer.parseInt(parts[5]);
+		int id = Integer.parseInt(parts[6]);
+		DateTime timeCreated = new DateTime(parts[7]);
 		
 		TaskDT userTask = new TaskDT(description);
 		userTask.setStartTime(startTime);
@@ -116,12 +130,13 @@ public class TaskDT {
 		userTask.setDate(date);
 		userTask.setLocation(location);
 		userTask.setRecurrencePeriod(recurrencePeriod);
+		userTask.setId(id);
+		userTask.setTimeCreated(timeCreated);
 		return userTask;
 	}
 	
 	/**
 	 * Create a new Task object from a standard taskString (from data file) 
-	 * TODO: need to Refractor
 	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
 	 * @return Task object generated from taskString, null if taskString is empty
 	 * @author Yiwen
@@ -186,5 +201,21 @@ public class TaskDT {
 	
 	public void setRecurrencePeriod(int recurrencePeriod) {
 		this.recurrencePeriod = recurrencePeriod;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public DateTime getTimeCreated() {
+		return timeCreated;
+	}
+	
+	public void setTimeCreated(DateTime timeCreated) {
+		this.timeCreated = timeCreated;
 	}
 }

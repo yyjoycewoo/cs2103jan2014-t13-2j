@@ -18,6 +18,8 @@ public class DisplayProcessor extends Processor {
 	 * @return TaskList
 	 */
 	public static String processDisplay(String argument) {
+		displayList = list;
+		
 		if (argument.isEmpty()) {
 			return display();
 		}

@@ -88,6 +88,7 @@ public class UpdateProcessor extends Processor {
 		whichToEdit = findDetailToEdit(argument);
 		updater(argument, whichToEdit, index);
 
+		displayList = list;
 		return list.getListItem(index);
 	}
 
