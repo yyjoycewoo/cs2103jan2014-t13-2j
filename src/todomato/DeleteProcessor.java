@@ -74,12 +74,10 @@ public class DeleteProcessor extends Processor {
 			logger.log(Level.INFO, "end of processing");
 			return statusMessage;
 		} catch(NumberFormatException e) {
-			// TODO
 			UndoProcessor.processUndo();
 			logger.log(Level.WARNING, "exited due to non-number");
 			return ERROR_MESSAGE_NUMBER_FORMAT;
 		} catch(IndexOutOfBoundsException e) {
-			// TODO
 			UndoProcessor.processUndo();
 			logger.log(Level.WARNING, "exited due to index out of bound");
 			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;

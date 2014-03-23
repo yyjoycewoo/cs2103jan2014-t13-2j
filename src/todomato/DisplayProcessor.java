@@ -16,6 +16,7 @@ package todomato;
  */
 public class DisplayProcessor extends Processor {
 	private static final String ARGUMENT_SORT_BY_DATE = "by date";
+	private static final String SUCCESS_DISPLAY = "All tasks have been displayed: ";
 	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
 	private static final String INVALID_ARGUMENT_MESSAGE = "Invalid argument";
 	
@@ -36,7 +37,7 @@ public class DisplayProcessor extends Processor {
 	}
 
 	private static String display() {
-		return list.toString();
+		return SUCCESS_DISPLAY + list.toString();
 	}
 
 	/**
