@@ -15,9 +15,7 @@ public class UndoProcessor extends Processor {
 	 * @author Joyce
 	 * @return Status message telling user if there were changes to undo
 	 */
-	public static String processUndo() {
-		displayList = list;
-		
+	public static String processUndo() {		
 		//add current list to redoList
 		redoList.push(list);
 		
@@ -25,6 +23,7 @@ public class UndoProcessor extends Processor {
 			//get latest list from undoList
 			list = undoList.pop();	
 			fileHandler.updateFile(list);
+			displayList = list;
 			return SUCCESS_MSG;
 		} else {
 			return NO_CHANGES_TO_UNDO_MSG;
