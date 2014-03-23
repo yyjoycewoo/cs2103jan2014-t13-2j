@@ -67,7 +67,12 @@ public class AddProcessor extends Processor {
 	private static int NO_OF_TASK_DETAILS = 7;
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	private static String CANNOT_RECUR_WITHOUT_DATE = "Cannot set recurring period without setting date";
+	private static String TODAY = " today";
+	private static String TOMORROW1 = " tmr";
+	private static String TOMORROW2 = " tomorrow";
+	private static String ADD_SUCCESSFUL = "Added ";
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
+	private static DateTime currentDate = DateTime.today(TimeZone.getDefault());
 	
 
 
@@ -100,7 +105,7 @@ public class AddProcessor extends Processor {
 		}
 		fileHandler.updateFile(list);
 		displayList = list;
-		return userTask.toString();
+		return ADD_SUCCESSFUL + userTask.toString();
 	}
 	
 	
@@ -117,6 +122,11 @@ public class AddProcessor extends Processor {
 		int keywordIndex = NOT_FOUND;
 		TaskDT userTaskDT = null;
 		String[] stringFragments = null;
+		
+		if (checkForTodayAndTomorrowStrings(input)) {
+			//Removes today and tomorrow from the string so that it does not appear in description
+			input = setDateForTodayAndTomorrow(input);
+		}
 		
 		if (!keywordIsInString(input)) {
 			taskDetails[INDEX_OF_DESC] = input;
@@ -412,5 +422,38 @@ public class AddProcessor extends Processor {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Checks if the input string has "today" "tmr" or tomorrow
+	 * @param input
+	 * @return true or false
+	 */
+	
+	private static Boolean checkForTodayAndTomorrowStrings (String input) {
+		if (input.contains(TODAY) || input.contains(TOMORROW1) || input.contains(TOMORROW2)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Updates Tasklist with current date or tomorrow's date
+	 * @param input
+	 * @return input without the today or tomorrow word
+	 */
+	
+	private static String setDateForTodayAndTomorrow (String input) {		
+		if (input.contains(TODAY)) {
+			taskDetails[INDEX_OF_DATE_STRING] = currentDate.toString();	
+			input = input.substring(0,input.indexOf(TODAY)) + input.substring(input.indexOf(TODAY) + TODAY.length());
+		} else if (input.contains(TOMORROW1)) {
+			taskDetails[INDEX_OF_DATE_STRING] = currentDate.plusDays(1).toString();			
+			input = input.substring(0,input.indexOf(TOMORROW1)) + input.substring(input.indexOf(TOMORROW1) + TOMORROW1.length());
+		} else if (input.contains(TOMORROW2)) {
+			taskDetails[INDEX_OF_DATE_STRING] = currentDate.plusDays(1).toString();			
+			input = input.substring(0,input.indexOf(TOMORROW2)) + input.substring(input.indexOf(TOMORROW2) + TOMORROW2.length());
+		}
+		return input;
 	}
 }
