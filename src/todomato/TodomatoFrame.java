@@ -1,5 +1,7 @@
 package todomato;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,6 +16,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -26,14 +30,13 @@ import net.miginfocom.swing.MigLayout;
 public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
 
-	private static String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
-	private static Object[][] data = loadData(Processor.getList());
-	static JTable table = new JTable(data, columnNames);
-	JScrollPane tableDisplay = new JScrollPane(table);
+	private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
+	private Object[][] data = loadData(Processor.getList());
+	private JTable table = new JTable(data, columnNames);
+	private JScrollPane tableDisplay = new JScrollPane(table);
 	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
 	private JLabel lblStatus = new JLabel(" ");
-	//private JList<TaskDT> listTasks = new JList<TaskDT>(loadTasks(Processor.getList()));
 
 
 	public TodomatoFrame() {
@@ -111,14 +114,17 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			}
 			return data[row][col];
 		}
-
 	}
-
+	
 	private void initDisplay() {
+		ColorRenderer cr = new ColorRenderer();
+        for (int i=0; i<7; i++)
+        	table.getColumn(table.getColumnName(i)).setCellRenderer(cr);
+        
 		panel.setLayout(new MigLayout("nocache"));
 		panel.add(tableDisplay, "wrap,push, grow");
 		panel.add(txtCommand, "wrap, pushx, growx");
-		panel.add(lblStatus);
+		panel.add(lblStatus);		
 
 		txtCommand.addActionListener(new ActionListener() {
 			@Override
