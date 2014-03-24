@@ -28,9 +28,9 @@ public class Processor {
 	protected static final int POS_OF_MINUTE = 2;
 	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
 	protected static final int NOT_FOUND = -1;
-	private static final String PRIORITY_LOW = "LOW";
-	private static final String PRIORITY_MED = "MEDIUM";
-	private static final String PRIORITY_HIGH = "HIGH";
+	protected static final String PRIORITY_LOW = "LOW";
+	protected static final String PRIORITY_MED = "MEDIUM";
+	protected static final String PRIORITY_HIGH = "HIGH";
 	
 
 	/**
