@@ -201,12 +201,12 @@ public class Processor {
 		for (int i = 0; i < priorityLevels.length; i++) {
 			if (input.contains(priorityLevels[i])) {
 				switch (i) {
-					case 0:
-							return PRIORITY_LOW;
-					case 1:
-							return PRIORITY_MED;
-					case 2:
-							return PRIORITY_HIGH;
+				case 0:
+						return PRIORITY_LOW;
+				case 1:
+						return PRIORITY_MED;
+				case 2:
+						return PRIORITY_HIGH;
 				}
 			}
 		}

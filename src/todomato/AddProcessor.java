@@ -396,6 +396,9 @@ public class AddProcessor extends Processor {
 
 		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
 		for (int i = 0; i < list.getSize(); i++) {
+			if (list.getListItem(i).getDate() == null) {
+				return false;
+			}
 			if (list.getListItem(i).getDate().equals(recurDate)) {
 				if (list.getListItem(i).compareDescAndLocation(task)) {
 					return true;
