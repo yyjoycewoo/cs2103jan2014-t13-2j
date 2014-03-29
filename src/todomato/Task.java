@@ -107,15 +107,25 @@ public class Task {
 		return task;
 	}
 	
+	/**
+	 * Creates a String from task of the following format:
+	 * <desc>#<startTime>#<endTime>#<date>#<location>#<recurrencePeriod>#<id>#<timeCreated>#<priorityLevel>#<isCompleted>#<eventId>#<updateTime>
+	 * @return
+	 */
 	public String toFileString() {
 		String task = description;
 		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + 
 				date + SEPERATOR +location + SEPERATOR + recurrencePeriod + 
 				SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR + priorityLevel
-				+ SEPERATOR + isCompleted;
+				+ SEPERATOR + isCompleted + SEPERATOR + eventId + SEPERATOR + updateTime;
 		return task;
 	}
-	
+	/**
+	 * Create a new Task object from a standard taskString (from data file) 
+	 * @return Task object generated from taskString, null if taskString is empty
+	 * @author Daryl
+	 * @throws InvalidInputException 
+	 */
 	public static Task createTaskFromFileString(String fileInput) {
 		String[] parts = fileInput.split(SEPERATOR);
 		String description = parts[0];
@@ -123,6 +133,8 @@ public class Task {
 		DateTime endTime = null;
 		DateTime date = null;
 		String location = null;
+		String eventId = null;
+		DateTime updateTime = null;
 		if (DateTime.isParseable(parts[1])) {
 			startTime = new DateTime(parts[1]);
 		}
@@ -143,6 +155,10 @@ public class Task {
 		if (parts[9].equals(IS_TRUE)){
 			isComplete = true;
 		}
+		eventId = parts[10];
+		if (DateTime.isParseable(parts[10])) {
+			updateTime = new DateTime(parts[10]);
+		}
 		Task userTask = new Task(description);
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
@@ -153,27 +169,9 @@ public class Task {
 		userTask.setTimeCreated(timeCreated);
 		userTask.setPriorityLevel(prioritylevel);
 		userTask.setCompleted(isComplete);
+		userTask.setEventId(eventId);
+		userTask.setUpdateTime(updateTime);
 		return userTask;
-	}
-	
-	/**
-	 * Create a new Task object from a standard taskString (from data file) 
-	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
-	 * @return Task object generated from taskString, null if taskString is empty
-	 * @author Yiwen
-	 * @throws InvalidInputException 
-	 */
-	public static Task createTaskFromString(String taskString) throws InvalidInputException {
-		Task task = null;
-		
-		if (taskString.isEmpty()) {
-			task = null;
-			
-		} else {
-			task = AddProcessor.parseTask(taskString);
-		}
-		return task;
-
 	}
 	
 	public String getDescription() {
@@ -256,7 +254,7 @@ public class Task {
 		this.isCompleted = isCompleted;
 	}
 	
-	public void seteventId (String eventId) {
+	public void setEventId (String eventId) {
 		this.eventId = eventId;
 	}
 	public void setUpdateTime (DateTime updateTime) {
