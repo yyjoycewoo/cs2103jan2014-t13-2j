@@ -16,6 +16,7 @@ public class SplitProcessorsHandler {
 	private static final String EXIT_COMMAND = "exit";
 	private static final Object REDO_COMMAND = "redo";
 	private static final Object FIND_COMMAND = "find";
+	private static final String RECUR_COMMAND = "recur";
 	
 	private static Command command;
 	
@@ -53,6 +54,9 @@ public class SplitProcessorsHandler {
 		}
 		if (command.getAction().equals(ADD_COMMAND)) {
 			return AddProcessor.processAdd(command.getArgument());
+		}
+		if (command.getAction().equals(RECUR_COMMAND)) {
+			return RecurProcessor.processRecur(command.getArgument());
 		}
 		//Treat as an add command if no action is specified
 		return AddProcessor.processAdd(userInput);

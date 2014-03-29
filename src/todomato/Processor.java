@@ -26,13 +26,15 @@ public class Processor {
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES = 4;
 	protected static final int POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR = 1;
 	protected static final int POS_OF_MINUTE = 2;
-	protected static final String INVALID_TIME_FORMAT = "Invalid Date Format";
+	protected static final String INVALID_DATE = "Invalid Date";
+	protected static final String INVALID_TIME = "Invalid Time";
 	protected static final int NOT_FOUND = -1;
 	protected static final String PRIORITY_LOW = "LOW";
 	protected static final String PRIORITY_MED = "MEDIUM";
 	protected static final String PRIORITY_HIGH = "HIGH";
 	protected static DateTime currentDate = DateTime.today(TimeZone.getDefault());
-	protected static String[] days = new String[] {"mon", "tues", "wed", "thurs", "fri", "sat", "sun"};
+	protected static final String[] days = new String[] {"mon", "tues", "wed", "thurs", "fri", "sat", "sun"};
+	protected static final String meridiems[] = new String[] { "am", "pm" };
 	
 
 	/**
@@ -72,7 +74,6 @@ public class Processor {
 	 */
 
 	protected static int checkMeridiem(String input) {
-		String meridiems[] = new String[] { "am", "pm" };
 		for (int i = 0; i < meridiems.length; i++) {
 			if (input.contains(meridiems[i])) {
 				return i;
@@ -89,9 +90,9 @@ public class Processor {
 	 * @return standardFormDate
 	 * @throws InvalidInputException
 	 */
-	protected static String parseDateString(String input) {
+	protected static String parseDateString(String input) throws InvalidInputException {
 		if (input == null) {
-			return null;
+			throw new InvalidInputException("INVALID_DATE");
 		}
 		
 		if (DateTime.isParseable(input)) {
@@ -138,6 +139,10 @@ public class Processor {
 			}
 		}
 		
+		if (standardFormDate == null) {
+			throw new InvalidInputException(INVALID_DATE);
+		}
+		
 		return standardFormDate;
 	}
 	
@@ -175,60 +180,79 @@ public class Processor {
 	 * @throws InvalidInputException
 	 */
 	
-	protected static String parseTimeStringFromInput(String input) {
-		String TimeString = null;
+	protected static String parseTimeStringFromInput(String input) throws InvalidInputException {
+		String timeString = null;
 		if (input == null) {
-			return null;
+			throw new InvalidInputException(INVALID_TIME);
 		}
 		if (input.length() > 5) {
-			return null;
+			throw new InvalidInputException(INVALID_TIME);
 		}
-		String meridiem[] = new String[] { "am", "pm" };
-		String userHour = null;
-		String userMinute = "00";
 		int meridiemIndex = checkMeridiem(input);
 		if (meridiemIndex != NOT_FOUND) {
-			input = input.substring(0,
-					input.indexOf(meridiem[meridiemIndex]));
-			if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
+			timeString = convertStringWithMeridiemToStdTimeString(input);
+			return timeString;
+		} else {
+			timeString = convertStringWithoutMeridiemToStdTimeString(input);
+			return timeString;
+		}
+	}
+	
+	protected static String convertStringWithoutMeridiemToStdTimeString (String input) {
+		String userHour = null;
+		String userMinute = "00";
+		String timeString = null;
+		if (input.length() == 5 && input.contains(":")) {
+			return input;
+		} else {
+			if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) 
+					|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
 				userHour = input;
-			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR) {
-				userHour = input;
-			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
-				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
 			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
 				userHour = input.substring(0, POS_OF_MINUTE);
 				userMinute = input.substring(POS_OF_MINUTE);
-			}
-			if (meridiemIndex == PM) {
-				if (Integer.parseInt(userHour) != 12) {
-					//Adds 12 hours to the hour if there is PM
-					userHour = Integer.toString(Integer.parseInt(userHour) + 12);
-				}
-			}
-		} else {
-			if (input.length() == 5 && input.contains(":")) {
-				return input;
-			} else {
-				if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) 
-						|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
-					userHour = input;
-				} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
-					userHour = input.substring(0, POS_OF_MINUTE);
-					userMinute = input.substring(POS_OF_MINUTE);
-				} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
-					userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-					userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-				}
+			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
 			}
 		}
 		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
 			//pads a single digit hour to fit the DateTime format
 			userHour = "0" + userHour;
 		}
-		TimeString = userHour + ":" + userMinute;
-		return TimeString;
+		timeString = userHour + ":" + userMinute;
+		return timeString;
+	}
+	
+	protected static String convertStringWithMeridiemToStdTimeString(String input) {
+		int meridiemIndex = checkMeridiem(input);
+		String userHour = null;
+		String userMinute = "00";
+		String timeString = null;
+		input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
+		if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
+			userHour = input;
+		} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR) {
+			userHour = input;
+		} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+			userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+			userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+		} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
+			userHour = input.substring(0, POS_OF_MINUTE);
+			userMinute = input.substring(POS_OF_MINUTE);
+		}
+		if (meridiemIndex == PM) {
+			if (Integer.parseInt(userHour) != 12) {
+				//Adds 12 hours to the hour if there is PM
+				userHour = Integer.toString(Integer.parseInt(userHour) + 12);
+			}
+		}
+		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
+			//pads a single digit hour to fit the DateTime format
+			userHour = "0" + userHour;
+		}
+		timeString = userHour + ":" + userMinute;
+		return timeString;
 	}
 	
 	/**

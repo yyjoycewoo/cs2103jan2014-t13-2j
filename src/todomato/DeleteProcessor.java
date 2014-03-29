@@ -88,7 +88,11 @@ public class DeleteProcessor extends Processor {
 		// TODO Auto-generated method stub
 		int numberOfTasksDeleted = 0;
 		String date = arg[1] + " " + arg[2];
-		date = parseDateString(date);
+		try {
+			date = parseDateString(date);
+		} catch (InvalidInputException e) {
+			return INVALID_DATE;
+		}
 		DateTime dateDT = convertStringToDateTime(date);
 		for (int i = list.getSize() - 1; i >= 0; i--) {
 			if(isSameDate(i,dateDT)) {
