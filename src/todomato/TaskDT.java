@@ -20,6 +20,8 @@ public class TaskDT {
 	private DateTime endTime;
 	private DateTime date;
 	private String location;
+	private String eventId;
+	private DateTime updateTime;
 	private int recurrencePeriod;
 	private int id;
 	private String priorityLevel;
