@@ -255,4 +255,18 @@ public class TaskDT {
 	public void setCompleted(Boolean isCompleted) {
 		this.isCompleted = isCompleted;
 	}
+	
+	public void seteventId (String eventId) {
+		this.eventId = eventId;
 	}
+	public void setUpdateTime (DateTime updateTime) {
+		this.updateTime = updateTime;
+	}
+	
+	public String getEventId () {
+		return eventId;
+	}
+	public DateTime getUpdateTime () {
+		return updateTime;
+	}
+}
