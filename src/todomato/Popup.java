@@ -9,14 +9,14 @@ package todomato;
  */
 public class Popup {
 
-	static TaskDTList myownlist = new TaskDTList();
+	static TaskList myownlist = new TaskList();
 
 	public static void show() {
 
 		myownlist.clearList();
 		// for notification checking
 		for (int i = 0; i < Processor.getList().getSize(); i++) {
-			TaskDT item = Processor.getList().getListItem(i);
+			Task item = Processor.getList().getListItem(i);
 			if (item.getDate() != null) {
 				// ***********need to have a better Date API*************
 				int day = item.getDate().getDay() - 1;

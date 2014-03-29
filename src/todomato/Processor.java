@@ -15,10 +15,10 @@ public class Processor {
 
 	protected static String fileLoc = "tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
-	protected static TaskDTList list = fileHandler.readFile();
-	protected static TaskDTList displayList = list;
-	protected static Stack<TaskDTList> undoList = new Stack<TaskDTList>();
-	protected static Stack<TaskDTList> redoList = new Stack<TaskDTList>();
+	protected static TaskList list = fileHandler.readFile();
+	protected static TaskList displayList = list;
+	protected static Stack<TaskList> undoList = new Stack<TaskList>();
+	protected static Stack<TaskList> redoList = new Stack<TaskList>();
 	protected static final int PM = 1;
 	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR = 1;
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
@@ -40,7 +40,7 @@ public class Processor {
 	 * for possible undo operations in the future.
 	 */
 	protected static void storeCurrentList() {
-		TaskDTList lastList = new TaskDTList();
+		TaskList lastList = new TaskList();
 		lastList.deepCopy(list);
 		undoList.push(lastList);
 	}
@@ -276,11 +276,11 @@ public class Processor {
 		return PRIORITY_LOW;
 	}
 
-	public static TaskDTList getList() {
+	public static TaskList getList() {
 		return list;
 	}
 
-	public static TaskDTList getDisplayList() {
+	public static TaskList getDisplayList() {
 		return displayList;
 	}
 }

@@ -121,7 +121,7 @@ public class DeleteProcessor extends Processor {
 	
 	private static String deleteSingleTask(String indexString) {
 		int index = Integer.parseInt(indexString) - 1;
-		TaskDT deletedTask = list.getListItem(index);
+		Task deletedTask = list.getListItem(index);
 		list.deleteListItem(index);
 		return deletedTask.toString();
 	}

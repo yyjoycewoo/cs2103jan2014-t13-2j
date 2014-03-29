@@ -1,236 +1,91 @@
 package todomato;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
-/**
- * This class stores a Task description, and optional additional attributes.
- * The attributes can be the following:
- * <ul>
- * <li>start time
- * <li>end time
- * <li>date
- * <li>location
- * </ul>
- * 
- * <p>
- * A Task may be constructed with any subset of the possible additional
- * information, as long as it has a description.
- * @author Joyce
- *
- */
+import hirondelle.date4j.DateTime;
+
+
 public class Task {
 	private static final String START_TIME_PREP = " at ";
 	private static final String END_TIME_PREP = " until ";
-	private static final String DATE_PREP = " on ";
 	private static final String LOCATION_PREP = " in ";
-	private static final String START_TIME_KEY = "at";
-	private static final String END_TIME_KEY = "until";
-	private static final String DATE_KEY = "on";
-	private static final String LOCATION_KEY = "in";
-
-	
+	private static final String DATE_PREP = " on ";
+	private static final String SEPERATOR = "#";
+	private static final String PRIORITY_LOW = "LOW";
+	private static final String IS_TRUE = "true";
+		
 	private String description;
-	private Time startTime;
-	private Time endTime;
-	private Date date;
+	private DateTime startTime;
+	private DateTime endTime;
+	private DateTime date;
 	private String location;
+	private String eventId;
+	private DateTime updateTime;
+	private int recurrencePeriod;
+	private int id;
+	private String priorityLevel;
+	private DateTime timeCreated;
+	private Boolean isCompleted;
 	
-	/**
-	 * Create a new Task object with description
-	 * @param description The description
-	 */
-	public Task(String description) {
-		this.setDescription(description);
+	public Task(String userDes) {
+		description = userDes;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
 	}
 	
-	/**
-	 * Create a new Task object with description and date
-	 * @param description The description
-	 * @param date The date
-	 */
-	public Task(String description, Date date) {
-		this.setDescription(description);
-		this.setDate(date);
+	public Task(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation) {
+		description = userDes;
+		startTime = userStart;
+		date = userDate;
+		endTime = userEnd;
+		location = userLocation;
+		recurrencePeriod = 0;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
 	}
 	
-	/**
-	 * Create a new Task object with description and startTime
-	 * @param description The description
-	 * @param startTime The start time
-	 */
-	public Task(String description, Time startTime) {
-		this(description);
-		this.setStartTime(startTime);
+	public Task(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation, int userRecurrencePeriod) {
+		description = userDes;
+		startTime = userStart;
+		date = userDate;
+		endTime = userEnd;
+		location = userLocation;
+		recurrencePeriod = userRecurrencePeriod;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
 	}
 	
-	/**
-	 * Create a new Task object with description and location
-	 * @param description The description
-	 * @param location The location
-	 */
-	public Task(String description, String location) {
-		this.setDescription(description);
-		this.setLocation(location);
+	public Task(Task copy) {
+		description = copy.getDescription();
+		startTime = copy.getStartTime();
+		endTime = copy.getEndTime();
+		date = copy.getDate();
+		location = copy.getLocation();
+		recurrencePeriod = copy.getRecurrencePeriod();
+		timeCreated = copy.getTimeCreated();
+		id = copy.getId();
+		priorityLevel = copy.getPriorityLevel();
+		isCompleted = false;
 	}
 
-	/**
-	 * Create a new Task object with description, startTime and date
-	 * @param description The description
-	 * @param startTime The start time
-	 * @param date The date
-	 */
-	public Task(String description, Time startTime, Date date) {
-		this(description, startTime);
-		this.setDate(date);
+	public static boolean isEqual(String string1, String string2) {
+	    return string1 == string2 || (string1 != null && string1.equals(string2));
 	}
 	
-	/**
-	 * Create a new Task object with description, startTime and endTime
-	 * @param description The description
-	 * @param startTime The start time
-	 * @param endTime The end time
-	 */
-	public Task(String description, Time startTime, Time endTime) {
-		this(description, startTime);
-		this.setEndTime(endTime);
-	}
-	
-	/**
-	 * Create a new Task object with description, startTime and location
-	 * @param description The description
-	 * @param startTime The start time
-	 * @param location The location
-	 */
-	public Task(String description, Time startTime, String location) {
-		this(description, startTime);
-		this.setLocation(location);
-	}
-	
-	/**
-	 * Create a new Task object with description, date and location
-	 * @param description The description
-	 * @param date The date
-	 * @param location The location
-	 */
-	public Task(String description, Date date, String location) {
-		this(description, date);
-		this.setLocation(location);
-	}
-	
-	/**
-	 * Create a new Task object with description, startTime, endTime and date
-	 * @param description The description
-	 * @param startTime The start time
-	 * @param endTime The end time
-	 * @param date The date
-	 */
-	public Task(String description, Time startTime, Time endTime, Date date) {
-		this(description, startTime, endTime);
-		this.setDate(date);
-	}
-	
-	/**
-	 * Create a new Task object with description, startTime, endTime, location
-	 * @param description The description
-	 * @param startTime The start time
-	 * @param endTime The end time
-	 * @param location The location
-	 */
-	public Task(String description, Time startTime, Time endTime, String location) {
-		this(description, startTime, endTime);
-		this.setLocation(location);
-	}
-	
-	/**
-	 * Create a new Task object with description, startTime, endTime, date and location
-	 * @param description The description
-	 * @param startTime The start time
-	 * @param endTime The end time
-	 * @param date The date
-	 * @param location The location
-	 */
-	public Task(String description, Time startTime, Time endTime, Date date, String location) {
-		this(description, startTime, endTime, date);
-		this.setLocation(location);
-	}
-	
-	/**
-	 * Create a new Task object that is a deep copy of the Task t
-	 * @param t Task to be copied
-	 */
-	public Task(Task t) {
-		this.setDate(t.getDate());
-		this.setDescription(t.getDescription());
-		this.setStartTime(t.getStartTime());
-		this.setEndTime(t.getEndTime());
-		this.setLocation(t.getLocation());
-	}
-
-	/**
-	 * Create a new Task object from a standard taskString (from data file) 
-	 * TODO: need to Refractor
-	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
-	 * @return Task object generated from taskString, null if taskString is empty
-	 * @author Yiwen
-	 * @throws InvalidInputException 
-	 */
-	public static Task createTaskFromString(String taskString) throws InvalidInputException {
-		Task task;
-		String description = null;
-		Time startTime = null;
-		Time endTime = null;
-		Date date = null;
-		String location = null;
-		
-		
-		if (taskString.isEmpty()) {
-			task = null;
-			
-		} else {
-			
-			List<String> taskStringList = Arrays.asList(taskString.split(" "));
-			
-			int descriptionIndex = 0;
-			int startTimeIndex = taskStringList.indexOf(START_TIME_KEY) + 1;
-			int endTimeIndex = taskStringList.indexOf(END_TIME_KEY) + 1;
-			int dateIndex = taskStringList.indexOf(DATE_KEY) + 1;
-			int locationIndex = taskStringList.indexOf(LOCATION_KEY) + 1;
-			int locationIndexEnd = taskStringList.size();
-			
-			int[] indexes = {startTimeIndex, endTimeIndex, dateIndex, locationIndex};
-	        Arrays.sort(indexes);
-	        int descriptionIndexEnd = indexes[0] - 1;
-
-			description = taskStringList.get(descriptionIndex);
-			for (int i = descriptionIndex + 1; i < descriptionIndexEnd; i++ ){
-				description = description + " " + taskStringList.get(i) ;
-			}
-			
-			if ( startTimeIndex != 0 ) {
-				startTime = new Time(taskStringList.get(startTimeIndex));
-			}
-			if ( endTimeIndex != 0 ) {
-				endTime = new Time(taskStringList.get(endTimeIndex));
-			}
-			if ( dateIndex != 0 ) {
-				date = new Date(taskStringList.get(dateIndex));
-			}
-			if ( locationIndex != 0 ) {
-				location = taskStringList.get(locationIndex);
-				for (int i = locationIndex + 1; i < locationIndexEnd; i++ ){
-					location = location + " " + taskStringList.get(i) ;
-				}
-			}
-			task = new Task(description, startTime, endTime, date, location);
+	public Boolean compareDescAndLocation(Task task) {
+		if (isEqual(this.description,task.getDescription()) && isEqual(this.location,task.getLocation())) {
+			return true;
 		}
-		
-		return task;
-
+		return false;
 	}
 	
-	@Override
 	public String toString() {
 		String task = description;
 		if (startTime != null) {
@@ -240,15 +95,87 @@ public class Task {
 			task += END_TIME_PREP + endTime;
 		}
 		if (date != null) {
-			task += DATE_PREP + date;
+			task += DATE_PREP + date.format("MMM DD YYYY", new Locale("US"));
 		}
 		if (location != null) {
 			task += LOCATION_PREP + location;
 		}
+		if (recurrencePeriod != 0) {
+			task += " recurring every "  + recurrencePeriod + " days";
+		}
 			
 		return task;
 	}
+	
+	public String toFileString() {
+		String task = description;
+		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + 
+				date + SEPERATOR +location + SEPERATOR + recurrencePeriod + 
+				SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR + priorityLevel
+				+ SEPERATOR + isCompleted;
+		return task;
+	}
+	
+	public static Task createTaskFromFileString(String fileInput) {
+		String[] parts = fileInput.split(SEPERATOR);
+		String description = parts[0];
+		DateTime startTime = null;
+		DateTime endTime = null;
+		DateTime date = null;
+		String location = null;
+		if (DateTime.isParseable(parts[1])) {
+			startTime = new DateTime(parts[1]);
+		}
+		if (DateTime.isParseable(parts[2])) {
+			endTime = new DateTime(parts[2]);
+		}
+		if (DateTime.isParseable(parts[3])) {
+			date = new DateTime(parts[3]);
+		}
+		if (!parts[4].equals("null")) {
+			location = parts[4];
+		}
+		int recurrencePeriod = Integer.parseInt(parts[5]);
+		int id = Integer.parseInt(parts[6]);
+		DateTime timeCreated = new DateTime(parts[7]);
+		String prioritylevel = parts[8];
+		Boolean isComplete = false;
+		if (parts[9].equals(IS_TRUE)){
+			isComplete = true;
+		}
+		Task userTask = new Task(description);
+		userTask.setStartTime(startTime);
+		userTask.setEndTime(endTime);
+		userTask.setDate(date);
+		userTask.setLocation(location);
+		userTask.setRecurrencePeriod(recurrencePeriod);
+		userTask.setId(id);
+		userTask.setTimeCreated(timeCreated);
+		userTask.setPriorityLevel(prioritylevel);
+		userTask.setCompleted(isComplete);
+		return userTask;
+	}
+	
+	/**
+	 * Create a new Task object from a standard taskString (from data file) 
+	 * @param taskString "eat at 05:00 until 07:00 on 16/02/2014 in utown"
+	 * @return Task object generated from taskString, null if taskString is empty
+	 * @author Yiwen
+	 * @throws InvalidInputException 
+	 */
+	public static Task createTaskFromString(String taskString) throws InvalidInputException {
+		Task task = null;
+		
+		if (taskString.isEmpty()) {
+			task = null;
+			
+		} else {
+			task = AddProcessor.parseTask(taskString);
+		}
+		return task;
 
+	}
+	
 	public String getDescription() {
 		return description;
 	}
@@ -257,28 +184,20 @@ public class Task {
 		this.description = description;
 	}
 
-	public Time getStartTime() {
+	public DateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Time startTime) {
+	public void setStartTime(DateTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public Time getEndTime() {
+	public DateTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Time endTime) {
+	public void setEndTime(DateTime endTime) {
 		this.endTime = endTime;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
 	}
 
 	public String getLocation() {
@@ -289,5 +208,65 @@ public class Task {
 		this.location = location;
 	}
 	
+	public void setDate(DateTime date) {
+		this.date = date;
+	}
 	
+	public DateTime getDate() {
+		return date;
+	}
+
+	public int getRecurrencePeriod() {
+		return recurrencePeriod;
+	}
+	
+	public void setRecurrencePeriod(int recurrencePeriod) {
+		this.recurrencePeriod = recurrencePeriod;
+	}
+	
+	public String getPriorityLevel() {
+		return priorityLevel;
+	}
+	
+	public void setPriorityLevel(String priorityLevel) {
+		this.priorityLevel = priorityLevel;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public DateTime getTimeCreated() {
+		return timeCreated;
+	}
+	
+	public void setTimeCreated(DateTime timeCreated) {
+		this.timeCreated = timeCreated;
+	}
+	
+	public Boolean getCompleted() {
+		return isCompleted;
+	}
+	
+	public void setCompleted(Boolean isCompleted) {
+		this.isCompleted = isCompleted;
+	}
+	
+	public void seteventId (String eventId) {
+		this.eventId = eventId;
+	}
+	public void setUpdateTime (DateTime updateTime) {
+		this.updateTime = updateTime;
+	}
+	
+	public String getEventId () {
+		return eventId;
+	}
+	public DateTime getUpdateTime () {
+		return updateTime;
+	}
 }

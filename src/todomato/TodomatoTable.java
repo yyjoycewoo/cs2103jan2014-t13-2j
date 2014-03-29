@@ -54,7 +54,7 @@ public class TodomatoTable extends JPanel {
 		return table;
 	}
 	
-	private static Object[][] loadData(TaskDTList l) {        
+	private static Object[][] loadData(TaskList l) {        
 		Object[][] list = new Object[1][8];
 		if (l.getSize() == 0) {
 			for (int i=0; i<=7; i++) {

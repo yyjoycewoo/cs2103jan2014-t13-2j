@@ -6,8 +6,8 @@ public class FindProcessor extends Processor {
 	private static final String SUCCESS_MSG = "Search completed";
 
 	public static String processFind(String argument) {
-		TaskDTList tasksFound = new TaskDTList();
-		for (TaskDT i : list.getList()) {
+		TaskList tasksFound = new TaskList();
+		for (Task i : list.getList()) {
 			String task = i.toString();
 			if (task.contains(argument) && task != "") {
 				tasksFound.addToList(i);
