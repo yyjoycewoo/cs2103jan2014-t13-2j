@@ -87,7 +87,7 @@ public class AddProcessor extends Processor {
 	 */
 	public static String processAdd(String input) throws NumberFormatException {
 		storeCurrentList();
-		TaskDT userTask = null;
+		Task userTask = null;
 		if (input.equals(RECUR_KEYWORD)) {
 			for (int i = 0; i < list.getSize(); i++){
 				addsRecurringTask(list.getListItem(i));
@@ -116,11 +116,11 @@ public class AddProcessor extends Processor {
 	 * @return Task
 	 * @throws InvalidInputException
 	 */
-	public static TaskDT parseTask(String input) throws InvalidInputException {
+	public static Task parseTask(String input) throws InvalidInputException {
 		Arrays.fill(taskDetails,null);
 		boolean taskDesExtracted = false;
 		int keywordIndex = NOT_FOUND;
-		TaskDT userTaskDT = null;
+		Task userTaskDT = null;
 		String[] stringFragments = null;
 		
 		if (checkForInvertedCommas(input)) {
@@ -160,8 +160,8 @@ public class AddProcessor extends Processor {
 	 * @return userTaskDT with all the task details
 	 */
 	
-	private static TaskDT setUserTask(String[] taskDetails) {
-		TaskDT userTask = new TaskDT(taskDetails[INDEX_OF_DESC]);
+	private static Task setUserTask(String[] taskDetails) {
+		Task userTask = new Task(taskDetails[INDEX_OF_DESC]);
 		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME_STRING]);
 		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME_STRING]);
 		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE_STRING]);
@@ -380,9 +380,9 @@ public class AddProcessor extends Processor {
 	 */
 	
 
-	protected static void addsRecurringTask(TaskDT task) {
+	protected static void addsRecurringTask(Task task) {
 		if (needsToBeRecurred(task)) {
-			TaskDT newTask = new TaskDT(task);
+			Task newTask = new Task(task);
 			newTask.setDate(task.getDate().plusDays(task.getRecurrencePeriod()));
 			list.addToList(newTask);
 		}
@@ -392,7 +392,7 @@ public class AddProcessor extends Processor {
 	 * @param task
 	 * @return Boolean
 	 */
-	protected static Boolean checkIfDuplicateRecurTaskExist (TaskDT task) {
+	protected static Boolean checkIfDuplicateRecurTaskExist (Task task) {
 
 		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
 		for (int i = 0; i < list.getSize(); i++) {
@@ -418,7 +418,7 @@ public class AddProcessor extends Processor {
 	 * @return Boolean
 	 */
 
-	protected static Boolean needsToBeRecurred(TaskDT task) {
+	protected static Boolean needsToBeRecurred(Task task) {
 		if (task.getRecurrencePeriod() == 0) {
 			return false;
 		}
