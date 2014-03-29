@@ -31,6 +31,8 @@ public class Processor {
 	protected static final String PRIORITY_LOW = "LOW";
 	protected static final String PRIORITY_MED = "MEDIUM";
 	protected static final String PRIORITY_HIGH = "HIGH";
+	protected static DateTime currentDate = DateTime.today(TimeZone.getDefault());
+	protected static String[] days = new String[] {"mon", "tues", "wed", "thurs", "fri", "sat", "sun"};
 	
 
 	/**
@@ -80,22 +82,50 @@ public class Processor {
 	}
 	/**
 	 * Converts "Jan 1" to "YYYY-MM-DD" (DateTime format)
+	 * Other input formats include days of the week "Monday", "Tuesday", etc
+	 * You can also put next before the days of the week
+	 * This will set the string the DateTime format of the specified day
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
 	 */
 	protected static String parseDateString(String input) {
-		if (DateTime.isParseable(input)) {
-			return input;
-		}
 		if (input == null) {
 			return null;
 		}
+		
+		if (DateTime.isParseable(input)) {
+			return input;
+		}
+		
 		input = input.toLowerCase();
-		String[] parts = input.split(" ");
 		String standardFormDate = null;
+		
+		String[] dateKeywords = new String[] {"today", "tomorrow", "tmr"};
+		for (int i = 0; i <dateKeywords.length; i++) {
+			if (input.contains(dateKeywords[i])) {
+				switch (i) {
+				case 0:
+					standardFormDate = currentDate.toString();
+				case 1:
+				case 2:
+					standardFormDate = currentDate.plusDays(1).toString();
+				}
+			}
+		}
+		
+		
 		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
 				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+		
+		int dayIndex = checkForDay(input);		
+		if (dayIndex != NOT_FOUND) {
+			standardFormDate = currentDate.plusDays(daysFromCurrentDay(input)).toString();
+			return standardFormDate;
+		}
+		
+		String[] parts = input.split(" ");
+		
 		for (int i = 0; i < months.length; i++) {
 			if (parts.length > 1) {
 				if (parts[0].contains(months[i])) {
@@ -111,6 +141,33 @@ public class Processor {
 		return standardFormDate;
 	}
 	
+	protected static int daysFromCurrentDay (String input) {
+		int currentDay = currentDate.getWeekDay();
+		int userDay = checkForDay(input);
+		currentDay -= 1;
+		if (currentDay == 0) {
+			currentDay = 7;
+		}
+		/* 1 is used as Sunday is the first day in DateTime, 
+		while Monday is first day in this program*/
+		int daysFromCurrent = userDay - currentDay;
+		if (input.contains("next")) {
+			daysFromCurrent += 7;
+		}		
+		return daysFromCurrent;
+	}
+	
+	protected static int checkForDay (String input) {
+		int dayValue = 0;
+		for (int i = 0;  i < days.length; i++) {
+			if (input.contains(days[i])) {
+				dayValue = i + 1;
+				return dayValue;
+			}
+		}
+		return -1;
+	}
+	
 	/**
 	 * Converts "930pm" to HH:MM (DateTime Format)
 	 * @param input
@@ -121,7 +178,10 @@ public class Processor {
 	protected static String parseTimeStringFromInput(String input) {
 		String TimeString = null;
 		if (input == null) {
-			return "";
+			return null;
+		}
+		if (input.length() > 5) {
+			return null;
 		}
 		String meridiem[] = new String[] { "am", "pm" };
 		String userHour = null;
@@ -187,6 +247,9 @@ public class Processor {
 				return null;
 			} else {
 				userDateTime = new DateTime(input);
+				if (!userDateTime.hasYearMonthDay()) {
+					userDateTime = new DateTime(currentDate.getYear() + "-" + userDateTime.toString());
+				}
 			}
 		}
 		return userDateTime;
