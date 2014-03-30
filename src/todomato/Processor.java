@@ -215,15 +215,20 @@ public class Processor {
 		if (input.length() == 5 && input.contains(":")) {
 			return input;
 		} else {
-			if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) 
-					|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
-				userHour = input;
-			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
-				userHour = input.substring(0, POS_OF_MINUTE);
-				userMinute = input.substring(POS_OF_MINUTE);
-			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
-				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+			if (!isParseableByInt(input)) {
+				throw new InvalidInputException(INVALID_TIME);
+			}
+			else {
+				if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) 
+						|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
+					userHour = input;
+				} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
+					userHour = input.substring(0, POS_OF_MINUTE);
+					userMinute = input.substring(POS_OF_MINUTE);
+				} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+					userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+					userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+				}
 			}
 		}
 		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
@@ -232,6 +237,15 @@ public class Processor {
 		}
 		timeString = userHour + ":" + userMinute;
 		return timeString;
+	}
+	
+	protected static Boolean isParseableByInt (String input) {
+		try {
+			Integer.parseInt(input);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
 	}
 	
 	protected static String convertStringWithMeridiemToStdTimeString(String input) {
@@ -283,7 +297,7 @@ public class Processor {
 			} else {
 				userDateTime = new DateTime(input);
 				if (!userDateTime.hasYearMonthDay()) {
-					userDateTime = new DateTime(currentDate.getYear() + "-" + userDateTime.toString());
+					userDateTime = new DateTime(userDateTime.toString());
 				}
 			}
 		}

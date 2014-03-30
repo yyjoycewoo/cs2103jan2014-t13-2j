@@ -89,6 +89,9 @@ public class AddProcessor extends Processor {
 	 */
 	public static String processAdd(String input) throws NumberFormatException {
 		storeCurrentList();
+		for (int i = 0; i < errorsInInput.length; i++) {
+			errorsInInput[i] = false;
+		}
 		Task userTask = null;
 		userTask = parseTask(input);
 		list.addToList(userTask);	
