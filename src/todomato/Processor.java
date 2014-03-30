@@ -49,7 +49,7 @@ public class Processor {
 	
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"
-	 * @author Daryl
+	 * @author Daryl Ho
 	 * @param String month, String day
 	 * 
 	 * @return userDate
@@ -68,6 +68,7 @@ public class Processor {
 	
 	/**
 	 * Checks whether "am" or "pm" is in the string
+	 * @author Daryl Ho
 	 * @param input
 	 * @return integer indicating which meridiem is present
 	 * -1 if there is not one
@@ -86,6 +87,7 @@ public class Processor {
 	 * Other input formats include days of the week "Monday", "Tuesday", etc
 	 * You can also put next before the days of the week
 	 * This will set the string the DateTime format of the specified day
+	 * @author Daryl Ho
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -145,6 +147,13 @@ public class Processor {
 		
 		return standardFormDate;
 	}
+	/**
+	 * Returns the number of days it is from the current day
+	 * Example : if today is Wednesday, and input is Tuesday, it will
+	 * return -1
+	 * @param input
+	 * @return
+	 */
 	
 	protected static int daysFromCurrentDay (String input) {
 		int currentDay = currentDate.getWeekDay();
@@ -175,6 +184,7 @@ public class Processor {
 	
 	/**
 	 * Converts "930pm" to HH:MM (DateTime Format)
+	 * @author Daryl Ho
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -258,6 +268,7 @@ public class Processor {
 	/**
 	 * Converts strings of form YYYY-MM-DD or
 	 * HH:MM to DateTime format
+	 * @author Daryl Ho
 	 * @param input
 	 * @return DateTime
 	 */
