@@ -11,10 +11,10 @@ public class RecurProcessor extends Processor {
 
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	
-	public static String processRecur(String input) {
+	public static String processRecur() {
 		for (int i = 0; i < list.getSize(); i++){
 			addsRecurringTask(list.getListItem(i));
-			}
+		}
 		fileHandler.updateFile(list);
 		return RECURRING_TASKS_ADDED;
 	}

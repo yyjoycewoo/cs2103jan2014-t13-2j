@@ -56,7 +56,7 @@ public class SplitProcessorsHandler {
 			return AddProcessor.processAdd(command.getArgument());
 		}
 		if (command.getAction().equals(RECUR_COMMAND)) {
-			return RecurProcessor.processRecur(command.getArgument());
+			return RecurProcessor.processRecur();
 		}
 		//Treat as an add command if no action is specified
 		return AddProcessor.processAdd(userInput);
