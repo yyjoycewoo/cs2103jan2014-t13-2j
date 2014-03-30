@@ -195,9 +195,6 @@ public class Processor {
 		if (input == null) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
-		if (input.length() > 5) {
-			throw new InvalidInputException(INVALID_TIME);
-		}
 		int meridiemIndex = checkMeridiem(input);
 		if (meridiemIndex != NOT_FOUND) {
 			timeString = convertStringWithMeridiemToStdTimeString(input);
@@ -208,10 +205,13 @@ public class Processor {
 		}
 	}
 	
-	protected static String convertStringWithoutMeridiemToStdTimeString (String input) {
+	protected static String convertStringWithoutMeridiemToStdTimeString (String input) throws InvalidInputException {
 		String userHour = null;
 		String userMinute = "00";
 		String timeString = null;
+		if (input.length() > 5) {
+			throw new InvalidInputException(INVALID_TIME);
+		}
 		if (input.length() == 5 && input.contains(":")) {
 			return input;
 		} else {
