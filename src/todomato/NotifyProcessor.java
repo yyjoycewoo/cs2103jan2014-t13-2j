@@ -67,8 +67,16 @@ public class NotifyProcessor extends Processor {
 		return list.getListItem(index).toString();
 	}
 
+	// limited to today's task
 	private static void notifyTime(int index, int which, String argument)
 			throws InvalidInputException {
+		String item_date = convertDateToStandardForm(list.getListItem(index)
+				.getDate().getMonth().toString(), list.getListItem(index)
+				.getDate().getDay().toString());
+		if (!item_date.contains(CurrentDate.date())) {
+			throw new InvalidInputException(
+					"Notification time is only for today's task, not for future task!");
+		}
 		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
 				.substring(which + NO_OF_CHAR_IN_NTIME)));
 		list.getListItem(index).setNoticeTime(time);
