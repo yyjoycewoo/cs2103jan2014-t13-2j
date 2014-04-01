@@ -30,7 +30,7 @@ public class Notification {
 	/**
 	 * @param taskToDo
 	 */
-	protected static void popUpNotice(String taskToDo) {
+	protected static void popUpNotice(String taskToDo, int n) {
 		String msg = "~~~Reminder! Do now or never!~~~";
 		// pop up disappeared after 7sec
 		final int waitfor = 7000;
@@ -46,7 +46,7 @@ public class Notification {
 		Insets toolHeight = Toolkit.getDefaultToolkit().getScreenInsets(
 				frame.getGraphicsConfiguration());
 		frame.setLocation((scrSize.width - frame.getWidth()), (scrSize.height
-				- frame.getHeight() - toolHeight.bottom));
+				- (frame.getHeight() * (n + 1)) - toolHeight.bottom));
 		frame.setLayout(new GridBagLayout());
 		frame.setAlwaysOnTop(true);
 
