@@ -1,8 +1,9 @@
 package todomato;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
- * This class stores a list of all Tasks that the user wants to keep track of.
+ * Class to store a list of all TaskDTs that the user wants to keep track of
  * @author Joyce
  *
  */
@@ -11,16 +12,16 @@ public class TaskList {
 	private ArrayList<Task> list;
 	
 	/**
-	 * Create a new empty TaskList
+	 * Create a new empty TaskDTList
 	 */
 	public TaskList() {
 		this.list = new ArrayList<Task>();
 	}
 	
 	/**
-	 * Add t to the TaskList
-	 * @param t Task to be added
-	 * @return Task that was added
+	 * Add t to the TaskDTList
+	 * @param t TaskDT to be added
+	 * @return TaskDT that was added
 	 */
 	public Task addToList(Task t) {
 		list.add(t);
@@ -28,27 +29,27 @@ public class TaskList {
 	}
 	
 	/**
-	 * Delete Task i from the TaskList
-	 * @param i index of task to be deleted
-	 * @return Task deleted
+	 * Delete TaskDT i from the TaskDTList
+	 * @param i index of TaskDT to be deleted
+	 * @return TaskDT deleted
 	 */
 	public Task deleteListItem(int i){
-		Task taskDeleted = list.get(i);
+		Task TaskDTDeleted = list.get(i);
 		list.remove(i);
-		return taskDeleted;
+		return TaskDTDeleted;
 	}
 	
 	/**
-	 * Clears all the Tasks in the TaskList
+	 * Clears all the TaskDTs in the TaskDTList
 	 */
 	public void clearList() {
 		list = new ArrayList<Task>();
 	}
 	
 	/**
-	 * Get the task at index i
-	 * @param i Index of Task to get
-	 * @return Task at index i
+	 * Get the TaskDT at index i
+	 * @param i Index of TaskDT to get
+	 * @return TaskDT at index i
 	 */
 	public Task getListItem(int i) {
 		return list.get(i);
@@ -57,17 +58,18 @@ public class TaskList {
 	@Override
 	public String toString() {
 		String s = "";
-		
+		int i = 0;
 		for (Task t : list){
-			s += t.toString() + LINE_BREAK;
+			s += Integer.toString(i+1) + ": " + t.toString() + LINE_BREAK;
+			i++;
 		}
 		return s;
 	}
 	
 	/**
-	 * Modifies TaskList to be a deep copy of copyList
-	 * @param copyList TaskList to be copied
-	 * @return modified TaskList
+	 * Modifies TaskDTList to be a deep copy of copyList
+	 * @param copyList TaskDTList to be copied
+	 * @return modified TaskDTList
 	 */
 	public ArrayList<Task> deepCopy(TaskList copyList) {
 		list = new ArrayList<Task>();
@@ -75,6 +77,22 @@ public class TaskList {
 			list.add(new Task(i));
 		}
 		return list;
+	}
+	
+	/**
+	 * Checks to see if the list is empty
+	 * @return true iff the list is empty
+	 */
+	public boolean isEmpty() {
+		return getSize() == 0;
+	}
+	
+	/**
+	 * Finds the size of the list
+	 * @return the size of the list
+	 */
+	public int getSize() {
+		return list.size();
 	}
 	
 	public ArrayList<Task> getList() {
@@ -85,7 +103,7 @@ public class TaskList {
 		this.list = list;
 	}
 	
-	public int getSize() {
-		return list.size();
+	public void swap(int i, int j) {
+		Collections.swap(list, i, j);
 	}
 }

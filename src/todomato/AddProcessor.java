@@ -51,26 +51,28 @@ import java.util.regex.Pattern;
 public class AddProcessor extends Processor {
 
 	private static String[] keywords = new String[] { " at ", " from ",
-			" until ", " to ", " in ", " due ",  " on ", " recur ", " priority "};
+			" until ", " to ", " due ", " in ", " on ", " recur ", " priority "};
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
 	private static int NOT_FOUND = -1;
-	private static String INVALID_INPUT = "Invalid input format";
-	private static String RECUR_KEYWORD = "recur";
+	private static String INVALID_INPUT = "Invalid input format ";
+	private static String INVALID_START_TIME = "Invalid Start Time ";
+	private static String INVALID_END_TIME = "Invalid End Time ";
+	private static String INVALID_DATE = "Invalid Date format ";
 	private static int INDEX_OF_DESC = 0;
-	private static int INDEX_OF_START_TIME_STRING = 1;
-	private static int INDEX_OF_END_TIME_STRING = 2;
-	private static int INDEX_OF_DATE_STRING = 3;
-	private static int INDEX_OF_LOCATION_STRING = 4;
-	private static int INDEX_OF_RECUR_STRING = 5;
-	private static int INDEX_OF_PRIORITY_STRING = 6;
+	private static int INDEX_OF_START_TIME = 1;
+	private static int INDEX_OF_END_TIME = 2;
+	private static int INDEX_OF_DATE = 3;
+	private static int INDEX_OF_LOCATION = 4;
+	private static int INDEX_OF_RECUR = 5;
+	private static int INDEX_OF_PRIORITY = 6;
 	private static int NO_OF_TASK_DETAILS = 7;
-	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	private static String CANNOT_RECUR_WITHOUT_DATE = "Cannot set recurring period without setting date";
 	private static String TODAY = " today";
 	private static String TOMORROW1 = " tmr";
 	private static String TOMORROW2 = " tomorrow";
 	private static String ADD_SUCCESSFUL = "Added ";
+	private static Boolean[] errorsInInput = {false, false, false, false, false, false, false};
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
 	private static DateTime currentDate = DateTime.today(TimeZone.getDefault());
 	
@@ -87,25 +89,41 @@ public class AddProcessor extends Processor {
 	 */
 	public static String processAdd(String input) throws NumberFormatException {
 		storeCurrentList();
-		TaskDT userTask = null;
-		if (input.equals(RECUR_KEYWORD)) {
-			for (int i = 0; i < list.getSize(); i++){
-				addsRecurringTask(list.getListItem(i));
-				}
-			fileHandler.updateFile(list);
-			return RECURRING_TASKS_ADDED;
+		for (int i = 0; i < errorsInInput.length; i++) {
+			errorsInInput[i] = false;
 		}
-		else {
-			try {
-				userTask = parseTask(input);
-			} catch (InvalidInputException e) {
-				return INVALID_INPUT;
-			}
-			list.addToList(userTask);
-		}
+		Task userTask = null;
+		userTask = parseTask(input);
+		list.addToList(userTask);	
 		fileHandler.updateFile(list);
 		displayList = list;
-		return ADD_SUCCESSFUL + userTask.toString();
+		String statusString = "";
+		Boolean errorPresent = false;
+		for (int i = 0; i < errorsInInput.length; i++) {
+			if (errorsInInput[i] == true) {
+				errorPresent = true;
+				switch (i) {
+				case 1:
+					statusString += INVALID_START_TIME;
+					break;
+				case 2:
+					statusString += INVALID_END_TIME;
+					break;
+				case 3:
+					statusString += INVALID_DATE;
+					break;
+				case 5:
+					statusString += CANNOT_RECUR_WITHOUT_DATE;
+					break;
+				}
+			}
+		}
+		if (!errorPresent) {
+			return ADD_SUCCESSFUL + userTask.toString();
+		}
+		else {
+			return statusString;
+		}
 	}
 	
 	
@@ -116,11 +134,11 @@ public class AddProcessor extends Processor {
 	 * @return Task
 	 * @throws InvalidInputException
 	 */
-	public static TaskDT parseTask(String input) throws InvalidInputException {
+	public static Task parseTask(String input) {
 		Arrays.fill(taskDetails,null);
 		boolean taskDesExtracted = false;
 		int keywordIndex = NOT_FOUND;
-		TaskDT userTaskDT = null;
+		Task userTaskDT = null;
 		String[] stringFragments = null;
 		
 		if (checkForInvertedCommas(input)) {
@@ -147,8 +165,11 @@ public class AddProcessor extends Processor {
 			taskDetails = keywordHandler(keywordIndex, stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS]);
 			input = stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS];
 		}
-		
-		userTaskDT = setUserTask(taskDetails);
+		try {
+			userTaskDT = setUserTask(taskDetails);
+		} catch (InvalidInputException recurWithoutDate) {
+			errorsInInput[INDEX_OF_RECUR] = true;
+		}
 		
 		return userTaskDT;
 	}
@@ -158,19 +179,20 @@ public class AddProcessor extends Processor {
 	 * an array
 	 * @param taskDetails
 	 * @return userTaskDT with all the task details
+	 * @throws InvalidInputException 
 	 */
 	
-	private static TaskDT setUserTask(String[] taskDetails) {
-		TaskDT userTask = new TaskDT(taskDetails[INDEX_OF_DESC]);
-		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME_STRING]);
-		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME_STRING]);
-		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE_STRING]);
+	private static Task setUserTask(String[] taskDetails) throws InvalidInputException {
+		Task userTask = new Task(taskDetails[INDEX_OF_DESC]);
+		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME]);
+		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME]);
+		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE]);
 		int recurPeriod = 0;
 		try {
-			if (date == null && taskDetails[INDEX_OF_RECUR_STRING] != null) {
-				System.out.print(CANNOT_RECUR_WITHOUT_DATE);
-			} else if (taskDetails[INDEX_OF_RECUR_STRING] != null && date != null){
-				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR_STRING]);
+			if (date == null && taskDetails[INDEX_OF_RECUR] != null) {
+				throw new InvalidInputException(CANNOT_RECUR_WITHOUT_DATE);
+			} else if (taskDetails[INDEX_OF_RECUR] != null && date != null){
+				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR]);
 			}
 		}
 		catch (NumberFormatException e) {
@@ -179,9 +201,9 @@ public class AddProcessor extends Processor {
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
 		userTask.setDate(date);
-		userTask.setLocation(taskDetails[INDEX_OF_LOCATION_STRING]);
+		userTask.setLocation(taskDetails[INDEX_OF_LOCATION]);
 		userTask.setRecurrencePeriod(recurPeriod);
-		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY_STRING]));
+		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY]));
 		return userTask;
 	}
 	
@@ -193,7 +215,7 @@ public class AddProcessor extends Processor {
 	 * @throws InvalidInputException
 	 */
 
-	private static String[] keywordHandler (int keywordType, String input) throws InvalidInputException {
+	private static String[] keywordHandler (int keywordType, String input) {
 	
 		int spaceIndex = input.indexOf(" ");
 		if (spaceIndex == NOT_FOUND) {
@@ -202,26 +224,37 @@ public class AddProcessor extends Processor {
 		switch (keywordType) {
 			case 0:
 			case 1:
-				taskDetails[INDEX_OF_START_TIME_STRING] = retrieveStartTime(input, spaceIndex);
+				try {
+					taskDetails[INDEX_OF_START_TIME] = retrieveStartTime(input, spaceIndex);
+				} catch (InvalidInputException invalidStartTime) {
+					errorsInInput[INDEX_OF_START_TIME] = true;
+				}
 				break;
 			case 2:
 			case 3:
-				taskDetails[INDEX_OF_END_TIME_STRING] = retrieveEndTime(input,spaceIndex);
-				break;
 			case 4:
-				taskDetails[INDEX_OF_LOCATION_STRING] = retrieveLocation(input);
+				try {
+					taskDetails[INDEX_OF_END_TIME] = retrieveEndTime(input,spaceIndex);
+				} catch (InvalidInputException invalidEndTime) {
+					errorsInInput[INDEX_OF_END_TIME] = true;
+				}
 				break;
 			case 5:
-				taskDetails[INDEX_OF_END_TIME_STRING] = retrieveEndTime(input,spaceIndex);
+				taskDetails[INDEX_OF_LOCATION] = retrieveLocation(input);
 				break;
 			case 6:
-				taskDetails[INDEX_OF_DATE_STRING] = retrieveDate(input);
+				try {
+					taskDetails[INDEX_OF_DATE] = retrieveDate(input);
+				}
+				catch (InvalidInputException invalidDate) {
+					errorsInInput[INDEX_OF_DATE] = true;
+				}
 				break;
 			case 7:
-				taskDetails[INDEX_OF_RECUR_STRING] = retrieveRecurPeriod(input, spaceIndex);
+				taskDetails[INDEX_OF_RECUR] = retrieveRecurPeriod(input, spaceIndex);
 				break;
 			case 8:
-				taskDetails[INDEX_OF_PRIORITY_STRING] = retrievePriority(input,spaceIndex);
+				taskDetails[INDEX_OF_PRIORITY] = retrievePriority(input,spaceIndex);
 				break;
 		}
 
@@ -245,9 +278,10 @@ public class AddProcessor extends Processor {
 	 * @param input
 	 * @param spaceIndex
 	 * @return startTimeString
+	 * @throws InvalidInputException 
 	 */
 	
-	private static String retrieveStartTime (String input, int spaceIndex) {
+	private static String retrieveStartTime (String input, int spaceIndex) throws InvalidInputException {
 		String startTimeString = (input.substring(0, spaceIndex));
 		startTimeString = parseTimeStringFromInput(startTimeString);
 		return startTimeString;
@@ -258,9 +292,10 @@ public class AddProcessor extends Processor {
 	 * @param input
 	 * @param spaceIndex
 	 * @return endTimeString
+	 * @throws InvalidInputException 
 	 */
 	
-	private static String retrieveEndTime (String input, int spaceIndex) {
+	private static String retrieveEndTime (String input, int spaceIndex) throws InvalidInputException {
 		String endTimeString = (input.substring(0, spaceIndex));
 		endTimeString = parseTimeStringFromInput(endTimeString);
 		return endTimeString;
@@ -375,64 +410,6 @@ public class AddProcessor extends Processor {
 	}
 	
 	/**
-	 * Adds tasks that have expired and needs to be recurred
-	 * @param task
-	 */
-	
-
-	protected static void addsRecurringTask(TaskDT task) {
-		if (needsToBeRecurred(task)) {
-			TaskDT newTask = new TaskDT(task);
-			newTask.setDate(task.getDate().plusDays(task.getRecurrencePeriod()));
-			list.addToList(newTask);
-		}
-	}
-	/**
-	 * Checks if there will be a duplicate task
-	 * @param task
-	 * @return Boolean
-	 */
-	protected static Boolean checkIfDuplicateRecurTaskExist (TaskDT task) {
-
-		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
-		for (int i = 0; i < list.getSize(); i++) {
-			if (list.getListItem(i).getDate() == null) {
-				return false;
-			}
-			if (list.getListItem(i).getDate().equals(recurDate)) {
-				if (list.getListItem(i).compareDescAndLocation(task)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Checks if the task needs to be readded to the list
-	 * These are the two conditions for recurrence:
-	 * Task must have expired
-	 * There must not be another task with the same description
-	 * and location on the date it is set to be recurred
-	 * @param task
-	 * @return Boolean
-	 */
-
-	protected static Boolean needsToBeRecurred(TaskDT task) {
-		if (task.getRecurrencePeriod() == 0) {
-			return false;
-		}
-		TimeZone SGT = TimeZone.getTimeZone("GMT+8");
-		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
-		if (DateTime.today(SGT).numDaysFrom(recurDate) < task.getRecurrencePeriod()) {
-			if (!checkIfDuplicateRecurTaskExist(task)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
 	 * Checks if the input string has "today" "tmr" or tomorrow
 	 * @param input
 	 * @return true or false
@@ -453,13 +430,13 @@ public class AddProcessor extends Processor {
 	
 	private static String setDateForTodayAndTomorrow (String input) {		
 		if (input.contains(TODAY)) {
-			taskDetails[INDEX_OF_DATE_STRING] = currentDate.toString();	
+			taskDetails[INDEX_OF_DATE] = currentDate.toString();	
 			input = input.substring(0,input.indexOf(TODAY)) + input.substring(input.indexOf(TODAY) + TODAY.length());
 		} else if (input.contains(TOMORROW1)) {
-			taskDetails[INDEX_OF_DATE_STRING] = currentDate.plusDays(1).toString();			
+			taskDetails[INDEX_OF_DATE] = currentDate.plusDays(1).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW1)) + input.substring(input.indexOf(TOMORROW1) + TOMORROW1.length());
 		} else if (input.contains(TOMORROW2)) {
-			taskDetails[INDEX_OF_DATE_STRING] = currentDate.plusDays(1).toString();			
+			taskDetails[INDEX_OF_DATE] = currentDate.plusDays(1).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW2)) + input.substring(input.indexOf(TOMORROW2) + TOMORROW2.length());
 		}
 		return input;
@@ -489,6 +466,7 @@ public class AddProcessor extends Processor {
 	private static String setDescWithWordsInsideInvertedCommas (String input) {
 		int firstIndex = input.indexOf("\"");
 		int secondIndex = input.lastIndexOf("\"");
+		//Extracts the task Description from in between the two quotation marks
 		taskDetails[INDEX_OF_DESC] = input.substring(1, secondIndex - firstIndex);
 		input = input.substring(secondIndex);
 		return input;

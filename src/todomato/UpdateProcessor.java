@@ -77,7 +77,7 @@ public class UpdateProcessor extends Processor {
 	 * @return Updated Task
 	 * @throws InvalidInputException
 	 */
-	public static TaskDT processUpdate(String argument)
+	public static Task processUpdate(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
@@ -164,7 +164,7 @@ public class UpdateProcessor extends Processor {
 	 * @return updated task
 	 * @throws InvalidInputException
 	 */
-	private static TaskDT updateStartTime(int index, int editStartTime,
+	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
 				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
@@ -173,7 +173,7 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 
-	private static TaskDT updateEndTime(int index, int editEndTime,
+	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument.substring(editEndTime
 				+ NO_OF_CHAR_IN_ETIME)));
@@ -182,7 +182,7 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 
-	private static TaskDT updateDate(int index, int editDate, String argument)
+	private static Task updateDate(int index, int editDate, String argument)
 			throws InvalidInputException {
 		DateTime date = convertStringToDateTime(parseDateString(argument.substring(editDate
 				+ NO_OF_CHAR_IN_DATE)));
@@ -191,7 +191,7 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 
-	private static TaskDT updateLocation(int index, int editLoc, String argument) {
+	private static Task updateLocation(int index, int editLoc, String argument) {
 		int stopIndex = argument.length();
 		if (argument.contains("\\")) {
 			int escChar = argument.indexOf("\\");
@@ -214,7 +214,7 @@ public class UpdateProcessor extends Processor {
 	 *            that contains new description
 	 * @return updated task
 	 */
-	private static TaskDT updateDesc(int index, int editDesc, String argument) {
+	private static Task updateDesc(int index, int editDesc, String argument) {
 		int stopIndex = argument.length();
 		if (argument.contains("\\")) {
 			int escChar = argument.indexOf("\\");
@@ -238,7 +238,7 @@ public class UpdateProcessor extends Processor {
 	 * @return updated task
 	 */
 	
-	private static TaskDT updateRecur(int index, int recurDesc, String argument) {
+	private static Task updateRecur(int index, int recurDesc, String argument) {
 		int stopIndex = argument.length();
 		int userRecurrence = list.getListItem(index).getRecurrencePeriod();
 		try {
@@ -263,7 +263,7 @@ public class UpdateProcessor extends Processor {
 	 * @return updated task
 	 */
 	
-	private static TaskDT updatePriority(int index, int priorityDesc, String argument) {
+	private static Task updatePriority(int index, int priorityDesc, String argument) {
 		int stopIndex = argument.length();
 		String priority = parsePriorityFromString(argument.substring(priorityDesc + NO_OF_CHAR_IN_PRIORITY, stopIndex));
 		list.getListItem(index).setPriorityLevel(priority);
@@ -271,7 +271,7 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 	
-	private static TaskDT updateCompletion(int index) {
+	private static Task updateCompletion(int index) {
 		list.getListItem(index).setCompleted(true);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);

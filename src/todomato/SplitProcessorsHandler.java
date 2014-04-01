@@ -11,10 +11,12 @@ public class SplitProcessorsHandler {
 	private static final String DELETE_COMMAND = "delete";
 	private static final String UPDATE_COMMAND = "update";
 	private static final String DISPLAY_COMMAND = "display";
+	private static final String SORT_COMMAND = "sort";
 	private static final String UNDO_COMMAND = "undo";
 	private static final String EXIT_COMMAND = "exit";
 	private static final Object REDO_COMMAND = "redo";
 	private static final Object FIND_COMMAND = "find";
+	private static final String RECUR_COMMAND = "recur";
 	
 	private static Command command;
 	
@@ -30,7 +32,7 @@ public class SplitProcessorsHandler {
 			System.exit(0);
 		}			
 		if (command.getAction().equals(DISPLAY_COMMAND)) {
-			return DisplayProcessor.processDisplay(command.getArgument());		
+			return DisplayProcessor.processDisplay();		
 		}
 		if (command.getAction().equals(UPDATE_COMMAND)) {
 			return UpdateProcessor.processUpdate(command.getArgument()).toString();
@@ -47,8 +49,14 @@ public class SplitProcessorsHandler {
 		if (command.getAction().equals(FIND_COMMAND)) {
 			return FindProcessor.processFind(command.getArgument());
 		}
+		if (command.getAction().equals(SORT_COMMAND)) {
+			return SortProcessor.processSort(command.getArgument());
+		}
 		if (command.getAction().equals(ADD_COMMAND)) {
 			return AddProcessor.processAdd(command.getArgument());
+		}
+		if (command.getAction().equals(RECUR_COMMAND)) {
+			return RecurProcessor.processRecur();
 		}
 		//Treat as an add command if no action is specified
 		return AddProcessor.processAdd(userInput);
