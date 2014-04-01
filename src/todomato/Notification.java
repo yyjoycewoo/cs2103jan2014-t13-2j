@@ -36,16 +36,17 @@ public class Notification {
 		final int waitfor = 7000;
 		// create and set up the window
 		final JFrame frame = new JFrame("Reminder");
+		frame.setSize(300, 125);
+		// remove the title bar and border
+		frame.setUndecorated(true);
 		// change the window location to bottom right corner of the screen
 		// size of the screen
 		Dimension scrSize = Toolkit.getDefaultToolkit().getScreenSize();
 		// height of the task bar
 		Insets toolHeight = Toolkit.getDefaultToolkit().getScreenInsets(
 				frame.getGraphicsConfiguration());
-		frame.setSize(300, 125);
 		frame.setLocation((scrSize.width - frame.getWidth()), (scrSize.height
 				- frame.getHeight() - toolHeight.bottom));
-		frame.setUndecorated(true);
 		frame.setLayout(new GridBagLayout());
 		frame.setAlwaysOnTop(true);
 
@@ -76,7 +77,11 @@ public class Notification {
 				frame.dispose();
 			}
 		});
-
+		/*
+		 * frame.add(new BasicArrowButton(BasicArrowButton.EAST),
+		 * BorderLayout.EAST); frame.add(new
+		 * BasicArrowButton(BasicArrowButton.WEST), BorderLayout.WEST);
+		 */
 		closeBt.setMargin(new Insets(1, 4, 1, 4));
 		closeBt.setFocusable(false);
 		frame.add(closeBt, constraints);
