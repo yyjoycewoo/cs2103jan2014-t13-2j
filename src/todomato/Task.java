@@ -1,10 +1,9 @@
 package todomato;
 
-import java.util.Locale;
-import java.util.TimeZone;
-
 import hirondelle.date4j.DateTime;
 
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class Task {
 	private static final String START_TIME_PREP = " at ";
@@ -14,10 +13,11 @@ public class Task {
 	private static final String SEPERATOR = "#";
 	private static final String PRIORITY_LOW = "LOW";
 	private static final String IS_TRUE = "true";
-		
+
 	private String description;
 	private DateTime startTime;
 	private DateTime endTime;
+	private DateTime noticeTime;
 	private DateTime date;
 	private String location;
 	private String eventId;
@@ -27,7 +27,7 @@ public class Task {
 	private String priorityLevel;
 	private DateTime timeCreated;
 	private Boolean isCompleted;
-	
+
 	public Task(String userDes) {
 		description = userDes;
 		timeCreated = DateTime.now(TimeZone.getDefault());
@@ -35,8 +35,9 @@ public class Task {
 		priorityLevel = PRIORITY_LOW;
 		isCompleted = false;
 	}
-	
-	public Task(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation) {
+
+	public Task(String userDes, DateTime userStart, DateTime userEnd,
+			DateTime userDate, String userLocation) {
 		description = userDes;
 		startTime = userStart;
 		date = userDate;
@@ -48,8 +49,9 @@ public class Task {
 		priorityLevel = PRIORITY_LOW;
 		isCompleted = false;
 	}
-	
-	public Task(String userDes, DateTime userStart, DateTime userEnd, DateTime userDate, String userLocation, int userRecurrencePeriod) {
+
+	public Task(String userDes, DateTime userStart, DateTime userEnd,
+			DateTime userDate, String userLocation, int userRecurrencePeriod) {
 		description = userDes;
 		startTime = userStart;
 		date = userDate;
@@ -61,7 +63,7 @@ public class Task {
 		priorityLevel = PRIORITY_LOW;
 		isCompleted = false;
 	}
-	
+
 	public Task(Task copy) {
 		description = copy.getDescription();
 		startTime = copy.getStartTime();
@@ -76,16 +78,19 @@ public class Task {
 	}
 
 	public static boolean isEqual(String string1, String string2) {
-	    return string1 == string2 || (string1 != null && string1.equals(string2));
+		return (string1 == string2)
+				|| ((string1 != null) && string1.equals(string2));
 	}
-	
+
 	public Boolean compareDescAndLocation(Task task) {
-		if (isEqual(this.description,task.getDescription()) && isEqual(this.location,task.getLocation())) {
+		if (isEqual(this.description, task.getDescription())
+				&& isEqual(this.location, task.getLocation())) {
 			return true;
 		}
 		return false;
 	}
-	
+
+	@Override
 	public String toString() {
 		String task = description;
 		if (startTime != null) {
@@ -101,30 +106,37 @@ public class Task {
 			task += LOCATION_PREP + location;
 		}
 		if (recurrencePeriod != 0) {
-			task += " recurring every "  + recurrencePeriod + " days";
+			task += " recurring every " + recurrencePeriod + " days";
 		}
-			
+
 		return task;
 	}
-	
+
 	/**
 	 * Creates a String from task of the following format:
-	 * <desc>#<startTime>#<endTime>#<date>#<location>#<recurrencePeriod>#<id>#<timeCreated>#<priorityLevel>#<isCompleted>#<eventId>#<updateTime>
+	 * <desc>#<startTime>#<endTime
+	 * >#<date>#<location>#<recurrencePeriod>#<id>#<timeCreated
+	 * >#<priorityLevel>#<isCompleted>#<eventId>#<updateTime>#<noticeTime>
+	 * 
 	 * @return
 	 */
 	public String toFileString() {
 		String task = description;
-		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + 
-				date + SEPERATOR +location + SEPERATOR + recurrencePeriod + 
-				SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR + priorityLevel
-				+ SEPERATOR + isCompleted + SEPERATOR + eventId + SEPERATOR + updateTime;
+		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + date
+				+ SEPERATOR + location + SEPERATOR + recurrencePeriod
+				+ SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR
+				+ priorityLevel + SEPERATOR + isCompleted + SEPERATOR + eventId
+				+ SEPERATOR + updateTime + SEPERATOR + noticeTime;
 		return task;
 	}
+
 	/**
-	 * Create a new Task object from a standard taskString (from data file) 
-	 * @return Task object generated from taskString, null if taskString is empty
+	 * Create a new Task object from a standard taskString (from data file)
+	 * 
+	 * @return Task object generated from taskString, null if taskString is
+	 *         empty
 	 * @author Daryl
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	public static Task createTaskFromFileString(String fileInput) {
 		String[] parts = fileInput.split(SEPERATOR);
@@ -135,6 +147,7 @@ public class Task {
 		String location = null;
 		String eventId = null;
 		DateTime updateTime = null;
+		DateTime noticeTime = null;
 		if (DateTime.isParseable(parts[1])) {
 			startTime = new DateTime(parts[1]);
 		}
@@ -152,12 +165,15 @@ public class Task {
 		DateTime timeCreated = new DateTime(parts[7]);
 		String prioritylevel = parts[8];
 		Boolean isComplete = false;
-		if (parts[9].equals(IS_TRUE)){
+		if (parts[9].equals(IS_TRUE)) {
 			isComplete = true;
 		}
 		eventId = parts[10];
 		if (DateTime.isParseable(parts[10])) {
 			updateTime = new DateTime(parts[10]);
+		}
+		if (DateTime.isParseable(parts[11])) {
+			noticeTime = new DateTime(parts[11]);
 		}
 		Task userTask = new Task(description);
 		userTask.setStartTime(startTime);
@@ -171,9 +187,10 @@ public class Task {
 		userTask.setCompleted(isComplete);
 		userTask.setEventId(eventId);
 		userTask.setUpdateTime(updateTime);
+		userTask.setNoticeTime(noticeTime);
 		return userTask;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
@@ -205,11 +222,11 @@ public class Task {
 	public void setLocation(String location) {
 		this.location = location;
 	}
-	
+
 	public void setDate(DateTime date) {
 		this.date = date;
 	}
-	
+
 	public DateTime getDate() {
 		return date;
 	}
@@ -217,54 +234,65 @@ public class Task {
 	public int getRecurrencePeriod() {
 		return recurrencePeriod;
 	}
-	
+
 	public void setRecurrencePeriod(int recurrencePeriod) {
 		this.recurrencePeriod = recurrencePeriod;
 	}
-	
+
 	public String getPriorityLevel() {
 		return priorityLevel;
 	}
-	
+
 	public void setPriorityLevel(String priorityLevel) {
 		this.priorityLevel = priorityLevel;
 	}
-	
+
 	public int getId() {
 		return id;
 	}
-	
+
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	public DateTime getTimeCreated() {
 		return timeCreated;
 	}
-	
+
 	public void setTimeCreated(DateTime timeCreated) {
 		this.timeCreated = timeCreated;
 	}
-	
+
 	public Boolean getCompleted() {
 		return isCompleted;
 	}
-	
+
 	public void setCompleted(Boolean isCompleted) {
 		this.isCompleted = isCompleted;
 	}
-	
-	public void setEventId (String eventId) {
+
+	public void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
-	public void setUpdateTime (DateTime updateTime) {
+
+	public void setUpdateTime(DateTime updateTime) {
 		this.updateTime = updateTime;
 	}
-	
-	public String getEventId () {
+
+	public String getEventId() {
 		return eventId;
 	}
-	public DateTime getUpdateTime () {
+
+	public DateTime getUpdateTime() {
 		return updateTime;
+	}
+
+	public DateTime getNoticeTime() {
+		return noticeTime;
+	}
+
+	public void setNoticeTime(DateTime time) {
+		this.noticeTime = time;
+
 	}
 }

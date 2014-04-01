@@ -6,24 +6,23 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 /**
- * This class contains methods to process update commands by the user.
- * It updates the user's lists of tasks, and saves it to disk.
+ * This class contains methods to process update commands by the user. It
+ * updates the user's lists of tasks, and saves it to disk.
  * 
  * <p>
- * It can process commands that update a description, a start time, an end
- * time, a date and a location. Any subset of the possible attributes
- * can be updated.
+ * It can process commands that update a description, a start time, an end time,
+ * a date and a location. Any subset of the possible attributes can be updated.
  * 
  * <p>
- * To update a task, start by typing "update," followed by a valid index.
- * The following keywords are necessary for the attributes, while the order
- * is flexible:
+ * To update a task, start by typing "update," followed by a valid index. The
+ * following keywords are necessary for the attributes, while the order is
+ * flexible:
  * <ul>
  * <li>"starttime" for the start time
  * <li>"endtime" for the end time
  * <li>"desc" for the description, followed by '\' afterwards
  * <li>"location" for the location, followed by '\' afterwards
- * <li> "date" for the date
+ * <li>"date" for the date
  * </ul>
  * 
  * <p>
@@ -67,7 +66,8 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
 
 	private static String[] updateKeywords = new String[] { " starttime ",
-			" endtime ", " desc ", " date ", " location ", " recur ", " priority ", " complete" };
+			" endtime ", " desc ", " date ", " location ", " recur ",
+			" priority ", " complete" };
 
 	/**
 	 * @author Hao Eng
@@ -77,19 +77,18 @@ public class UpdateProcessor extends Processor {
 	 * @return Updated Task
 	 * @throws InvalidInputException
 	 */
-	public static Task processUpdate(String argument)
+	public static String processUpdate(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1};
+		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
 		updater(argument, whichToEdit, index);
-		
 
 		displayList = list;
-		return list.getListItem(index);
+		return list.getListItem(index).toString();
 	}
 
 	/**
@@ -175,8 +174,8 @@ public class UpdateProcessor extends Processor {
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument.substring(editEndTime
-				+ NO_OF_CHAR_IN_ETIME)));
+		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
+				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
 		list.getListItem(index).setEndTime(time);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
@@ -184,8 +183,8 @@ public class UpdateProcessor extends Processor {
 
 	private static Task updateDate(int index, int editDate, String argument)
 			throws InvalidInputException {
-		DateTime date = convertStringToDateTime(parseDateString(argument.substring(editDate
-				+ NO_OF_CHAR_IN_DATE)));
+		DateTime date = convertStringToDateTime(parseDateString(argument
+				.substring(editDate + NO_OF_CHAR_IN_DATE)));
 		list.getListItem(index).setDate(date);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
@@ -229,21 +228,24 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
+
 	/**
 	 * Updates task with the new recurrent period
+	 * 
 	 * @param index
 	 * @param recurDesc
-	 * @param argument that contains recurrence period
+	 * @param argument
+	 *            that contains recurrence period
 	 * @return updated task
 	 */
-	
+
 	private static Task updateRecur(int index, int recurDesc, String argument) {
 		int stopIndex = argument.length();
 		int userRecurrence = list.getListItem(index).getRecurrencePeriod();
 		try {
-			userRecurrence = Integer.parseInt(argument.substring(recurDesc + NO_OF_CHAR_IN_RECUR, stopIndex));
-		} catch ( NumberFormatException e) {
+			userRecurrence = Integer.parseInt(argument.substring(recurDesc
+					+ NO_OF_CHAR_IN_RECUR, stopIndex));
+		} catch (NumberFormatException e) {
 			return null;
 		}
 		if (list.getListItem(index).getDate() == null) {
@@ -253,24 +255,27 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
 
 	/**
 	 * Updates task with the new priority
+	 * 
 	 * @param index
 	 * @param recurDesc
-	 * @param argument that contains priority
+	 * @param argument
+	 *            that contains priority
 	 * @return updated task
 	 */
-	
-	private static Task updatePriority(int index, int priorityDesc, String argument) {
+
+	private static Task updatePriority(int index, int priorityDesc,
+			String argument) {
 		int stopIndex = argument.length();
-		String priority = parsePriorityFromString(argument.substring(priorityDesc + NO_OF_CHAR_IN_PRIORITY, stopIndex));
+		String priority = parsePriorityFromString(argument.substring(
+				priorityDesc + NO_OF_CHAR_IN_PRIORITY, stopIndex));
 		list.getListItem(index).setPriorityLevel(priority);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
+
 	private static Task updateCompletion(int index) {
 		list.getListItem(index).setCompleted(true);
 		fileHandler.updateFile(list);
