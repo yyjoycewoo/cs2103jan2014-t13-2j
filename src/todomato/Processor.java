@@ -13,8 +13,8 @@ import java.util.TimeZone;
  */
 public class Processor {
 
-	// protected static String fileLoc = "tasks.txt";
-	protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\tasks.txt";
+	protected static String fileLoc = "tasks.txt";
+	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskList list = fileHandler.readFile();
 	protected static TaskList displayList = list;

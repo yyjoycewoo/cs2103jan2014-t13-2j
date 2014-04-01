@@ -18,8 +18,10 @@ package todomato;
 public class SortProcessor extends Processor{
 	private static final String ARGUMENT_SORT_BY_DATE = "date";
 	private static final String ARGUMENT_SORT_BY_PRIORITY = "priority";
+	private static final String ARGUMENT_SORT_BY_COMPLETION = "complete";
 	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
 	private static final String SUCCESS_SORT_BY_PRIORITY = "Sorted by priority";
+	private static final String SUCCESS_SORT_BY_COMPLETION = "Sorted by completion status";
 	private static final String INVALID_ARGUMENT_MESSAGE = "Invalid argument";
 	
 	public static String processSort(String argument) {
@@ -31,19 +33,29 @@ public class SortProcessor extends Processor{
 		if (argument.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
 			return sortByPriority();
 		}
+		if (argument.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
+			return sortByCompletion();
+		}
 		return INVALID_ARGUMENT_MESSAGE;
 	}
 	
-	private static String sortByDate() {
-		bubbleSort(ARGUMENT_SORT_BY_DATE);
+	private static String sortByCompletion() {
+		// TODO Auto-generated method stub
+		bubbleSort(ARGUMENT_SORT_BY_COMPLETION);
 		fileHandler.updateFile(list);
-		return SUCCESS_SORT_BY_DATE;
+		return SUCCESS_SORT_BY_COMPLETION;
 	}
 
 	private static String sortByPriority() {
 		bubbleSort(ARGUMENT_SORT_BY_PRIORITY);
 		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_PRIORITY;
+	}
+	
+	private static String sortByDate() {
+		bubbleSort(ARGUMENT_SORT_BY_DATE);
+		fileHandler.updateFile(list);
+		return SUCCESS_SORT_BY_DATE;
 	}
 	
 	private static void bubbleSort(String arg) {
@@ -57,9 +69,23 @@ public class SortProcessor extends Processor{
 					if (comparePriority(j, j + 1)) {
 						list.swap(j, j + 1);
 					}
+				} else if (arg.equals(ARGUMENT_SORT_BY_COMPLETION)) {
+					if (compareCompletion(j, j + 1)) {
+						list.swap(j, j + 1);
+					}
 				}
 			}
 		}
+	}
+
+	private static boolean compareCompletion(int i, int j) {
+		// TODO Auto-generated method stub
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
