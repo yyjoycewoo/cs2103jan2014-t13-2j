@@ -12,7 +12,6 @@ import net.miginfocom.swing.MigLayout;
 @SuppressWarnings("serial")
 public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
-	
 	private TodomatoTable table = new TodomatoTable();
 	
 	private JPanel panel = new JPanel();

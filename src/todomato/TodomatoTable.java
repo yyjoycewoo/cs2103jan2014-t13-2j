@@ -9,6 +9,7 @@ import javax.swing.table.*;
 
 public class TodomatoTable extends JPanel {
 	private static final int PRIORITY_COLUNM_INDEX = 6;
+	protected static final int COMPLETED_COLUNM_INDEX = 7;
 	private JTable table;
 	private JScrollPane tableDisplay;
 	static Object[][] data;
@@ -37,12 +38,16 @@ public class TodomatoTable extends JPanel {
 				if (!isRowSelected(row)) {
 					c.setBackground(getBackground());
 					int modelRow = convertRowIndexToModel(row);
-					String type = (String)getModel().getValueAt(modelRow, PRIORITY_COLUNM_INDEX);
-					if ("HIGH".equals(type)) {
+					String priority = (String)getModel().getValueAt(modelRow, PRIORITY_COLUNM_INDEX);
+					String completed = (String)getModel().getValueAt(modelRow, COMPLETED_COLUNM_INDEX);
+					if ("HIGH".equals(priority)) {
 						c.setBackground(Color.RED);
 					}
-					if ("MEDIUM".equals(type)) {
+					if ("MEDIUM".equals(priority)) {
 						c.setBackground(Color.YELLOW);
+					}
+					if ("Y".equals(completed)) {
+						c.setBackground(Color.GRAY);
 					}
 				}
 				return c;
