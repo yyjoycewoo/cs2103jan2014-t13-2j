@@ -66,16 +66,20 @@ public class SortProcessor extends Processor{
 	 * 
 	 * @param i
 	 * @param j
-	 * @return true if date of list[i] is later than list[j], or 
-	 * list[i has a date but list[j] doesn't i.e needs to be swapped.
+	 * @return true swap is needed i.e.
+	 * if date of list[i] is later than list[j], or 
+	 * list[j] has a date but list[i] doesn't
 	 * False otherwise. 
 	 * i and j are consecutive indices of items in the list, where i + 1 = j
 	 */
 	private static boolean compareDate(int i, int j) {
 		if(list.getListItem(i).getDate() == null) {
-			return false;
-		} if(list.getListItem(j).getDate() == null) {
+			if(list.getListItem(j).getDate() == null) {
+				return false;
+			}
 			return true;
+		} if(list.getListItem(j).getDate() == null) {
+			return false;
 		} if(list.getListItem(i).getDate()
 				.compareTo(list.getListItem(j).getDate()) > 0) {
 			return true;
