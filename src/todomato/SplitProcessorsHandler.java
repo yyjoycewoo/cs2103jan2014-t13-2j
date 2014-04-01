@@ -1,9 +1,11 @@
 package todomato;
+
 /**
  * This class handles user commands by calling the processing method depending
  * on the action specified.
+ * 
  * @author Joyce
- *
+ * 
  */
 public class SplitProcessorsHandler {
 
@@ -17,25 +19,27 @@ public class SplitProcessorsHandler {
 	private static final Object REDO_COMMAND = "redo";
 	private static final Object FIND_COMMAND = "find";
 	private static final String RECUR_COMMAND = "recur";
-	
+	private static final String NOTIFY_COMMAND = "notify";
+
 	private static Command command;
-	
+
 	/**
 	 * 
 	 * @param userInput
 	 * @return A status message describing the last action completed
 	 * @throws InvalidInputException
 	 */
-	public static String processCommand(String userInput) throws InvalidInputException {	
+	public static String processCommand(String userInput)
+			throws InvalidInputException {
 		command = new Command(userInput.split(" ", 2));
 		if (command.getAction().equals(EXIT_COMMAND)) {
 			System.exit(0);
-		}			
+		}
 		if (command.getAction().equals(DISPLAY_COMMAND)) {
-			return DisplayProcessor.processDisplay();		
+			return DisplayProcessor.processDisplay();
 		}
 		if (command.getAction().equals(UPDATE_COMMAND)) {
-			return UpdateProcessor.processUpdate(command.getArgument()).toString();
+			return UpdateProcessor.processUpdate(command.getArgument());
 		}
 		if (command.getAction().equals(DELETE_COMMAND)) {
 			return DeleteProcessor.processDelete(command.getArgument());
@@ -58,7 +62,10 @@ public class SplitProcessorsHandler {
 		if (command.getAction().equals(RECUR_COMMAND)) {
 			return RecurProcessor.processRecur();
 		}
-		//Treat as an add command if no action is specified
+		if (command.getAction().equals(NOTIFY_COMMAND)) {
+			return NotifyProcessor.processNotify(command.getArgument());
+		}
+		// Treat as an add command if no action is specified
 		return AddProcessor.processAdd(userInput);
 	}
 }

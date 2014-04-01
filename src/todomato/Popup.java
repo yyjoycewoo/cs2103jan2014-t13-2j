@@ -23,6 +23,7 @@ public class Popup extends Processor {
 		// create calendar instance
 		Calendar now = Calendar.getInstance();
 		now.add(Calendar.DATE, daysB4deadline);
+
 		myownlist.clearList();
 		// for notification checking
 		for (int i = 0; i < Processor.getList().getSize(); i++) {
