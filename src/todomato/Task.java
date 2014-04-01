@@ -74,7 +74,7 @@ public class Task {
 		timeCreated = copy.getTimeCreated();
 		id = copy.getId();
 		priorityLevel = copy.getPriorityLevel();
-		isCompleted = false;
+		isCompleted = copy.getCompleted();
 	}
 
 	public static boolean isEqual(String string1, String string2) {
