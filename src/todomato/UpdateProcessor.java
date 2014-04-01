@@ -23,6 +23,9 @@ import hirondelle.date4j.DateTime;
  * <li>"desc" for the description, followed by '\' afterwards
  * <li>"location" for the location, followed by '\' afterwards
  * <li>"date" for the date
+ * <li>"recur" for recurrence interval
+ * <li>"priority" for priority level
+ * <li>"complete" for completion status
  * </ul>
  * 
  * <p>
@@ -276,6 +279,12 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 
+	/**
+	 * Updates task to completed status
+	 * 
+	 * @param index
+	 * @return updated tasks
+	 */
 	private static Task updateCompletion(int index) {
 		list.getListItem(index).setCompleted(true);
 		fileHandler.updateFile(list);
