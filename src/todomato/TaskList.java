@@ -81,7 +81,7 @@ public class TaskList {
 	
 	/**
 	 * Checks to see if the list is empty
-	 * @return true iff the list is empty
+	 * @return true if the list is empty
 	 */
 	public boolean isEmpty() {
 		return getSize() == 0;
