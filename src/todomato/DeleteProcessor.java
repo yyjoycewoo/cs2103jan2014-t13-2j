@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 public class DeleteProcessor extends Processor {
 	private static final String argDelimiter = "\\s*(,| )\\s*";
 	private static final String ARGUMENT_DATE = "date";
-	private static final String ARGUMENT_CLEAR_ALL = "all";
+	private static final String ARGUMENT_ALL = "all";
+	private static final String ARGUMENT_COMPLETED = "completed";
 	private static final String TASKS = " task(s)";
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
@@ -51,22 +52,39 @@ public class DeleteProcessor extends Processor {
 		
 		storeCurrentList();
 		
-		String[] arg = argument.split(argDelimiter);
+		String[] argArr = argument.split(argDelimiter);
+		String argStr = argArr[0];
 		String statusMessage;
 		try {
-			if(arg.length > 1) {
-				if(arg[0].equalsIgnoreCase(ARGUMENT_DATE)) {
-					statusMessage = SUCCESSFUL_DELETE + deleteDate(arg) + TASKS;
+			if (argStr.equalsIgnoreCase(ARGUMENT_ALL)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteAll() + TASKS; 
+			}
+			else if (argStr.equalsIgnoreCase(ARGUMENT_COMPLETED)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteCompleted() + TASKS;
+			}
+			else if (argStr.equalsIgnoreCase(ARGUMENT_DATE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteDate(argArr) + TASKS;
+			}
+			else if (argArr.length > 1) {
+				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
+			}
+			else {
+				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr) + TASKS;
+			}
+			/*
+			if(argArr.length > 1) {
+				if(argArr[0].equalsIgnoreCase(ARGUMENT_DATE)) {
+					statusMessage = SUCCESSFUL_DELETE + deleteDate(argArr) + TASKS;
 				} else {
-					statusMessage = SUCCESSFUL_DELETE + deleteMultiple(arg) + TASKS;
+					statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
 				}
 			} else {
-				if(arg[0].equals(ARGUMENT_CLEAR_ALL)) {
+				if(argArr[0].equals(ARGUMENT_ALL)) {
 					statusMessage = SUCCESSFUL_DELETE + deleteAll() + TASKS;
 				} else {
-					statusMessage = SUCCESSFUL_DELETE + deleteSingleTask(arg[0]);
+					statusMessage = SUCCESSFUL_DELETE + deleteSingle(argArr[0]);
 				} 
-			}
+			}*/
 			fileHandler.updateFile(list);
 
 			displayList = list;
@@ -84,6 +102,18 @@ public class DeleteProcessor extends Processor {
 		}		
 	}
 	
+	private static String deleteCompleted() {
+		// TODO Auto-generated method stub
+		int numberOfTasksDeleted = 0;
+		for (int i = 0; i < list.getSize(); i++) {
+			if (list.getListItem(i).getCompleted()) {
+				list.deleteListItem(i);
+				numberOfTasksDeleted++;				
+			}
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+
 	private static String deleteDate(String[] arg) {
 		// TODO Auto-generated method stub
 		int numberOfTasksDeleted = 0;
@@ -123,7 +153,7 @@ public class DeleteProcessor extends Processor {
 		return Integer.toString(numberOfTasksDeleted);
 	}
 	
-	private static String deleteSingleTask(String indexString) {
+	private static String deleteSingle(String indexString) {
 		int index = Integer.parseInt(indexString) - 1;
 		Task deletedTask = list.getListItem(index);
 		list.deleteListItem(index);
