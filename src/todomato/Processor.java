@@ -112,22 +112,11 @@ public class Processor {
 
 		input = input.toLowerCase();
 		String standardFormDate = null;
-
-		String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
-		for (int i = 0; i < dateKeywords.length; i++) {
-			if (input.contains(dateKeywords[i])) {
-				switch (i) {
-				case 0:
-					standardFormDate = currentDate.toString();
-				case 1:
-				case 2:
-					standardFormDate = currentDate.plusDays(1).toString();
-				}
-			}
+		if (hasTodayOrTmr(input)) {
+			standardFormDate = getDateIfTdyOrTmrInString(input);
+			return standardFormDate;
 		}
 
-		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
-				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
 		int dayIndex = checkForDay(input);
 		if (dayIndex != NOT_FOUND) {
@@ -137,6 +126,8 @@ public class Processor {
 		}
 
 		String[] parts = input.split(" ");
+		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
+				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
 		for (int i = 0; i < months.length; i++) {
 			if (parts.length > 1) {
@@ -156,6 +147,46 @@ public class Processor {
 
 		return standardFormDate;
 	}
+	/**
+	 * Returns true if "today" "tomorrow" or "tmr" is in string
+	 * @param input
+	 * @return
+	 */
+	
+	protected static Boolean hasTodayOrTmr (String input) {
+		String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
+		for (int i = 0; i < dateKeywords.length; i++) {
+			if (input.contains(dateKeywords[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns today or tomorrow's date depending on which keyword is present
+	 * @param input
+	 * @return
+	 */
+	
+	protected static String getDateIfTdyOrTmrInString (String input) {
+		String userDate;
+		String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
+		for (int i = 0; i < dateKeywords.length; i++) {
+			if (input.contains(dateKeywords[i])) {
+				switch (i) {
+				case 0:
+					userDate = currentDate.toString();
+					return userDate;
+				case 1:
+				case 2:
+					userDate = currentDate.plusDays(1).toString();
+					return userDate;
+				}
+			}
+		}
+		return input;
+	}
 
 	/**
 	 * Returns the number of days it is from the current day Example : if today
@@ -168,14 +199,14 @@ public class Processor {
 	protected static int daysFromCurrentDay(String input) {
 		int currentDay = currentDate.getWeekDay();
 		int userDay = checkForDay(input);
+		/*
+		 * 1 is used as Sunday is the first day in DateTime, while Monday is
+		 * first day in this program, the next 3 lines is to readjust
+		 */
 		currentDay -= 1;
 		if (currentDay == 0) {
 			currentDay = 7;
 		}
-		/*
-		 * 1 is used as Sunday is the first day in DateTime, while Monday is
-		 * first day in this program
-		 */
 		int daysFromCurrent = userDay - currentDay;
 		if (input.contains("next")) {
 			daysFromCurrent += 7;
@@ -209,79 +240,38 @@ public class Processor {
 		if (input == null) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
-		int meridiemIndex = checkMeridiem(input);
-		if (meridiemIndex != NOT_FOUND) {
-			timeString = convertStringWithMeridiemToStdTimeString(input);
-			return timeString;
-		} else {
-			timeString = convertStringWithoutMeridiemToStdTimeString(input);
-			return timeString;
-		}
+		timeString = convertStringToStdTimeString(input);
+		return timeString;
 	}
-
-	protected static String convertStringWithoutMeridiemToStdTimeString(
-			String input) throws InvalidInputException {
+	
+	protected static String convertStringToStdTimeString (String input) throws InvalidInputException {
 		String userHour = null;
 		String userMinute = "00";
 		String timeString = null;
+		int meridiemIndex = checkMeridiem(input);
+		if (meridiemIndex != NOT_FOUND) {
+			input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
+		}
 		if (input.length() > 5) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
 		if ((input.length() == 5) && input.contains(":")) {
 			return input;
+		} 
+		
+		if (!isParseableByInt(input)) {
+			throw new InvalidInputException(INVALID_TIME);
 		} else {
-			if (!isParseableByInt(input)) {
-				throw new InvalidInputException(INVALID_TIME);
-			} else {
-				if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR)
-						|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
-					userHour = input;
-				} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
-					userHour = input.substring(0, POS_OF_MINUTE);
-					userMinute = input.substring(POS_OF_MINUTE);
-				} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
-					userHour = input.substring(0,
-							POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-					userMinute = input
-							.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-				}
+			if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR)
+					|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
+				userHour = input;
+			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE);
+				userMinute = input.substring(POS_OF_MINUTE);
+			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
 			}
-		}
-		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
-			// pads a single digit hour to fit the DateTime format
-			userHour = "0" + userHour;
-		}
-		timeString = userHour + ":" + userMinute;
-		return timeString;
-	}
-
-	protected static Boolean isParseableByInt(String input) {
-		try {
-			Integer.parseInt(input);
-		} catch (NumberFormatException e) {
-			return false;
-		}
-		return true;
-	}
-
-	protected static String convertStringWithMeridiemToStdTimeString(
-			String input) {
-		int meridiemIndex = checkMeridiem(input);
-		String userHour = null;
-		String userMinute = "00";
-		String timeString = null;
-		input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
-		if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
-			userHour = input;
-		} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR) {
-			userHour = input;
-		} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
-			userHour = input
-					.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-			userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
-		} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
-			userHour = input.substring(0, POS_OF_MINUTE);
-			userMinute = input.substring(POS_OF_MINUTE);
 		}
 		if (meridiemIndex == PM) { 	
 			if (Integer.parseInt(userHour) != 12) {
@@ -295,6 +285,21 @@ public class Processor {
 		}
 		timeString = userHour + ":" + userMinute;
 		return timeString;
+	}
+	/**
+	 * Returns true if the string can be parsed by int
+	 * Returns false if not
+	 * @param input
+	 * @return
+	 */
+
+	protected static Boolean isParseableByInt(String input) {
+		try {
+			Integer.parseInt(input);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -321,23 +326,40 @@ public class Processor {
 		}
 		return userDateTime;
 	}
+	
+	/**
+	 * Parses Priority from string
+	 * The input can either be "1", "2" or "3" or
+	 * "high", "med", "low"
+	 * @param input
+	 * @return
+	 */
 
 	protected static String parsePriorityFromString(String input) {
 		if (input == null) {
 			return PRIORITY_LOW;
 		}
-		String priorityLevels[] = new String[] { "low", "med", "high" };
 		if (isParseableByInt(input)) {
-			int noPriority = Integer.parseInt(input);
-			switch (noPriority) {
-			case 1:
-				return PRIORITY_LOW;
-			case 2:
-				return PRIORITY_MED;
-			case 3:
-				return PRIORITY_HIGH;
-			}
+			return parsePriorityFromNumber(input);
 		}
+		return parsePriorityFromWords(input);
+	}
+	
+	protected static String parsePriorityFromNumber (String input) {
+		int noPriority = Integer.parseInt(input);
+		switch (noPriority) {
+		case 1:
+			return PRIORITY_LOW;
+		case 2:
+			return PRIORITY_MED;
+		case 3:
+			return PRIORITY_HIGH;
+		}
+		return PRIORITY_LOW;
+	}
+	
+	protected static String parsePriorityFromWords (String input) {
+		String priorityLevels[] = new String[] { "low", "med", "high" };
 		input = input.toLowerCase();
 		for (int i = 0; i < priorityLevels.length; i++) {
 			if (input.contains(priorityLevels[i])) {
@@ -352,6 +374,28 @@ public class Processor {
 			}
 		}
 		return PRIORITY_LOW;
+		
+	}
+	
+	
+	protected static int parseRecurrencePeriodFromString(String input) {
+		if (isParseableByInt(input)) {
+			return Integer.parseInt(input);
+		}
+		String recurPeriodKeywords[] = new String[] { "daily", "weekly"};
+		input = input.toLowerCase();
+		for (int i = 0; i < recurPeriodKeywords.length; i++) {
+			if (input.contains(recurPeriodKeywords[i])) {
+				switch (i) {
+				case 0:
+					return 1;
+				case 1:
+					return 7;
+				}
+				
+			}
+		}
+		return 0;
 	}
 
 	public static TaskList getList() {
