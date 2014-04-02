@@ -5,6 +5,9 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -38,6 +41,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		//pack();
 		setVisible(true);
 	}
+
 
 	private void initDisplay() {
 		panel.setLayout(new MigLayout("nocache"));
