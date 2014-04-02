@@ -19,7 +19,7 @@ public class TodomatoTable extends JTable {
 	private static final int LOCATION_COLUNM_WIDTH = 100;
 	private static final int PRIORITY_COLUNM_WIDTH = 52;
 	private static final int COMPLETED_COLUNM_WIDTH = 80;
-	
+
 	//constants for column indices
 	private static final int INDEX_COLUNM_INDEX = 0;
 	private static final int DESC_COLUNM_INDEX = 1;
@@ -29,7 +29,7 @@ public class TodomatoTable extends JTable {
 	private static final int LOCATION_COLUNM_INDEX = 5;
 	private static final int PRIORITY_COLUNM_INDEX = 6;
 	private static final int COMPLETED_COLUNM_INDEX = 7;
-	
+
 	//constants for minimum column widths
 	private static final int INDEX_MIN_WIDTH = 10;
 	private static final int DESC_MIN_WIDTH = 50;
@@ -39,17 +39,17 @@ public class TodomatoTable extends JTable {
 	private static final int LOCATION_MIN_WIDTH = 50;
 	private static final int PRIORITY_MIN_WIDTH = 50;
 	private static final int COMPLETED_MIN_WIDTH = 10;
-	
+
 	//constants for background colour for the rows
 	protected static final Object PRIORITY_HIGH = "HIGH";
 	protected static final Object PRIORITY_MEDIUM = "MEDIUM";
 	protected static final Object TASK_COMPLETED = "Y";
-	
+
 	private JTable table;
 	private JScrollPane tableDisplay;
 	static Object[][] data;
 	int rowSelected;
-	
+
 	public TodomatoTable() {
 		String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
 		data = loadData(Processor.getDisplayList());
@@ -66,61 +66,45 @@ public class TodomatoTable extends JTable {
 		setColumnSorting();
 		tableDisplay = new JScrollPane(table);
 	}
-	
+
 	private void setColumnSorting() {
 		TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
 		sorter.setSortable(INDEX_COLUNM_INDEX, false);
-		
+
 		table.getTableHeader().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-			     super.mouseClicked(e); 
-			     JTableHeader header = (JTableHeader)(e.getSource());  
-			     JTable tableView = header.getTable();  
-			     TableColumnModel columnModel = tableView.getColumnModel();  
-			     int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
+				super.mouseClicked(e); 
+				JTableHeader header = (JTableHeader)(e.getSource());  
+				JTable tableView = header.getTable();  
+				TableColumnModel columnModel = tableView.getColumnModel();  
+				int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
 
-			      if(columnModel.getColumn(viewColumn).getIdentifier().equals("Date"))
-			      {
-			    	  String status;
-			    	  try {
-			    		  status = SplitProcessorsHandler.processCommand("sort date");
-			    		  assert status != null;
-			    		  update();
-			    	  } catch (InvalidInputException e1) {
-			    		  // TODO Auto-generated catch block
-			    		  e1.printStackTrace();
-			    	  }
-			      }
+				try {
+					String status = null;
+					if(columnModel.getColumn(viewColumn).getIdentifier().equals("Date"))
+					{
+							status = SplitProcessorsHandler.processCommand("sort date");
+					}
+	
+					if(columnModel.getColumn(viewColumn).getIdentifier().equals("Completed"))
+					{
+							status = SplitProcessorsHandler.processCommand("sort complete");
+					}
+	
+					if(columnModel.getColumn(viewColumn).getIdentifier().equals("Priority"))
+					{
+							status = SplitProcessorsHandler.processCommand("sort priority");
+					}
+					assert status != null;
+					update();
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 
-			      if(columnModel.getColumn(viewColumn).getIdentifier().equals("Completed"))
-			      {
-			    	  String status;
-			    	  try {
-			    		  status = SplitProcessorsHandler.processCommand("sort complete");
-			    		  assert status != null;
-			    		  update();
-			    	  } catch (InvalidInputException e1) {
-			    		  // TODO Auto-generated catch block
-			    		  e1.printStackTrace();
-			    	  }
-			      }
 
-			      if(columnModel.getColumn(viewColumn).getIdentifier().equals("Priority"))
-			      {
-			    	  String status;
-			    	  try {
-			    		  status = SplitProcessorsHandler.processCommand("sort priority");
-			    		  assert status != null;
-			    		  update();
-			    	  } catch (InvalidInputException e1) {
-			    		  // TODO Auto-generated catch block
-			    		  e1.printStackTrace();
-			    	  }
-			      }
-			      
 
-			      
 			};
 		});
 	}
@@ -151,24 +135,24 @@ public class TodomatoTable extends JTable {
 		};
 
 		//table.changeSelection(0, 0, false, false);
-        table.setAutoCreateRowSorter(true);
+		table.setAutoCreateRowSorter(true);
 		return table;
 	}
-	
+
 	private void addListListener() {
 		table.getSelectionModel().addListSelectionListener(
-		        new ListSelectionListener() {
-		            public void valueChanged(ListSelectionEvent event) {
-		                rowSelected = table.getSelectedRow();
-	                    /*int modelRow = table.convertRowIndexToModel(viewRow);
+				new ListSelectionListener() {
+					public void valueChanged(ListSelectionEvent event) {
+						rowSelected = table.getSelectedRow();
+						/*int modelRow = table.convertRowIndexToModel(viewRow);
 	                    System.out.println(
 	                        String.format("Selected Row in view: %d. " +
 	                            "Selected Row in model: %d.", 
 	                            viewRow, modelRow));*/
-	                    //System.out.println(String.format("Selected Row in view: %d. ", viewRow));
-		                }
-		            }		        
-		);
+						//System.out.println(String.format("Selected Row in view: %d. ", viewRow));
+					}
+				}		        
+				);
 	}
 
 	private void setColumnWidths() {
@@ -194,7 +178,7 @@ public class TodomatoTable extends JTable {
 		table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
 		//table.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
 	}
-	
+
 	private static Object[][] loadData(TaskList l) {        
 		Object[][] list = new Object[1][8];
 		if (l.getSize() == 0) {
@@ -222,8 +206,8 @@ public class TodomatoTable extends JTable {
 		}
 		return list;
 	}
-	
-	
+
+
 	private static Object checkNullDate(DateTime date) {
 		if (date == null) {
 			return "";
@@ -244,7 +228,7 @@ public class TodomatoTable extends JTable {
 		data = loadData(Processor.getDisplayList());
 		table.setModel(new CustModel(data));
 	}
-	
+
 	class CustModel extends AbstractTableModel {
 		private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
 		private Object[][] data = loadData(Processor.getDisplayList());
@@ -280,7 +264,7 @@ public class TodomatoTable extends JTable {
 	public void setTable(JTable table) {
 		this.table = table;
 	}
-	
+
 	public static Object[][] getData() {
 		return data;
 	}
