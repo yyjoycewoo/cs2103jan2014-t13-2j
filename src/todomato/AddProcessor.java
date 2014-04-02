@@ -21,7 +21,8 @@ import java.util.regex.Pattern;
  * <li>" at " or " from " keyword for the start time
  * <li>" to ", " until ", " due " for the end time
  * <li>" on " for the date
- * <li>" in " for the keyword
+ * <li>" in " or " @" for the location <- no space after the @
+ * <li> " priority " or " !" <- take note there is no space after the !
  * </ul>
  * 
  * <p>
