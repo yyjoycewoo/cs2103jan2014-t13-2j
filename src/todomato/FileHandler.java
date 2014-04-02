@@ -90,7 +90,6 @@ public class FileHandler {
 			}
 			
 			for (Task task : taskList.getList()) {
-				//content = task.toString() + LINE_BREAK;
 				content = task.toFileString() + LINE_BREAK;
 				bufferedWriter.write(content);
 			}
@@ -117,12 +116,6 @@ public class FileHandler {
 	private Task readTask(String line) {
 		Task task = null;
 		task = Task.createTaskFromFileString(line);
-		/*try {
-			task = TaskDT.createTaskFromFileString(line);
-		} catch (InvalidInputException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		return task;
 	}
 	
