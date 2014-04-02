@@ -1,7 +1,11 @@
 package todomato;
 
+import java.awt.Dimension;
 import java.awt.event.*;
+
 import javax.swing.*;
+import javax.swing.event.*;
+
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -23,6 +27,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		super("Todomato");
 		super.setDefaultLookAndFeelDecorated(true);
 		setSize(700,500);
+		setMinimumSize(new Dimension(370, 200));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		initDisplay();
@@ -62,10 +67,11 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		}
 	}
 
-	private void initShortcuts() {
+	private void initShortcuts() {		
 		String UNDO = "undo action key";
 		String REDO = "redo action key";
 		String FIND = "search action key";
+		String DELETE = "delete action key";
 
 		Action undoAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
@@ -84,14 +90,23 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 				updateData("find " + txtCommand.getText());
 			}
 		};
+		
+		Action deleteAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				//updateData("delete " + txtCommand.getText());
+				System.out.println("deleting row: " + table.getSelectedRow());
+			}
+		};
 
 		panel.getActionMap().put(UNDO, undoAction);
 		panel.getActionMap().put(REDO, redoAction);
 		panel.getActionMap().put(FIND, searchAction);
+		panel.getActionMap().put(DELETE, deleteAction);
 
 		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), UNDO);
 		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), REDO);
 		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F2"), FIND);
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), DELETE);
 	}
 
 	@Override
