@@ -60,7 +60,7 @@ public class SplitProcessorsHandler {
 			return AddProcessor.processAdd(command.getArgument());
 		}
 		if (command.getAction().equalsIgnoreCase(RECUR_COMMAND)) {
-			return RecurProcessor.processRecur();
+			return RecurProcessor.processRecur(command.getArgument());
 		}
 		if (command.getAction().equals(NOTIFY_COMMAND)) {
 			return NotifyProcessor.processNotify(command.getArgument());
