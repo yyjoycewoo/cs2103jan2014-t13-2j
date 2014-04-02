@@ -190,7 +190,7 @@ public class AddProcessor extends Processor {
 			if (date == null && taskDetails[INDEX_OF_RECUR] != null) {
 				errorsInInput[INDEX_OF_RECUR] = true;
 			} else if (taskDetails[INDEX_OF_RECUR] != null && date != null){
-				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR]);
+				recurPeriod = parseRecurrencePeriodFromString(taskDetails[INDEX_OF_RECUR]);
 			}
 		}
 		catch (NumberFormatException e) {

@@ -353,6 +353,26 @@ public class Processor {
 		}
 		return PRIORITY_LOW;
 	}
+	
+	protected static int parseRecurrencePeriodFromString(String input) {
+		if (isParseableByInt(input)) {
+			return Integer.parseInt(input);
+		}
+		String recurPeriodKeywords[] = new String[] { "daily", "weekly"};
+		input = input.toLowerCase();
+		for (int i = 0; i < recurPeriodKeywords.length; i++) {
+			if (input.contains(recurPeriodKeywords[i])) {
+				switch (i) {
+				case 0:
+					return 1;
+				case 1:
+					return 7;
+				}
+				
+			}
+		}
+		return 0;
+	}
 
 	public static TaskList getList() {
 		return list;
