@@ -3,13 +3,44 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 
-public class TodomatoTable extends JPanel {
+public class TodomatoTable extends JTable {	
+	//constants for preferred column widths
+	private static final int INDEX_COLUNM_WIDTH = 40;
+	private static final int DESC_COLUNM_WIDTH = 205;
+	private static final int STARTTIME_COLUNM_WIDTH = 60;
+	private static final int ENDTIME_COLUNM_WIDTH = 60;
+	private static final int DATE_COLUNM_WIDTH = 70;
+	private static final int LOCATION_COLUNM_WIDTH = 100;
+	private static final int PRIORITY_COLUNM_WIDTH = 52;
+	private static final int COMPLETED_COLUNM_WIDTH = 80;
+	
+	//constants for column indices
+	private static final int INDEX_COLUNM_INDEX = 0;
+	private static final int DESC_COLUNM_INDEX = 1;
+	private static final int STARTTIME_COLUNM_INDEX = 2;
+	private static final int ENDTIME_COLUNM_INDEX = 3;
+	private static final int DATE_COLUNM_INDEX = 4;
+	private static final int LOCATION_COLUNM_INDEX = 5;
 	private static final int PRIORITY_COLUNM_INDEX = 6;
-	protected static final int COMPLETED_COLUNM_INDEX = 7;
+	private static final int COMPLETED_COLUNM_INDEX = 7;
+	
+	//constants for minimum column widths
+	private static final int INDEX_MIN_WIDTH = 10;
+	private static final int DESC_MIN_WIDTH = 50;
+	private static final int STARTTIME_MIN_WIDTH = 50;
+	private static final int ENDTIME_MIN_WIDTH = 50;
+	private static final int DATE_MIN_WIDTH = 60;
+	private static final int LOCATION_MIN_WIDTH = 50;
+	private static final int PRIORITY_MIN_WIDTH = 50;
+	private static final int COMPLETED_MIN_WIDTH = 10;
+	
 	private JTable table;
 	private JScrollPane tableDisplay;
 	static Object[][] data;
@@ -25,9 +56,9 @@ public class TodomatoTable extends JPanel {
 		};
 
 		table = createData(model);
+		setColumnWidths();
 		tableDisplay = new JScrollPane(table);
 	}
-
 
 	private JTable createData(DefaultTableModel model) {
 		JTable table = new JTable(model) {
@@ -58,6 +89,30 @@ public class TodomatoTable extends JPanel {
         //table.setAutoCreateRowSorter(true);
 		return table;
 	}
+
+	private void setColumnWidths() {
+		boolean canAutoCreateColumnsFromModel = false;
+		table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setPreferredWidth(INDEX_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setPreferredWidth(DESC_COLUNM_WIDTH);		
+		table.getColumnModel().getColumn(STARTTIME_COLUNM_INDEX).setPreferredWidth(STARTTIME_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setPreferredWidth(ENDTIME_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(DATE_COLUNM_INDEX).setPreferredWidth(DATE_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setPreferredWidth(LOCATION_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(PRIORITY_COLUNM_INDEX).setPreferredWidth(PRIORITY_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(COMPLETED_COLUNM_INDEX).setPreferredWidth(COMPLETED_COLUNM_WIDTH);
+
+		table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setMinWidth(INDEX_MIN_WIDTH);
+		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setMinWidth(DESC_MIN_WIDTH);		
+		table.getColumnModel().getColumn(STARTTIME_COLUNM_INDEX).setMinWidth(STARTTIME_MIN_WIDTH);
+		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setMinWidth(ENDTIME_MIN_WIDTH);
+		table.getColumnModel().getColumn(DATE_COLUNM_INDEX).setMinWidth(DATE_MIN_WIDTH);
+		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setMinWidth(LOCATION_MIN_WIDTH);
+		table.getColumnModel().getColumn(PRIORITY_COLUNM_INDEX).setMinWidth(PRIORITY_MIN_WIDTH);
+		table.getColumnModel().getColumn(COMPLETED_COLUNM_INDEX).setMinWidth(COMPLETED_MIN_WIDTH);
+
+		table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
+		//table.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
+	}
 	
 	private static Object[][] loadData(TaskList l) {        
 		Object[][] list = new Object[1][8];
@@ -65,27 +120,28 @@ public class TodomatoTable extends JPanel {
 			for (int i=0; i<=7; i++) {
 				list[0][i] = "";
 			}				
-			list[0][0] = "0";
-			list[0][1] = "(Empty)";
+			list[0][INDEX_COLUNM_INDEX] = "0";
+			list[0][DESC_COLUNM_INDEX] = "(Empty)";
 		} else {
 			list = new Object[l.getSize()][8];
 			for (int i = 0; i < l.getSize(); i++) {
-				list[i][0] = String.valueOf(i+1);
-				list[i][1] = checkNull(l.getListItem(i).getDescription());
-				list[i][2] = checkNull(l.getListItem(i).getStartTime());
-				list[i][3] = checkNull(l.getListItem(i).getEndTime());
-				list[i][4] = checkNullDate(l.getListItem(i).getDate());				
-				list[i][5] = checkNull(l.getListItem(i).getLocation());
-				list[i][6] = checkNull(l.getListItem(i).getPriorityLevel());
+				list[i][INDEX_COLUNM_INDEX] = String.valueOf(i+1);
+				list[i][DESC_COLUNM_INDEX] = checkNull(l.getListItem(i).getDescription());
+				list[i][STARTTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getStartTime());
+				list[i][ENDTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getEndTime());
+				list[i][DATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getDate());				
+				list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());
+				list[i][PRIORITY_COLUNM_INDEX] = checkNull(l.getListItem(i).getPriorityLevel());
 				if (l.getListItem(i).getCompleted()) {
-					list[i][7] = "Y";
+					list[i][COMPLETED_COLUNM_INDEX] = "Y";
 				} else {
-					list[i][7] = "N";
+					list[i][COMPLETED_COLUNM_INDEX] = "N";
 				}
 			}
 		}
 		return list;
 	}
+	
 	
 	private static Object checkNullDate(DateTime date) {
 		if (date == null) {
