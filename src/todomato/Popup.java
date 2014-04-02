@@ -28,7 +28,8 @@ public class Popup extends Processor {
 		// for notification checking
 		for (int i = 0; i < Processor.getList().getSize(); i++) {
 			Task item = Processor.getList().getListItem(i);
-			if (item.getDate() != null) {
+			// task has date and is not completed
+			if ((item.getDate() != null) && !item.getCompleted()) {
 				int m = now.get(Calendar.MONTH) + 1;
 				String deadline = convertDateToStandardForm("" + m,
 						"" + now.get(Calendar.DATE));
@@ -40,12 +41,16 @@ public class Popup extends Processor {
 					Date max = sdf.parse(deadline);
 					Date min = sdf.parse(present);
 					Date d = sdf.parse(item_date);
+					// check whether the task falls between today and #days
+					// after today
 					if ((d.after(min) && d.before(max))) {
 						myownlist.addToList(item);
 					}
+					// check task's date == today
 					if (d.equals(min)) {
 						myownlist.addToList(item);
 					}
+					// check task's date == #days after today
 					if (d.equals(max)) {
 						myownlist.addToList(item);
 					}
