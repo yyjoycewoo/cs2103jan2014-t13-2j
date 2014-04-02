@@ -50,8 +50,8 @@ import java.util.regex.Pattern;
  */
 public class AddProcessor extends Processor {
 
-	private static String[] keywords = new String[] { " at ", " from ",
-			" until ", " to ", " due ", " in ", " on ", " recur ", " priority "};
+	private static String[] keywords = new String[] { " at ", " from ", 
+			" until ", " to ", " due ", " in ", " @", " on ", " recur ", " priority ", " !"};
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
 	private static int NOT_FOUND = -1;
@@ -240,9 +240,10 @@ public class AddProcessor extends Processor {
 				}
 				break;
 			case 5:
+			case 6:
 				taskDetails[INDEX_OF_LOCATION] = retrieveLocation(input);
 				break;
-			case 6:
+			case 7:
 				try {
 					taskDetails[INDEX_OF_DATE] = retrieveDate(input);
 				}
@@ -250,10 +251,11 @@ public class AddProcessor extends Processor {
 					errorsInInput[INDEX_OF_DATE] = true;
 				}
 				break;
-			case 7:
+			case 8:
 				taskDetails[INDEX_OF_RECUR] = retrieveRecurPeriod(input, spaceIndex);
 				break;
-			case 8:
+			case 9:
+			case 10:
 				taskDetails[INDEX_OF_PRIORITY] = retrievePriority(input,spaceIndex);
 				break;
 		}
