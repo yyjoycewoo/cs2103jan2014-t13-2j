@@ -81,21 +81,17 @@ public class TodomatoTable extends JTable {
 				int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
 
 				try {
+					String columnHeader = (String) columnModel.getColumn(viewColumn).getIdentifier();
 					String status = null;
-					if(columnModel.getColumn(viewColumn).getIdentifier().equals("Date"))
-					{
-							status = SplitProcessorsHandler.processCommand("sort date");
+
+					if (columnHeader.equals("Date")) {
+						status = SplitProcessorsHandler.processCommand("sort date");
+					} else if (columnHeader.equals("Completed")) {
+						status = SplitProcessorsHandler.processCommand("sort complete");
+					} else if (columnHeader.equals("Priority")) {
+						status = SplitProcessorsHandler.processCommand("sort priority");
 					}
-	
-					if(columnModel.getColumn(viewColumn).getIdentifier().equals("Completed"))
-					{
-							status = SplitProcessorsHandler.processCommand("sort complete");
-					}
-	
-					if(columnModel.getColumn(viewColumn).getIdentifier().equals("Priority"))
-					{
-							status = SplitProcessorsHandler.processCommand("sort priority");
-					}
+
 					assert status != null;
 					update();
 				} catch (InvalidInputException e1) {
