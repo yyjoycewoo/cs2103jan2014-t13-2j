@@ -11,7 +11,7 @@ public class RecurProcessor extends Processor {
 
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	
-	public static String processRecur() {
+	public static String processRecur(String input) {
 		for (int i = 0; i < list.getSize(); i++){
 			addsRecurringTask(list.getListItem(i));
 		}

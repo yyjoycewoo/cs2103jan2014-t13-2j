@@ -56,10 +56,11 @@ public class AddProcessor extends Processor {
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
 	private static int NOT_FOUND = -1;
-	private static String INVALID_INPUT = "Invalid input format ";
+	private static String INVALID_INPUT = "Invalid Input format ";
 	private static String INVALID_START_TIME = "Invalid Start Time ";
 	private static String INVALID_END_TIME = "Invalid End Time ";
 	private static String INVALID_DATE = "Invalid Date format ";
+	private static String INVALID_RECUR = "Invalid Recur format : Need Date before adding recurrence period";
 	private static int INDEX_OF_DESC = 0;
 	private static int INDEX_OF_START_TIME = 1;
 	private static int INDEX_OF_END_TIME = 2;
@@ -68,7 +69,6 @@ public class AddProcessor extends Processor {
 	private static int INDEX_OF_RECUR = 5;
 	private static int INDEX_OF_PRIORITY = 6;
 	private static int NO_OF_TASK_DETAILS = 7;
-	private static String CANNOT_RECUR_WITHOUT_DATE = "Cannot set recurring period without setting date";
 	private static String TODAY = " today";
 	private static String TOMORROW1 = " tmr";
 	private static String TOMORROW2 = " tomorrow";
@@ -95,7 +95,8 @@ public class AddProcessor extends Processor {
 		}
 		Task userTask = null;
 		userTask = parseTask(input);
-		list.addToList(userTask);	
+		System.out.print(userTask.toString());
+		list.addToList(userTask);
 		fileHandler.updateFile(list);
 		displayList = list;
 		String statusString = "";
@@ -114,7 +115,7 @@ public class AddProcessor extends Processor {
 					statusString += INVALID_DATE;
 					break;
 				case 5:
-					statusString += CANNOT_RECUR_WITHOUT_DATE;
+					statusString += INVALID_RECUR;
 					break;
 				}
 			}
@@ -166,11 +167,7 @@ public class AddProcessor extends Processor {
 			taskDetails = keywordHandler(keywordIndex, stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS]);
 			input = stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS];
 		}
-		try {
-			userTaskDT = setUserTask(taskDetails);
-		} catch (InvalidInputException recurWithoutDate) {
-			errorsInInput[INDEX_OF_RECUR] = true;
-		}
+		userTaskDT = setUserTask(taskDetails);
 		
 		return userTaskDT;
 	}
@@ -183,7 +180,7 @@ public class AddProcessor extends Processor {
 	 * @throws InvalidInputException 
 	 */
 	
-	private static Task setUserTask(String[] taskDetails) throws InvalidInputException {
+	private static Task setUserTask(String[] taskDetails) {
 		Task userTask = new Task(taskDetails[INDEX_OF_DESC]);
 		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME]);
 		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME]);
@@ -191,7 +188,7 @@ public class AddProcessor extends Processor {
 		int recurPeriod = 0;
 		try {
 			if (date == null && taskDetails[INDEX_OF_RECUR] != null) {
-				throw new InvalidInputException(CANNOT_RECUR_WITHOUT_DATE);
+				errorsInInput[INDEX_OF_RECUR] = true;
 			} else if (taskDetails[INDEX_OF_RECUR] != null && date != null){
 				recurPeriod = Integer.parseInt(taskDetails[INDEX_OF_RECUR]);
 			}
@@ -205,6 +202,7 @@ public class AddProcessor extends Processor {
 		userTask.setLocation(taskDetails[INDEX_OF_LOCATION]);
 		userTask.setRecurrencePeriod(recurPeriod);
 		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY]));
+		System.out.print(userTask.toString());
 		return userTask;
 	}
 	
