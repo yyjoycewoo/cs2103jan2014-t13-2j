@@ -12,8 +12,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import todomato.FileHandler;
 import todomato.SplitProcessorsHandler;
 import todomato.InvalidInputException;
+import todomato.TaskList;
 
 public class IntegrationTest {
 	private  File tasks;
@@ -35,6 +37,10 @@ public class IntegrationTest {
 	
 	@Test
 	public void testAddDelete() throws InvalidInputException, IOException {
+		String fileLoc = "tasks.txt";
+		FileHandler fileHandler = new FileHandler(fileLoc);
+		TaskList list = fileHandler.readFile();
+		assertEquals("cs post-lecture quiz", list.getListItem(0).getDescription());
 		String messageAdd1 = SplitProcessorsHandler.processCommand("add something");
 		assertEquals("Added something", messageAdd1);
 		String messageUndo1 = SplitProcessorsHandler.processCommand("undo");
