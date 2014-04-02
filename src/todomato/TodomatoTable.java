@@ -3,11 +3,10 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
 import javax.swing.table.*;
 
 public class TodomatoTable extends JTable {	
@@ -41,6 +40,11 @@ public class TodomatoTable extends JTable {
 	private static final int PRIORITY_MIN_WIDTH = 50;
 	private static final int COMPLETED_MIN_WIDTH = 10;
 	
+	//constants for background colour for the rows
+	protected static final Object PRIORITY_HIGH = "HIGH";
+	protected static final Object PRIORITY_MEDIUM = "MEDIUM";
+	protected static final Object TASK_COMPLETED = "Y";
+	
 	private JTable table;
 	private JScrollPane tableDisplay;
 	static Object[][] data;
@@ -59,7 +63,66 @@ public class TodomatoTable extends JTable {
 		table = createData(model);
 		addListListener();
 		setColumnWidths();
+		setColumnSorting();
 		tableDisplay = new JScrollPane(table);
+	}
+	
+	private void setColumnSorting() {
+		TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
+		sorter.setSortable(INDEX_COLUNM_INDEX, false);
+		
+		table.getTableHeader().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			     super.mouseClicked(e); 
+			     JTableHeader header = (JTableHeader)(e.getSource());  
+			     JTable tableView = header.getTable();  
+			     TableColumnModel columnModel = tableView.getColumnModel();  
+			     int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
+
+			      if(columnModel.getColumn(viewColumn).getIdentifier().equals("Date"))
+			      {
+			    	  String status;
+			    	  try {
+			    		  status = SplitProcessorsHandler.processCommand("sort date");
+			    		  assert status != null;
+			    		  update();
+			    	  } catch (InvalidInputException e1) {
+			    		  // TODO Auto-generated catch block
+			    		  e1.printStackTrace();
+			    	  }
+			      }
+
+			      if(columnModel.getColumn(viewColumn).getIdentifier().equals("Completed"))
+			      {
+			    	  String status;
+			    	  try {
+			    		  status = SplitProcessorsHandler.processCommand("sort complete");
+			    		  assert status != null;
+			    		  update();
+			    	  } catch (InvalidInputException e1) {
+			    		  // TODO Auto-generated catch block
+			    		  e1.printStackTrace();
+			    	  }
+			      }
+
+			      if(columnModel.getColumn(viewColumn).getIdentifier().equals("Priority"))
+			      {
+			    	  String status;
+			    	  try {
+			    		  status = SplitProcessorsHandler.processCommand("sort priority");
+			    		  assert status != null;
+			    		  update();
+			    	  } catch (InvalidInputException e1) {
+			    		  // TODO Auto-generated catch block
+			    		  e1.printStackTrace();
+			    	  }
+			      }
+			      
+
+			      
+			};
+		});
 	}
 
 	private JTable createData(DefaultTableModel model) {
@@ -73,13 +136,13 @@ public class TodomatoTable extends JTable {
 					int modelRow = convertRowIndexToModel(row);
 					String priority = (String)getModel().getValueAt(modelRow, PRIORITY_COLUNM_INDEX);
 					String completed = (String)getModel().getValueAt(modelRow, COMPLETED_COLUNM_INDEX);
-					if ("HIGH".equals(priority)) {
+					if (PRIORITY_HIGH.equals(priority)) {
 						c.setBackground(Color.RED);
 					}
-					if ("MEDIUM".equals(priority)) {
+					if (PRIORITY_MEDIUM.equals(priority)) {
 						c.setBackground(Color.YELLOW);
 					}
-					if ("Y".equals(completed)) {
+					if (TASK_COMPLETED.equals(completed)) {
 						c.setBackground(Color.GRAY);
 					}
 				}
@@ -88,7 +151,7 @@ public class TodomatoTable extends JTable {
 		};
 
 		//table.changeSelection(0, 0, false, false);
-        //table.setAutoCreateRowSorter(true);
+        table.setAutoCreateRowSorter(true);
 		return table;
 	}
 	
@@ -180,7 +243,6 @@ public class TodomatoTable extends JTable {
 	public void update() {
 		data = loadData(Processor.getDisplayList());
 		table.setModel(new CustModel(data));
-		table.setAutoCreateRowSorter(true);
 	}
 	
 	class CustModel extends AbstractTableModel {
