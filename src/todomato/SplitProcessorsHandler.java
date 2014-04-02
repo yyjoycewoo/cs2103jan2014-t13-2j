@@ -65,7 +65,11 @@ public class SplitProcessorsHandler {
 		if (command.getAction().equals(NOTIFY_COMMAND)) {
 			return NotifyProcessor.processNotify(command.getArgument());
 		}
-		// Treat as an add command if no action is specified
+		// Do nothing if empty string is entered
+		if (command.getAction().equals("")) {
+			return " ";
+		}
+		// Otherwise, treat as an add command
 		return AddProcessor.processAdd(userInput);
 	}
 }

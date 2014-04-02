@@ -44,6 +44,7 @@ public class TodomatoTable extends JTable {
 	private JTable table;
 	private JScrollPane tableDisplay;
 	static Object[][] data;
+	int rowSelected;
 	
 	public TodomatoTable() {
 		String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
@@ -56,6 +57,7 @@ public class TodomatoTable extends JTable {
 		};
 
 		table = createData(model);
+		addListListener();
 		setColumnWidths();
 		tableDisplay = new JScrollPane(table);
 	}
@@ -88,6 +90,22 @@ public class TodomatoTable extends JTable {
 		//table.changeSelection(0, 0, false, false);
         //table.setAutoCreateRowSorter(true);
 		return table;
+	}
+	
+	private void addListListener() {
+		table.getSelectionModel().addListSelectionListener(
+		        new ListSelectionListener() {
+		            public void valueChanged(ListSelectionEvent event) {
+		                rowSelected = table.getSelectedRow();
+	                    /*int modelRow = table.convertRowIndexToModel(viewRow);
+	                    System.out.println(
+	                        String.format("Selected Row in view: %d. " +
+	                            "Selected Row in model: %d.", 
+	                            viewRow, modelRow));*/
+	                    //System.out.println(String.format("Selected Row in view: %d. ", viewRow));
+		                }
+		            }		        
+		);
 	}
 
 	private void setColumnWidths() {

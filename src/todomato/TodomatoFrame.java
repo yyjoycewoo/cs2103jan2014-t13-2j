@@ -16,8 +16,9 @@ import net.miginfocom.swing.MigLayout;
 @SuppressWarnings("serial")
 public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
-	private TodomatoTable table = new TodomatoTable();
+	protected static final int INDEX_OFFSET = 1;
 	
+	private TodomatoTable table = new TodomatoTable();	
 	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
 	private JLabel lblStatus = new JLabel(" ");
@@ -32,6 +33,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		initDisplay();
 		initShortcuts();
+		
 		add(panel);
 		//pack();
 		setVisible(true);
@@ -40,6 +42,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private void initDisplay() {
 		panel.setLayout(new MigLayout("nocache"));
 		panel.add(table.getTableDisplay(), "wrap, push, grow");
+		updateData("");
 		panel.add(txtCommand, "wrap, pushx, growx");
 		panel.add(lblStatus);
 
@@ -93,8 +96,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		
 		Action deleteAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
-				//updateData("delete " + txtCommand.getText());
-				System.out.println("deleting row: " + table.getSelectedRow());
+				int rowIndex = table.rowSelected + INDEX_OFFSET;
+				updateData("delete " + rowIndex);
 			}
 		};
 
