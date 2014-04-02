@@ -34,6 +34,7 @@ public class DeleteProcessor extends Processor {
 	private static final String TASKS = " task(s)";
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
+	private static final String INVALID_INPUT_MISSING_ARGUMENT = "missing argument";
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	
@@ -50,6 +51,10 @@ public class DeleteProcessor extends Processor {
 		if (list.getSize() == 0) {
 			logger.log(Level.INFO, "exited due to empty list");
 			throw new InvalidInputException(INVALID_INPUT_EMPTY_LIST);
+		}
+		if (argument.isEmpty()) {
+			logger.log(Level.WARNING, "exited due to missing argument");
+			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
 		}
 		
 		storeCurrentList();
