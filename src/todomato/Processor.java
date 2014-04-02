@@ -283,7 +283,7 @@ public class Processor {
 			userHour = input.substring(0, POS_OF_MINUTE);
 			userMinute = input.substring(POS_OF_MINUTE);
 		}
-		if (meridiemIndex == PM) {
+		if (meridiemIndex == PM) { 	
 			if (Integer.parseInt(userHour) != 12) {
 				// Adds 12 hours to the hour if there is PM
 				userHour = Integer.toString(Integer.parseInt(userHour) + 12);

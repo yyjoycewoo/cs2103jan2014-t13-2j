@@ -16,8 +16,8 @@ public class SplitProcessorsHandler {
 	private static final String SORT_COMMAND = "sort";
 	private static final String UNDO_COMMAND = "undo";
 	private static final String EXIT_COMMAND = "exit";
-	private static final Object REDO_COMMAND = "redo";
-	private static final Object FIND_COMMAND = "find";
+	private static final String REDO_COMMAND = "redo";
+	private static final String FIND_COMMAND = "find";
 	private static final String RECUR_COMMAND = "recur";
 	private static final String NOTIFY_COMMAND = "notify";
 
@@ -32,34 +32,34 @@ public class SplitProcessorsHandler {
 	public static String processCommand(String userInput)
 			throws InvalidInputException {
 		command = new Command(userInput.split(" ", 2));
-		if (command.getAction().equals(EXIT_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(EXIT_COMMAND)) {
 			System.exit(0);
 		}
-		if (command.getAction().equals(DISPLAY_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(DISPLAY_COMMAND)) {
 			return DisplayProcessor.processDisplay();
 		}
-		if (command.getAction().equals(UPDATE_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(UPDATE_COMMAND)) {
 			return UpdateProcessor.processUpdate(command.getArgument());
 		}
-		if (command.getAction().equals(DELETE_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(DELETE_COMMAND)) {
 			return DeleteProcessor.processDelete(command.getArgument());
 		}
-		if (command.getAction().equals(UNDO_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(UNDO_COMMAND)) {
 			return UndoProcessor.processUndo();
 		}
-		if (command.getAction().equals(REDO_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(REDO_COMMAND)) {
 			return RedoProcessor.processRedo();
 		}
-		if (command.getAction().equals(FIND_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(FIND_COMMAND)) {
 			return FindProcessor.processFind(command.getArgument());
 		}
-		if (command.getAction().equals(SORT_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(SORT_COMMAND)) {
 			return SortProcessor.processSort(command.getArgument());
 		}
-		if (command.getAction().equals(ADD_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(ADD_COMMAND)) {
 			return AddProcessor.processAdd(command.getArgument());
 		}
-		if (command.getAction().equals(RECUR_COMMAND)) {
+		if (command.getAction().equalsIgnoreCase(RECUR_COMMAND)) {
 			return RecurProcessor.processRecur();
 		}
 		if (command.getAction().equals(NOTIFY_COMMAND)) {
