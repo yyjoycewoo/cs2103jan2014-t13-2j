@@ -326,8 +326,19 @@ public class Processor {
 		if (input == null) {
 			return PRIORITY_LOW;
 		}
-		input = input.toLowerCase();
 		String priorityLevels[] = new String[] { "low", "med", "high" };
+		if (isParseableByInt(input)) {
+			int noPriority = Integer.parseInt(input);
+			switch (noPriority) {
+			case 1:
+				return PRIORITY_LOW;
+			case 2:
+				return PRIORITY_MED;
+			case 3:
+				return PRIORITY_HIGH;
+			}
+		}
+		input = input.toLowerCase();
 		for (int i = 0; i < priorityLevels.length; i++) {
 			if (input.contains(priorityLevels[i])) {
 				switch (i) {
