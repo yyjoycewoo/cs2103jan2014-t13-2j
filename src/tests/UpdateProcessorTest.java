@@ -12,10 +12,6 @@ import todomato.InvalidInputException;
 import todomato.Processor;
 import todomato.UpdateProcessor;
 
-/**
- * @author Hao Eng
- * 
- */
 public class UpdateProcessorTest {
 
 	@Test
