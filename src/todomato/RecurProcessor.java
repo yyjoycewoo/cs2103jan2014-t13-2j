@@ -20,11 +20,10 @@ public class RecurProcessor extends Processor {
 	}
 	
 	/**
-	 * Adds tasks that have expired and needs to be recurred
+	 * Adds tasks that have expired (date is after current date) and needs to be recurred
 	 * @param task
 	 */
 	
-
 	protected static void addsRecurringTask(Task task) {
 		if (needsToBeRecurred(task)) {
 			Task newTask = new Task(task);
