@@ -34,7 +34,7 @@ public class DeleteProcessor extends Processor {
 	private static final String TASKS = " task(s)";
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
-	private static final String INVALID_INPUT_MISSING_ARGUMENT = "missing argument";
+	private static final String INVALID_INPUT_MISSING_ARGUMENT = "Missing argument";
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	
@@ -78,20 +78,6 @@ public class DeleteProcessor extends Processor {
 			else {
 				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr);
 			}
-			/*
-			if(argArr.length > 1) {
-				if(argArr[0].equalsIgnoreCase(ARGUMENT_DATE)) {
-					statusMessage = SUCCESSFUL_DELETE + deleteDate(argArr) + TASKS;
-				} else {
-					statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
-				}
-			} else {
-				if(argArr[0].equals(ARGUMENT_ALL)) {
-					statusMessage = SUCCESSFUL_DELETE + deleteAll() + TASKS;
-				} else {
-					statusMessage = SUCCESSFUL_DELETE + deleteSingle(argArr[0]);
-				} 
-			}*/
 			fileHandler.updateFile(list);
 
 			displayList = list;
@@ -110,7 +96,6 @@ public class DeleteProcessor extends Processor {
 	}
 	
 	private static String deleteCompleted() {
-		// TODO Auto-generated method stub
 		int numberOfTasksDeleted = 0;
 		for (int i = list.getSize() - 1; i >= 0 ; i--) { 
 			if (list.getListItem(i).getCompleted()) {
@@ -122,7 +107,6 @@ public class DeleteProcessor extends Processor {
 	}
 
 	private static String deleteDate(String[] arg) {
-		// TODO Auto-generated method stub
 		int numberOfTasksDeleted = 0;
 		String date = arg[1] + " " + arg[2];
 		try {

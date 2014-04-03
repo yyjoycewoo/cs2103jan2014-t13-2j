@@ -106,4 +106,8 @@ public class TaskList {
 	public void swap(int i, int j) {
 		Collections.swap(list, i, j);
 	}
+	
+	public void reverse() {
+		Collections.reverse(list);
+	}
 }
