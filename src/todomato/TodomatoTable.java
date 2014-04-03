@@ -10,6 +10,16 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 
 public class TodomatoTable extends JTable {	
+	//constants for column names
+	private static final String INDEX_HEADER = "Index";
+	private static final String DESC_HEADER = "Description";
+	private static final String STARTTIME_HEADER = "Start Time";
+	private static final String ENDTIME_HEADER = "End Time";
+	private static final String DATE_HEADER = "Date";
+	private static final String LOCATION_HEADER = "Location";
+	private static final String PRIORITY_HEADER = "Priority";
+	private static final String COMPLETE_HEADER = "Completed";
+	
 	//constants for preferred column widths
 	private static final int INDEX_COLUNM_WIDTH = 40;
 	private static final int DESC_COLUNM_WIDTH = 205;
@@ -41,9 +51,10 @@ public class TodomatoTable extends JTable {
 	private static final int COMPLETED_MIN_WIDTH = 10;
 
 	//constants for background colour for the rows
-	protected static final Object PRIORITY_HIGH = "HIGH";
-	protected static final Object PRIORITY_MEDIUM = "MEDIUM";
-	protected static final Object TASK_COMPLETED = "Y";
+	private static final Object PRIORITY_HIGH = "HIGH";
+	private static final Object PRIORITY_MEDIUM = "MEDIUM";
+	private static final Object TASK_COMPLETED = "Y";
+	private static final Object TASK_NOT_COMPLETED = "N";
 
 	private JTable table;
 	private JScrollPane tableDisplay;
@@ -98,9 +109,6 @@ public class TodomatoTable extends JTable {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-
-
-
 			};
 		});
 	}
@@ -137,18 +145,18 @@ public class TodomatoTable extends JTable {
 
 	private void addListListener() {
 		table.getSelectionModel().addListSelectionListener(
-				new ListSelectionListener() {
-					public void valueChanged(ListSelectionEvent event) {
-						rowSelected = table.getSelectedRow();
-						/*int modelRow = table.convertRowIndexToModel(viewRow);
-	                    System.out.println(
-	                        String.format("Selected Row in view: %d. " +
-	                            "Selected Row in model: %d.", 
-	                            viewRow, modelRow));*/
-						//System.out.println(String.format("Selected Row in view: %d. ", viewRow));
-					}
-				}		        
-				);
+			new ListSelectionListener() {
+				public void valueChanged(ListSelectionEvent event) {
+					rowSelected = table.getSelectedRow();
+					/*int modelRow = table.convertRowIndexToModel(viewRow);
+                    System.out.println(
+                        String.format("Selected Row in view: %d. " +
+                            "Selected Row in model: %d.", 
+                            viewRow, modelRow));*/
+					//System.out.println(String.format("Selected Row in view: %d. ", viewRow));
+				}
+			}	        
+		);
 	}
 
 	private void setColumnWidths() {
@@ -194,15 +202,14 @@ public class TodomatoTable extends JTable {
 				list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());
 				list[i][PRIORITY_COLUNM_INDEX] = checkNull(l.getListItem(i).getPriorityLevel());
 				if (l.getListItem(i).getCompleted()) {
-					list[i][COMPLETED_COLUNM_INDEX] = "Y";
+					list[i][COMPLETED_COLUNM_INDEX] = TASK_COMPLETED;
 				} else {
-					list[i][COMPLETED_COLUNM_INDEX] = "N";
+					list[i][COMPLETED_COLUNM_INDEX] = TASK_NOT_COMPLETED;
 				}
 			}
 		}
 		return list;
 	}
-
 
 	private static Object checkNullDate(DateTime date) {
 		if (date == null) {
@@ -226,7 +233,9 @@ public class TodomatoTable extends JTable {
 	}
 
 	class CustModel extends AbstractTableModel {
-		private String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
+		private String[] columnNames = {INDEX_HEADER, DESC_HEADER,
+				STARTTIME_HEADER, ENDTIME_HEADER, DATE_HEADER,
+				LOCATION_HEADER, PRIORITY_HEADER, COMPLETE_HEADER};
 		private Object[][] data = loadData(Processor.getDisplayList());
 
 		public CustModel(Object[][] data) {
@@ -252,7 +261,6 @@ public class TodomatoTable extends JTable {
 		}
 	}	
 
-
 	public JTable getTable() {
 		return table;
 	}
@@ -265,11 +273,9 @@ public class TodomatoTable extends JTable {
 		return data;
 	}
 
-
 	public JScrollPane getTableDisplay() {
 		return tableDisplay;
 	}
-
 
 	public void setTableDisplay(JScrollPane tableDisplay) {
 		this.tableDisplay = tableDisplay;
