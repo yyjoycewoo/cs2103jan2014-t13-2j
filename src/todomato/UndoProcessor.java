@@ -16,13 +16,14 @@ public class UndoProcessor extends Processor {
 	 * @return Status message telling user if there were changes to undo
 	 */
 	public static String processUndo() {		
-		//add current list to redoList
-		redoList.push(list);
-		
-		if (!undoList.isEmpty()) {
+		if (!undoList.isEmpty()) {	
+			//add current list to redoList
+			redoList.push(list);
+			
 			//get latest list from undoList
 			list = undoList.pop();	
 			fileHandler.updateFile(list);
+			displayList = list;
 			return SUCCESS_MSG;
 		} else {
 			return NO_CHANGES_TO_UNDO_MSG;
