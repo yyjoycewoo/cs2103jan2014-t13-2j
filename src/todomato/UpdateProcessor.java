@@ -24,7 +24,7 @@ import hirondelle.date4j.DateTime;
  * <li>"location" for the location, followed by '\' afterwards
  * <li>"date" for the date
  * <li>"recur" for recurrence interval
- * <li>"priority" for priority level
+ * <li>"priority" or "!" for priority level
  * <li>"complete" for completion status
  * </ul>
  * 
@@ -70,7 +70,7 @@ public class UpdateProcessor extends Processor {
 
 	private static String[] updateKeywords = new String[] { " starttime ",
 			" endtime ", " desc ", " date ", " location ", " recur ",
-			" priority ", " complete" };
+			" priority ", " complete", " !" };
 
 	/**
 	 * @author Hao Eng
@@ -84,7 +84,7 @@ public class UpdateProcessor extends Processor {
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
@@ -129,6 +129,8 @@ public class UpdateProcessor extends Processor {
 				case 7:
 					updateCompletion(index);
 					break;
+				case 8:
+					updatePriority(index, whichToEdit[8], argument);
 				}
 			}
 		}
@@ -272,8 +274,14 @@ public class UpdateProcessor extends Processor {
 	private static Task updatePriority(int index, int priorityDesc,
 			String argument) {
 		int stopIndex = argument.length();
-		String priority = parsePriorityFromString(argument.substring(
-				priorityDesc + NO_OF_CHAR_IN_PRIORITY, stopIndex));
+		String priority = null;
+		if (argument.contains(" !")) {
+			priority = parsePriorityFromString(argument.substring(
+					priorityDesc + 2, stopIndex));
+		} else {
+			priority = parsePriorityFromString(argument.substring(priorityDesc
+					+ NO_OF_CHAR_IN_PRIORITY, stopIndex));
+		}
 		list.getListItem(index).setPriorityLevel(priority);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
@@ -297,7 +305,7 @@ public class UpdateProcessor extends Processor {
 	 * @return the starting index of which task detail to change
 	 */
 	private static int[] findDetailToEdit(String argument) {
-		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		for (int i = 0; i < edit.length; i++) {
 			if (argument.contains(updateKeywords[i])) {
 				edit[i] = argument.indexOf(updateKeywords[i]);
