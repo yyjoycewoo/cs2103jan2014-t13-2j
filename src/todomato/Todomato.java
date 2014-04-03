@@ -5,8 +5,8 @@ import java.util.Scanner;
 /**
  * This class is the driver for the Todomato application. It creates the GUI,
  * and repeatedly obtains user input until the user in the main method, until
- * the user wants to exit. 
- *
+ * the user wants to exit.
+ * 
  */
 public class Todomato {
 
@@ -30,17 +30,14 @@ public class Todomato {
 
 		System.out.println(WELCOME_MSG);
 
+		Popup.show();
+
 		// type "exit" to exit the program
 		while (true) {
 			try {
 				System.out.print(PROMPT_USER_INPUT);
 				String command = scan.nextLine();
 
-				/*
-				 * To use all the different Processors, comment out the next
-				 * line, and uncomment the one after that
-				 */
-				// String status = CmdHandler.processCommand(command);
 				String status = SplitProcessorsHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {
@@ -48,4 +45,5 @@ public class Todomato {
 			}
 		}
 	}
+
 }

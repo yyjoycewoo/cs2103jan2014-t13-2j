@@ -6,24 +6,26 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 /**
- * This class contains methods to process update commands by the user.
- * It updates the user's lists of tasks, and saves it to disk.
+ * This class contains methods to process update commands by the user. It
+ * updates the user's lists of tasks, and saves it to disk.
  * 
  * <p>
- * It can process commands that update a description, a start time, an end
- * time, a date and a location. Any subset of the possible attributes
- * can be updated.
+ * It can process commands that update a description, a start time, an end time,
+ * a date and a location. Any subset of the possible attributes can be updated.
  * 
  * <p>
- * To update a task, start by typing "update," followed by a valid index.
- * The following keywords are necessary for the attributes, while the order
- * is flexible:
+ * To update a task, start by typing "update," followed by a valid index. The
+ * following keywords are necessary for the attributes, while the order is
+ * flexible:
  * <ul>
  * <li>"starttime" for the start time
  * <li>"endtime" for the end time
  * <li>"desc" for the description, followed by '\' afterwards
  * <li>"location" for the location, followed by '\' afterwards
- * <li> "date" for the date
+ * <li>"date" for the date
+ * <li>"recur" for recurrence interval
+ * <li>"priority" or "!" for priority level
+ * <li>"complete" for completion status
  * </ul>
  * 
  * <p>
@@ -32,7 +34,7 @@ import hirondelle.date4j.DateTime;
  * <p>
  * Examples:
  * <ul>
- * <li>"update 2 date 04/01/14"
+ * <li>"update 2 date 4 Jan"
  * <li>"update 1 starttime 1900 desc dinner with parents\ location home\
  * </ul>
  * 
@@ -52,8 +54,6 @@ import hirondelle.date4j.DateTime;
  * <li>jan 1
  * <li>1 january
  * <li>january 1
- * <li>DD/MM
- * <li>DD/MM/YY
  * </ul>
  * 
  * @author Hao Eng
@@ -66,9 +66,11 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_DESC = 6;
 	private static final int NO_OF_CHAR_IN_DATE = 6;
 	private static final int NO_OF_CHAR_IN_RECUR = 7;
+	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
 
 	private static String[] updateKeywords = new String[] { " starttime ",
-			" endtime ", " desc ", " date ", " location ", " recur " };
+			" endtime ", " desc ", " date ", " location ", " recur ",
+			" priority ", " complete", " !", " @" };
 
 	/**
 	 * @author Hao Eng
@@ -78,17 +80,18 @@ public class UpdateProcessor extends Processor {
 	 * @return Updated Task
 	 * @throws InvalidInputException
 	 */
-	public static TaskDT processUpdate(String argument)
+	public static String processUpdate(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1, -1 };
+		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
 		updater(argument, whichToEdit, index);
 
-		return list.getListItem(index);
+		displayList = list;
+		return list.getListItem(index).toString();
 	}
 
 	/**
@@ -119,6 +122,20 @@ public class UpdateProcessor extends Processor {
 					break;
 				case 5:
 					updateRecur(index, whichToEdit[5], argument);
+					break;
+				case 6:
+					updatePriority(index, whichToEdit[6], argument);
+					break;
+				case 7:
+					updateCompletion(index);
+					break;
+				case 8:
+					// for !
+					updatePriority(index, whichToEdit[8], argument);
+					break;
+				case 9:
+					// for @
+					updateLocation(index, whichToEdit[9], argument);
 					break;
 				}
 			}
@@ -157,7 +174,7 @@ public class UpdateProcessor extends Processor {
 	 * @return updated task
 	 * @throws InvalidInputException
 	 */
-	private static TaskDT updateStartTime(int index, int editStartTime,
+	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
 				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
@@ -166,25 +183,25 @@ public class UpdateProcessor extends Processor {
 		return list.getListItem(index);
 	}
 
-	private static TaskDT updateEndTime(int index, int editEndTime,
+	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument.substring(editEndTime
-				+ NO_OF_CHAR_IN_ETIME)));
+		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
+				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
 		list.getListItem(index).setEndTime(time);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
-	private static TaskDT updateDate(int index, int editDate, String argument)
+	private static Task updateDate(int index, int editDate, String argument)
 			throws InvalidInputException {
-		DateTime date = convertStringToDateTime(parseDateString(argument.substring(editDate
-				+ NO_OF_CHAR_IN_DATE)));
+		DateTime date = convertStringToDateTime(parseDateString(argument
+				.substring(editDate + NO_OF_CHAR_IN_DATE)));
 		list.getListItem(index).setDate(date);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
-	private static TaskDT updateLocation(int index, int editLoc, String argument) {
+	private static Task updateLocation(int index, int editLoc, String argument) {
 		int stopIndex = argument.length();
 		if (argument.contains("\\")) {
 			int escChar = argument.indexOf("\\");
@@ -194,8 +211,13 @@ public class UpdateProcessor extends Processor {
 				stopIndex = escChar;
 			}
 		}
-		list.getListItem(index).setLocation(
-				argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
+		if (argument.contains(" @")) {
+			list.getListItem(index).setLocation(
+					argument.substring(editLoc + 2, stopIndex));
+		} else {
+			list.getListItem(index).setLocation(
+					argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
+		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -207,7 +229,7 @@ public class UpdateProcessor extends Processor {
 	 *            that contains new description
 	 * @return updated task
 	 */
-	private static TaskDT updateDesc(int index, int editDesc, String argument) {
+	private static Task updateDesc(int index, int editDesc, String argument) {
 		int stopIndex = argument.length();
 		if (argument.contains("\\")) {
 			int escChar = argument.indexOf("\\");
@@ -222,14 +244,68 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
-	private static TaskDT updateRecur(int index, int recurDesc, String argument) {
+
+	/**
+	 * Updates task with the new recurrent period
+	 * 
+	 * @param index
+	 * @param recurDesc
+	 * @param argument
+	 *            that contains recurrence period
+	 * @return updated task
+	 */
+
+	private static Task updateRecur(int index, int recurDesc, String argument) {
 		int stopIndex = argument.length();
-		int userRecurrence = Integer.parseInt(argument.substring(recurDesc + NO_OF_CHAR_IN_RECUR, stopIndex));
+		int userRecurrence = list.getListItem(index).getRecurrencePeriod();
+		try {
+			userRecurrence = Integer.parseInt(argument.substring(recurDesc
+					+ NO_OF_CHAR_IN_RECUR, stopIndex));
+		} catch (NumberFormatException e) {
+			return null;
+		}
 		if (list.getListItem(index).getDate() == null) {
 			return null;
 		}
 		list.getListItem(index).setRecurrencePeriod(userRecurrence);
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * Updates task with the new priority
+	 * 
+	 * @param index
+	 * @param recurDesc
+	 * @param argument
+	 *            that contains priority
+	 * @return updated task
+	 */
+
+	private static Task updatePriority(int index, int priorityDesc,
+			String argument) {
+		int stopIndex = argument.length();
+		String priority = null;
+		if (argument.contains(" !")) {
+			priority = parsePriorityFromString(argument.substring(
+					priorityDesc + 2, stopIndex));
+		} else {
+			priority = parsePriorityFromString(argument.substring(priorityDesc
+					+ NO_OF_CHAR_IN_PRIORITY, stopIndex));
+		}
+		list.getListItem(index).setPriorityLevel(priority);
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * Updates task to completed status
+	 * 
+	 * @param index
+	 * @return updated tasks
+	 */
+	private static Task updateCompletion(int index) {
+		list.getListItem(index).setCompleted(true);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -240,8 +316,8 @@ public class UpdateProcessor extends Processor {
 	 * @return the starting index of which task detail to change
 	 */
 	private static int[] findDetailToEdit(String argument) {
-		int[] edit = { -1, -1, -1, -1, -1, -1 };
-		for (int i = 0; i < 6; i++) {
+		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		for (int i = 0; i < edit.length; i++) {
 			if (argument.contains(updateKeywords[i])) {
 				edit[i] = argument.indexOf(updateKeywords[i]);
 			}
