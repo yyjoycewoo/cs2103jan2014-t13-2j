@@ -70,7 +70,7 @@ public class UpdateProcessor extends Processor {
 
 	private static String[] updateKeywords = new String[] { " starttime ",
 			" endtime ", " desc ", " date ", " location ", " recur ",
-			" priority ", " complete", " !" };
+			" priority ", " complete", " !", " @" };
 
 	/**
 	 * @author Hao Eng
@@ -84,7 +84,7 @@ public class UpdateProcessor extends Processor {
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
@@ -130,7 +130,13 @@ public class UpdateProcessor extends Processor {
 					updateCompletion(index);
 					break;
 				case 8:
+					// for !
 					updatePriority(index, whichToEdit[8], argument);
+					break;
+				case 9:
+					// for @
+					updateLocation(index, whichToEdit[9], argument);
+					break;
 				}
 			}
 		}
@@ -205,8 +211,13 @@ public class UpdateProcessor extends Processor {
 				stopIndex = escChar;
 			}
 		}
-		list.getListItem(index).setLocation(
-				argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
+		if (argument.contains(" @")) {
+			list.getListItem(index).setLocation(
+					argument.substring(editLoc + 2, stopIndex));
+		} else {
+			list.getListItem(index).setLocation(
+					argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
+		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -305,7 +316,7 @@ public class UpdateProcessor extends Processor {
 	 * @return the starting index of which task detail to change
 	 */
 	private static int[] findDetailToEdit(String argument) {
-		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		for (int i = 0; i < edit.length; i++) {
 			if (argument.contains(updateKeywords[i])) {
 				edit[i] = argument.indexOf(updateKeywords[i]);
