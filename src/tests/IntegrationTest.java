@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -25,7 +26,7 @@ public class IntegrationTest {
 	public TemporaryFolder folder= new TemporaryFolder();
 	
 	@Before
-	public void createTestData() throws IOException {
+	public void createTestData() throws IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		System.setProperty("user.dir", folder.getRoot().toString());
 		tasks = folder.newFile("tasks.txt");
 		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
@@ -33,6 +34,17 @@ public class IntegrationTest {
         out.write("study#12:00#16:00#2014-03-31#utown#7#950768200#2014-04-02 23:17:24.118000000#LOW#true#null#null#null\r\n");
         out.write("es1531 assignment 2#null#null#2014-04-01#null#0#636174328#2014-03-30 16:24:17.877000000#HIGH#true#null#null#null\r\n");
         out.close();
+        
+        // To reset list to the tasks written ^ before each test case
+        // by modifying list in Processor
+        FileHandler fileHandler = new FileHandler("tasks.txt");
+        TaskList newList = fileHandler.readFile();
+        Field f = Processor.class.getDeclaredField("list");
+        f.setAccessible(true);
+        if ("list".equals(f.getName())) {
+            f.setAccessible(true);
+            f.set("list", newList);
+        }
 	}
 
 	
@@ -85,5 +97,4 @@ public class IntegrationTest {
 		assertEquals("Deleted: 5 task(s)", messageDelete1);
 		assertEquals(Processor.getList().toString(), "");
 	}
-	
 }
