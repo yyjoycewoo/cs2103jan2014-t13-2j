@@ -76,7 +76,7 @@ public class DeleteProcessor extends Processor {
 				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
 			}
 			else {
-				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr) + TASKS;
+				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr);
 			}
 			/*
 			if(argArr.length > 1) {
