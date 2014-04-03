@@ -11,7 +11,31 @@ package todomato;
  * <ul> <li> "sort date" </ul>
  * <li> sort tasks by priority from high to low
  * <ul> <li> "sort priority" </ul>
+ * <li> sort tasks by completion status
+ * <ul> <li> "sort complete" </ul>
  * </ul>
+ * 
+ * <p> 
+ * User may also specify order of sorting to be ascending or descending
+ * by appending it to the end of the command.
+ * 
+ * <p>
+ * The following notations for ascending order are allowed:
+ * <ul>
+ * <li> "a"
+ * <li> "asc"
+ * <li> "ascending"
+ * </ul>
+ * 
+ * <p>
+ * The following notations for descending order are allowed:
+ * <ul>
+ * <li> "d"
+ * <li> "desc"
+ * <li> "descending"
+ * </ul>
+ * 
+ * @author linxuan
  * 
  */
 
@@ -22,64 +46,118 @@ public class SortProcessor extends Processor{
 	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
 	private static final String SUCCESS_SORT_BY_PRIORITY = "Sorted by priority";
 	private static final String SUCCESS_SORT_BY_COMPLETION = "Sorted by completion status";
-	private static final String INVALID_ARGUMENT_MESSAGE = "Invalid argument";
+	private static final String INVALID_INPUT_MISSING_ARGUMENT = "Missing argument";
+	private static final String INVALID_INPUT_ORDER = "Sorting order could not be determined";
+	private static final String INVALID_INPUT_TYPE = "Sorting type could not be determined";
+	
+	private static final String descending[] = {"descending", "d", "desc"};
+	private static final String ascending[] = {"ascending", "a", "asc"};
 	
 	public static String processSort(String argument) {
-		displayList = list;
-
-		if (argument.equalsIgnoreCase(ARGUMENT_SORT_BY_DATE)) {
-			return sortByDate();
+		if (argument.isEmpty()) {
+			return INVALID_INPUT_MISSING_ARGUMENT;
 		}
-		if (argument.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
-			return sortByPriority();
+		
+		String argArr[] = argument.split(" ", 2);
+		String type = argArr[0];
+		String order = "";
+		if (argArr.length == 2) {
+			order = argArr[1];
 		}
-		if (argument.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
-			return sortByCompletion();
+		
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_DATE)) {
+			return sortByDate(order);
 		}
-		return INVALID_ARGUMENT_MESSAGE;
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
+			return sortByPriority(order);
+		}
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
+			return sortByCompletion(order);
+		}
+		
+		return INVALID_INPUT_TYPE;
 	}
 	
-	private static String sortByCompletion() {
-		// TODO Auto-generated method stub
+	// Sort in order of..
+	// Default/Ascending: unfinished -> completed tasks
+	// Descending: completed -> unfinished tasks
+	private static String sortByCompletion(String order) {
+		if (!isValidOrder(order)) {
+			return INVALID_INPUT_ORDER;
+		}
+		
 		bubbleSort(ARGUMENT_SORT_BY_COMPLETION);
+		if (isDescending(order)) {
+			list.reverse();
+		}
 		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_COMPLETION;
 	}
 
-	private static String sortByPriority() {
+	// Sort in order of..
+	// Default/Descending: High -> Medium -> Low priority
+	// Ascending: Low -> Medium -> High priority
+	private static String sortByPriority(String order) {
+		if (!isValidOrder(order)) {
+			return INVALID_INPUT_ORDER;
+		}
+		
 		bubbleSort(ARGUMENT_SORT_BY_PRIORITY);
+		if (isAscending(order)) {
+			list.reverse();
+		}
 		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_PRIORITY;
 	}
 	
-	private static String sortByDate() {
+	// Sort in order of..
+	// Default/Ascending: Most recent -> Least recent -> No date
+	// Descending: No date -> Least recent -> Most recent
+	private static String sortByDate(String order) {
+		if (!isValidOrder(order)) {
+			return INVALID_INPUT_ORDER;
+		}
+		
 		bubbleSort(ARGUMENT_SORT_BY_DATE);
+		if (isDescending(order)) {
+			list.reverse();
+		}
 		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
 	}
 	
-	private static void bubbleSort(String arg) {
+	private static void bubbleSort(String type) {
 		for (int i = 0; i < (list.getSize() - 1); i++) {
 			for (int j = 0; j < (list.getSize() - i - 1); j++) {
-				if (arg.equals(ARGUMENT_SORT_BY_DATE)) {
-					if (compareDate(j, j + 1)) {
-						list.swap(j, j + 1);
-					}
-				} else if (arg.equals(ARGUMENT_SORT_BY_PRIORITY)) {
-					if (comparePriority(j, j + 1)) {
-						list.swap(j, j + 1);
-					}
-				} else if (arg.equals(ARGUMENT_SORT_BY_COMPLETION)) {
-					if (compareCompletion(j, j + 1)) {
-						list.swap(j, j + 1);
-					}
+				if (needSwap(type, j)) {
+					list.swap(j, j + 1);
 				}
 			}
 		}
 	}
 
+	private static boolean needSwap(String type, int j) {
+		if (type.equals(ARGUMENT_SORT_BY_DATE)) {
+			if (compareDate(j, j + 1)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_SORT_BY_PRIORITY)) {
+			if (comparePriority(j, j + 1)) {
+				return true;
+			}
+		} 
+		if (type.equals(ARGUMENT_SORT_BY_COMPLETION)) {
+			if (compareCompletion(j, j + 1)) {
+				return true;
+			}
+		} 
+		return false;
+	}
+	
+//	Returns true if..
+//	list[i] is completed but list[j] is not
 	private static boolean compareCompletion(int i, int j) {
-		// TODO Auto-generated method stub
 		if (list.getListItem(i).getCompleted()) {
 			if (!list.getListItem(j).getCompleted()) {
 				return true;
@@ -88,16 +166,9 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 
-	/**
-	 * 
-	 * @param i
-	 * @param j
-	 * @return true swap is needed i.e.
-	 * if date of list[i] is later than list[j], or 
-	 * list[j] has a date but list[i] doesn't
-	 * False otherwise. 
-	 * i and j are consecutive indices of items in the list, where i + 1 = j
-	 */
+//  Returns true if..
+//  list[i] later than list[j]
+//	Tasks without date is considered latest
 	private static boolean compareDate(int i, int j) {
 		if(list.getListItem(i).getDate() == null) {
 			if(list.getListItem(j).getDate() == null) {
@@ -113,14 +184,8 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 	
-	/**
-	 * 
-	 * @param i
-	 * @param j
-	 * @return True if list[i] has lower priority than list[j] i.e. need swap.
-	 * False otherwise.
-	 * i and j are consecutive indices of items in the list, where i + 1 = j
-	 */
+//	Returns true if..
+//	list[i] has lower priority than list[j]
 	private static boolean comparePriority(int i, int j) {
 		if(list.getListItem(i).getPriorityLevel().equals(PRIORITY_LOW)) {
 			if(list.getListItem(j).getPriorityLevel().equals(PRIORITY_LOW)) {
@@ -133,6 +198,37 @@ public class SortProcessor extends Processor{
 				return true;
 			}
 			return false;
+		}
+		return false;
+	}
+	
+	private static boolean isAscending(String order) {
+		for (String s: ascending) {
+			if (order.equalsIgnoreCase(s)) {
+				return true;				
+			}
+		}
+		return false;
+	}
+	
+	private static boolean isDescending(String order) {
+		for (String s: descending) {
+			if (order.equalsIgnoreCase(s)) {
+				return true;				
+			}
+		}
+		return false;
+	}
+	
+	private static boolean isValidOrder(String order) {
+		if (order.isEmpty()) {
+			return true;
+		}
+		if (isAscending(order)) {
+			return true;
+		}
+		if (isDescending(order)) {
+			return true;
 		}
 		return false;
 	}
