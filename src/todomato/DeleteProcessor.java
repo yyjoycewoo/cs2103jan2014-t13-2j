@@ -112,7 +112,7 @@ public class DeleteProcessor extends Processor {
 	private static String deleteCompleted() {
 		// TODO Auto-generated method stub
 		int numberOfTasksDeleted = 0;
-		for (int i = 0; i < list.getSize(); i++) {
+		for (int i = list.getSize() - 1; i >= 0 ; i--) { 
 			if (list.getListItem(i).getCompleted()) {
 				list.deleteListItem(i);
 				numberOfTasksDeleted++;				
