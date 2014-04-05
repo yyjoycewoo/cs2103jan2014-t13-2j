@@ -27,8 +27,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
 	protected static final String SORT_DATE_DESC_COMMAND = "sort date desc";
 	protected static final String SORT_DATE_ASC_COMMAND = "sort date asc";
-	protected static final String SORT_DESC_DESC_COMMAND = "sort description desc";
-	protected static final String SORT_DESC_ASC_COMMAND = "sort description asc";
 	
 	protected static final int INDEX_OFFSET = 1;
 	
@@ -36,7 +34,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_PRIORITY = "Sort by priority";
 	private static final String SORT_COMPLETED = "Sort by completed";
 	private static final String SORT_DATE = "Sort by date";
-	private static final String SORT_DESC = "Sort by description";
 
 	private static Icon downArrow = new BevelArrowIcon(1, false, true);
 	private static Icon upArrow = new BevelArrowIcon(0, false, true);
@@ -48,7 +45,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private JButton btnPriority = new JButton(SORT_PRIORITY, upArrow);
 	private JButton btnCompleted = new JButton(SORT_COMPLETED, upArrow);
 	private JButton btnDate = new JButton(SORT_DATE, upArrow);
-	private JButton btnDesc = new JButton(SORT_DESC, upArrow);
 
 
 	public TodomatoFrame() {
@@ -70,8 +66,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private void initDisplay() {
 		panel.setLayout(new MigLayout("nocache"));
 		panel.add(table.getTableDisplay(), "wrap, push, grow");
-		panel.add(btnDesc, "split");
-		panel.add(btnDate);
+		panel.add(btnDate, "split");
 		panel.add(btnPriority);
 		//panel.add(btnPriority, "split");
 		panel.add(btnCompleted, "wrap");
@@ -82,33 +77,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 		initTxtCommandAction(); 
 		initBtnDateAction();
-		initBtnDescAction();
 		initBtnPriorityAction();   
 		initBtnCompletedAction();  
-	}
-
-
-	private void initBtnDescAction() {
-		btnDesc.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e)
-            {
-				String status;
-				try {
-					if (btnDesc.getIcon() == upArrow) {
-						status = SplitProcessorsHandler.processCommand(SORT_DESC_ASC_COMMAND);
-						btnDesc.setIcon(downArrow);
-					} else {
-						status = SplitProcessorsHandler.processCommand(SORT_DESC_DESC_COMMAND);
-						btnDesc.setIcon(upArrow);
-					}
-					assert status != null;
-					table.update();
-				} catch (InvalidInputException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}	
-            }
-        });
 	}
 
 
