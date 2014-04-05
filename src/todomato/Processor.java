@@ -20,6 +20,7 @@ public class Processor {
 	protected static TaskList displayList = list;
 	protected static Stack<TaskList> undoList = new Stack<TaskList>();
 	protected static Stack<TaskList> redoList = new Stack<TaskList>();
+	
 	protected static final int PM = 1;
 	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR = 1;
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
@@ -27,14 +28,19 @@ public class Processor {
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES = 4;
 	protected static final int POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR = 1;
 	protected static final int POS_OF_MINUTE = 2;
+	
 	protected static final String INVALID_DATE = "Invalid Date";
 	protected static final String INVALID_TIME = "Invalid Time";
+	
 	protected static final int NOT_FOUND = -1;
+	
 	protected static final String PRIORITY_LOW = "LOW";
 	protected static final String PRIORITY_MED = "MEDIUM";
 	protected static final String PRIORITY_HIGH = "HIGH";
+	
 	protected static DateTime currentDate = DateTime.today(TimeZone
 			.getDefault());
+	
 	protected static final String[] days = new String[] { "mon", "tues", "wed",
 			"thurs", "fri", "sat", "sun" };
 	protected static final String meridiems[] = new String[] { "am", "pm" };
