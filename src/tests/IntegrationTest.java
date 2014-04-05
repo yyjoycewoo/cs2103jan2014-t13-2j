@@ -62,12 +62,14 @@ public class IntegrationTest {
 		String messageUndo1 = SplitProcessorsHandler.processCommand("undo");
 		assertEquals("Last action undone", messageUndo1);
 		
+		//test undo when there is nothing to undo
 		String messageUndo2 = SplitProcessorsHandler.processCommand("undo");
 		assertEquals("No changes to undo", messageUndo2);
 		
 		String messageRedo1 = SplitProcessorsHandler.processCommand("redo");
 		assertEquals("Last action redone", messageRedo1);
 		
+		//test redo when there is nothing to redo
 		String messageRedo2 = SplitProcessorsHandler.processCommand("redo");
 		assertEquals("No changes to redo", messageRedo2);
 

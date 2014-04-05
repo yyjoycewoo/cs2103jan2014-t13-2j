@@ -17,8 +17,6 @@ public class TodomatoTable extends JTable {
 	private static final String ENDTIME_HEADER = "End Time";
 	private static final String DATE_HEADER = "Date";
 	private static final String LOCATION_HEADER = "Location";
-	private static final String PRIORITY_HEADER = "Priority";
-	private static final String COMPLETE_HEADER = "Completed";
 	
 	//constants for preferred column widths
 	private static final int INDEX_COLUNM_WIDTH = 40;
@@ -27,8 +25,6 @@ public class TodomatoTable extends JTable {
 	private static final int ENDTIME_COLUNM_WIDTH = 60;
 	private static final int DATE_COLUNM_WIDTH = 70;
 	private static final int LOCATION_COLUNM_WIDTH = 100;
-	private static final int PRIORITY_COLUNM_WIDTH = 52;
-	private static final int COMPLETED_COLUNM_WIDTH = 80;
 
 	//constants for column indices
 	private static final int INDEX_COLUNM_INDEX = 0;
@@ -37,8 +33,6 @@ public class TodomatoTable extends JTable {
 	private static final int ENDTIME_COLUNM_INDEX = 3;
 	private static final int DATE_COLUNM_INDEX = 4;
 	private static final int LOCATION_COLUNM_INDEX = 5;
-	private static final int PRIORITY_COLUNM_INDEX = 6;
-	private static final int COMPLETED_COLUNM_INDEX = 7;
 
 	//constants for minimum column widths
 	private static final int INDEX_MIN_WIDTH = 10;
@@ -47,22 +41,23 @@ public class TodomatoTable extends JTable {
 	private static final int ENDTIME_MIN_WIDTH = 50;
 	private static final int DATE_MIN_WIDTH = 60;
 	private static final int LOCATION_MIN_WIDTH = 50;
-	private static final int PRIORITY_MIN_WIDTH = 50;
-	private static final int COMPLETED_MIN_WIDTH = 10;
 
 	//constants for background colour for the rows
 	private static final Object PRIORITY_HIGH = "HIGH";
 	private static final Object PRIORITY_MEDIUM = "MEDIUM";
 	private static final Object TASK_COMPLETED = "Y";
 	private static final Object TASK_NOT_COMPLETED = "N";
+	
+	private static final int NUM_COLS = 5;
 
 	private JTable table;
 	private JScrollPane tableDisplay;
 	static Object[][] data;
 	int rowSelected;
-
+	TaskList list = Processor.getDisplayList();
+	
 	public TodomatoTable() {
-		String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location", "Priority", "Completed"};
+		String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
 		data = loadData(Processor.getDisplayList());
 
 		DefaultTableModel model = new DefaultTableModel(data, columnNames) {
@@ -122,16 +117,22 @@ public class TodomatoTable extends JTable {
 				if (!isRowSelected(row)) {
 					c.setBackground(getBackground());
 					int modelRow = convertRowIndexToModel(row);
-					String priority = (String)getModel().getValueAt(modelRow, PRIORITY_COLUNM_INDEX);
-					String completed = (String)getModel().getValueAt(modelRow, COMPLETED_COLUNM_INDEX);
-					if (PRIORITY_HIGH.equals(priority)) {
-						c.setBackground(Color.RED);
-					}
-					if (PRIORITY_MEDIUM.equals(priority)) {
-						c.setBackground(Color.YELLOW);
-					}
-					if (TASK_COMPLETED.equals(completed)) {
-						c.setBackground(Color.GRAY);
+					
+					int index = Integer.parseInt( (String) getModel().getValueAt(modelRow, INDEX_COLUNM_INDEX));
+					if (index != 0) {
+						Task item = list.getListItem(index - 1);
+						String priority = item.getPriorityLevel();
+						if (PRIORITY_HIGH.equals(priority)) {
+							c.setBackground(Color.RED);
+						}
+						if (PRIORITY_MEDIUM.equals(priority)) {
+							c.setBackground(Color.YELLOW);
+						}
+
+						Boolean completed = item.getCompleted();
+						if (completed) {
+							c.setBackground(Color.GRAY);
+						}
 					}
 				}
 				return c;
@@ -167,8 +168,6 @@ public class TodomatoTable extends JTable {
 		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setPreferredWidth(ENDTIME_COLUNM_WIDTH);
 		table.getColumnModel().getColumn(DATE_COLUNM_INDEX).setPreferredWidth(DATE_COLUNM_WIDTH);
 		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setPreferredWidth(LOCATION_COLUNM_WIDTH);
-		table.getColumnModel().getColumn(PRIORITY_COLUNM_INDEX).setPreferredWidth(PRIORITY_COLUNM_WIDTH);
-		table.getColumnModel().getColumn(COMPLETED_COLUNM_INDEX).setPreferredWidth(COMPLETED_COLUNM_WIDTH);
 
 		table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setMinWidth(INDEX_MIN_WIDTH);
 		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setMinWidth(DESC_MIN_WIDTH);		
@@ -176,8 +175,6 @@ public class TodomatoTable extends JTable {
 		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setMinWidth(ENDTIME_MIN_WIDTH);
 		table.getColumnModel().getColumn(DATE_COLUNM_INDEX).setMinWidth(DATE_MIN_WIDTH);
 		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setMinWidth(LOCATION_MIN_WIDTH);
-		table.getColumnModel().getColumn(PRIORITY_COLUNM_INDEX).setMinWidth(PRIORITY_MIN_WIDTH);
-		table.getColumnModel().getColumn(COMPLETED_COLUNM_INDEX).setMinWidth(COMPLETED_MIN_WIDTH);
 
 		table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
 		//table.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
@@ -186,7 +183,7 @@ public class TodomatoTable extends JTable {
 	private static Object[][] loadData(TaskList l) {        
 		Object[][] list = new Object[1][8];
 		if (l.getSize() == 0) {
-			for (int i=0; i<=7; i++) {
+			for (int i=0; i<=NUM_COLS; i++) {
 				list[0][i] = "";
 			}				
 			list[0][INDEX_COLUNM_INDEX] = "0";
@@ -200,12 +197,6 @@ public class TodomatoTable extends JTable {
 				list[i][ENDTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getEndTime());
 				list[i][DATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getDate());				
 				list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());
-				list[i][PRIORITY_COLUNM_INDEX] = checkNull(l.getListItem(i).getPriorityLevel());
-				if (l.getListItem(i).getCompleted()) {
-					list[i][COMPLETED_COLUNM_INDEX] = TASK_COMPLETED;
-				} else {
-					list[i][COMPLETED_COLUNM_INDEX] = TASK_NOT_COMPLETED;
-				}
 			}
 		}
 		return list;
@@ -235,8 +226,8 @@ public class TodomatoTable extends JTable {
 	class CustModel extends AbstractTableModel {
 		private String[] columnNames = {INDEX_HEADER, DESC_HEADER,
 				STARTTIME_HEADER, ENDTIME_HEADER, DATE_HEADER,
-				LOCATION_HEADER, PRIORITY_HEADER, COMPLETE_HEADER};
-		private Object[][] data = loadData(Processor.getDisplayList());
+				LOCATION_HEADER};
+		private Object[][] data = loadData(list);
 
 		public CustModel(Object[][] data) {
 			this.data = data;
