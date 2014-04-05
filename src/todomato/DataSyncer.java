@@ -21,9 +21,10 @@ public class DataSyncer {
 	
 	private TaskList Sync(String username, String password, DateTime lastsync) {
 		JsonObject localJson = prepareData(this.localList, username, password, lastsync);
-		JsonObject responseJson = sendRequest(localJson);
+		/*JsonObject responseJson = sendRequest(localJson);
 		localList = processResponse(responseJson);
-		return localList
+		return localList;*/
+		return null;
 	}
 	
 	private String formatTime(DateTime dt) {
