@@ -5,9 +5,12 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
+
+import org.jfree.ui.BevelArrowIcon;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -22,21 +25,30 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_PRIORITY_ASC_COMMAND = "sort priority asc";
 	private static final String SORT_COMPLETE_DESC_COMMAND = "sort complete desc";
 	private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
+	protected static final String SORT_DATE_DESC_COMMAND = "sort date desc";
+	protected static final String SORT_DATE_ASC_COMMAND = "sort date asc";
+	protected static final String SORT_DESC_DESC_COMMAND = "sort description desc";
+	protected static final String SORT_DESC_ASC_COMMAND = "sort description asc";
 	
 	protected static final int INDEX_OFFSET = 1;
 	
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
-	private static final String SORT_PRIORITY_ASC = "Sort by priority (asc) ";
-	private static final String SORT_PRIORITY_DES = "Sort by priority (des) ";
-	private static final String SORT_COMPLETED_ASC = "Sort by completed (asc) ";
-	private static final String SORT_COMPLETED_DES = "Sort by completed (des) ";
+	private static final String SORT_PRIORITY = "Sort by priority";
+	private static final String SORT_COMPLETED = "Sort by completed";
+	private static final String SORT_DATE = "Sort by date";
+	private static final String SORT_DESC = "Sort by description";
+
+	private static Icon downArrow = new BevelArrowIcon(1, false, true);
+	private static Icon upArrow = new BevelArrowIcon(0, false, true);
 	
 	private TodomatoTable table = new TodomatoTable();	
 	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
 	private JLabel lblStatus = new JLabel(" ");
-	private JButton btnPriority = new JButton(SORT_PRIORITY_ASC);
-	private JButton btnCompleted = new JButton(SORT_COMPLETED_ASC);
+	private JButton btnPriority = new JButton(SORT_PRIORITY, upArrow);
+	private JButton btnCompleted = new JButton(SORT_COMPLETED, upArrow);
+	private JButton btnDate = new JButton(SORT_DATE, upArrow);
+	private JButton btnDesc = new JButton(SORT_DESC, upArrow);
 
 
 	public TodomatoFrame() {
@@ -58,16 +70,69 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private void initDisplay() {
 		panel.setLayout(new MigLayout("nocache"));
 		panel.add(table.getTableDisplay(), "wrap, push, grow");
-		panel.add(btnPriority, "split");
+		panel.add(btnDesc, "split");
+		panel.add(btnDate);
+		panel.add(btnPriority);
+		//panel.add(btnPriority, "split");
 		panel.add(btnCompleted, "wrap");
 		panel.add(txtCommand, "wrap, pushx, growx");
 		panel.add(lblStatus);
 
 		updateData("");
 
-		initTxtCommandAction();
+		initTxtCommandAction(); 
+		initBtnDateAction();
+		initBtnDescAction();
 		initBtnPriorityAction();   
-		initBtnCompletedAction();   
+		initBtnCompletedAction();  
+	}
+
+
+	private void initBtnDescAction() {
+		btnDesc.addActionListener(new ActionListener() {			 
+            public void actionPerformed(ActionEvent e)
+            {
+				String status;
+				try {
+					if (btnDesc.getIcon() == upArrow) {
+						status = SplitProcessorsHandler.processCommand(SORT_DESC_ASC_COMMAND);
+						btnDesc.setIcon(downArrow);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_DESC_DESC_COMMAND);
+						btnDesc.setIcon(upArrow);
+					}
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+            }
+        });
+	}
+
+
+	private void initBtnDateAction() {
+		btnDate.addActionListener(new ActionListener() {			 
+            public void actionPerformed(ActionEvent e)
+            {
+				String status;
+				try {
+					if (btnDate.getIcon() == upArrow) {
+						status = SplitProcessorsHandler.processCommand(SORT_DATE_ASC_COMMAND);
+						btnDate.setIcon(downArrow);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_DATE_DESC_COMMAND);
+						btnDate.setIcon(upArrow);
+					}
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+            }
+        });
 	}
 
 
@@ -77,12 +142,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
             {
 				String status;
 				try {
-					if (btnCompleted.getText() == SORT_COMPLETED_ASC) {
+					if (btnCompleted.getIcon() == upArrow) {
 						status = SplitProcessorsHandler.processCommand(SORT_COMPLETE_ASC_COMMAND);
-						btnCompleted.setText(SORT_COMPLETED_DES);
+						btnCompleted.setIcon(downArrow);
 					} else {
 						status = SplitProcessorsHandler.processCommand(SORT_COMPLETE_DESC_COMMAND);
-						btnCompleted.setText(SORT_COMPLETED_ASC);
+						btnCompleted.setIcon(upArrow);
 					}
 					assert status != null;
 					table.update();
@@ -101,12 +166,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
             {
 				String status = null;
 				try {
-					if (btnPriority.getText() == SORT_PRIORITY_ASC) {
+					if (btnPriority.getIcon() == upArrow) {
 						status = SplitProcessorsHandler.processCommand(SORT_PRIORITY_ASC_COMMAND);
-						btnPriority.setText(SORT_PRIORITY_DES);
+						btnPriority.setIcon(downArrow);
 					} else {
 						status = SplitProcessorsHandler.processCommand(SORT_PRIORITY_DESC_COMMAND);
-						btnPriority.setText(SORT_PRIORITY_ASC);						
+						btnPriority.setIcon(upArrow);						
 					}
 					assert status != null;
 					table.update();					
