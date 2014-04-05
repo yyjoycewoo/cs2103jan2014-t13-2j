@@ -92,11 +92,7 @@ public class TodomatoTable extends JTable {
 
 					if (columnHeader.equals("Date")) {
 						status = SplitProcessorsHandler.processCommand("sort date");
-					} else if (columnHeader.equals("Completed")) {
-						status = SplitProcessorsHandler.processCommand("sort complete");
-					} else if (columnHeader.equals("Priority")) {
-						status = SplitProcessorsHandler.processCommand("sort priority");
-					}
+					} 
 
 					assert status != null;
 					update();

@@ -25,12 +25,14 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
 	private JLabel lblStatus = new JLabel(" ");
+	private JButton btnPriority = new JButton("Sort by priority");
+	private JButton btnCompleted = new JButton("Sort by completed");
 
 
 	public TodomatoFrame() {
 		super("Todomato");
 		super.setDefaultLookAndFeelDecorated(true);
-		setSize(700,500);
+		setSize(600,500);
 		setMinimumSize(new Dimension(370, 200));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -46,9 +48,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private void initDisplay() {
 		panel.setLayout(new MigLayout("nocache"));
 		panel.add(table.getTableDisplay(), "wrap, push, grow");
-		updateData("");
+		panel.add(btnPriority, "split");
+		panel.add(btnCompleted, "wrap");
 		panel.add(txtCommand, "wrap, pushx, growx");
 		panel.add(lblStatus);
+
+		updateData("");
 
 		txtCommand.addActionListener(new ActionListener() {
 			@Override
@@ -56,6 +61,36 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 				updateData(txtCommand.getText());
 			}
 		});
+		
+		btnPriority.addActionListener(new ActionListener() {			 
+            public void actionPerformed(ActionEvent e)
+            {
+				String status;
+				try {
+					status = SplitProcessorsHandler.processCommand("sort priority");
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+            }
+        });   
+		
+		btnCompleted.addActionListener(new ActionListener() {			 
+            public void actionPerformed(ActionEvent e)
+            {
+				String status;
+				try {
+					status = SplitProcessorsHandler.processCommand("sort complete");
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+            }
+        });   
 	}
 
 	private void updateData(String command) {
