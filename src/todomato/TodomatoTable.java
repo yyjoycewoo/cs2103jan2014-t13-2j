@@ -109,7 +109,7 @@ public class TodomatoTable extends JTable {
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 				Component c = super.prepareRenderer(renderer, row, column);
 
-				//  Color row based on a cell value
+				//  Color row based on priority and completed
 				if (!isRowSelected(row)) {
 					c.setBackground(getBackground());
 					int modelRow = convertRowIndexToModel(row);

@@ -18,15 +18,25 @@ import net.miginfocom.swing.MigLayout;
  */
 @SuppressWarnings("serial")
 public class TodomatoFrame extends JFrame implements ActionListener {
-	private static final String INVALID_INPUT_MSG = "Invalid input: ";
+	private static final String SORT_PRIORITY_DESC_COMMAND = "sort priority desc";
+	private static final String SORT_PRIORITY_ASC_COMMAND = "sort priority asc";
+	private static final String SORT_COMPLETE_DESC_COMMAND = "sort complete desc";
+	private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
+	
 	protected static final int INDEX_OFFSET = 1;
+	
+	private static final String INVALID_INPUT_MSG = "Invalid input: ";
+	private static final String SORT_PRIORITY_ASC = "Sort by priority (asc) ";
+	private static final String SORT_PRIORITY_DES = "Sort by priority (des) ";
+	private static final String SORT_COMPLETED_ASC = "Sort by completed (asc) ";
+	private static final String SORT_COMPLETED_DES = "Sort by completed (des) ";
 	
 	private TodomatoTable table = new TodomatoTable();	
 	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
 	private JLabel lblStatus = new JLabel(" ");
-	private JButton btnPriority = new JButton("Sort by priority");
-	private JButton btnCompleted = new JButton("Sort by completed");
+	private JButton btnPriority = new JButton(SORT_PRIORITY_ASC);
+	private JButton btnCompleted = new JButton(SORT_COMPLETED_ASC);
 
 
 	public TodomatoFrame() {
@@ -55,42 +65,67 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 		updateData("");
 
+		initTxtCommandAction();
+		initBtnPriorityAction();   
+		initBtnCompletedAction();   
+	}
+
+
+	private void initBtnCompletedAction() {
+		btnCompleted.addActionListener(new ActionListener() {			 
+            public void actionPerformed(ActionEvent e)
+            {
+				String status;
+				try {
+					if (btnCompleted.getText() == SORT_COMPLETED_ASC) {
+						status = SplitProcessorsHandler.processCommand(SORT_COMPLETE_ASC_COMMAND);
+						btnCompleted.setText(SORT_COMPLETED_DES);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_COMPLETE_DESC_COMMAND);
+						btnCompleted.setText(SORT_COMPLETED_ASC);
+					}
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+            }
+        });
+	}
+
+
+	private void initBtnPriorityAction() {
+		btnPriority.addActionListener(new ActionListener() {			 
+            public void actionPerformed(ActionEvent e)
+            {
+				String status = null;
+				try {
+					if (btnPriority.getText() == SORT_PRIORITY_ASC) {
+						status = SplitProcessorsHandler.processCommand(SORT_PRIORITY_ASC_COMMAND);
+						btnPriority.setText(SORT_PRIORITY_DES);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_PRIORITY_DESC_COMMAND);
+						btnPriority.setText(SORT_PRIORITY_ASC);						
+					}
+					assert status != null;
+					table.update();					
+				} catch (InvalidInputException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}	
+            }
+        });
+	}
+
+
+	private void initTxtCommandAction() {
 		txtCommand.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateData(txtCommand.getText());
 			}
 		});
-		
-		btnPriority.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e)
-            {
-				String status;
-				try {
-					status = SplitProcessorsHandler.processCommand("sort priority");
-					assert status != null;
-					table.update();
-				} catch (InvalidInputException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}	
-            }
-        });   
-		
-		btnCompleted.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e)
-            {
-				String status;
-				try {
-					status = SplitProcessorsHandler.processCommand("sort complete");
-					assert status != null;
-					table.update();
-				} catch (InvalidInputException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}	
-            }
-        });   
 	}
 
 	private void updateData(String command) {
