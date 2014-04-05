@@ -9,13 +9,23 @@ public class FindProcessor extends Processor {
 		//Make search case insensitive by converting everything to uppercase
 		argument = argument.toUpperCase();
 		TaskList tasksFound = new TaskList();
+		TaskList tasksNotFound = new TaskList();
 		
 		for (Task i : list.getList()) {
 			String task = i.toString().toUpperCase();
 			if (task.contains(argument) && task != "") {
 				tasksFound.addToList(i);
+				System.out.println(task);
+			} else {
+				tasksNotFound.addToList(i);
 			}
 		}
+		
+		list.deepCopy(tasksFound);
+		for (Task i : tasksNotFound.getList()) {
+			list.addToList(i);
+		}
+		fileHandler.updateFile(list);
 		
 		displayList = tasksFound;
 		
