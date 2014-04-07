@@ -2,6 +2,7 @@ package todomato;
 import hirondelle.date4j.DateTime;
 
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,6 +22,7 @@ public class DataSyncer extends Processor {
 	
 	private TaskList Sync(String username, String password, DateTime lastsync) {
 		JsonObject localJson = prepareData(this.localList, username, password, lastsync);
+		list.setLastSyncTime(DateTime.now(TimeZone.getDefault()));
 		/*JsonObject responseJson = sendRequest(localJson);
 		localList = processResponse(responseJson);
 		

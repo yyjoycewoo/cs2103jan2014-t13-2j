@@ -1,4 +1,6 @@
 package todomato;
+import hirondelle.date4j.DateTime;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,15 +49,20 @@ public class FileHandler {
 	public TaskList readFile() {
 		
 		try {
-		
+			Boolean isSyncTimeRetrieved = false;
 			String currentLine;
 			Task currentTask;
 			TaskList taskList = new TaskList();
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(file.getAbsoluteFile()));
-			
+		
 			while ((currentLine = bufferedReader.readLine()) != null) {
-				currentTask = readTask(currentLine);
-				taskList.addToList(currentTask);
+				if (!isSyncTimeRetrieved) {
+					taskList.setLastSyncTime (new DateTime(currentLine));
+					isSyncTimeRetrieved = true;
+				} else {
+					currentTask = readTask(currentLine);
+					taskList.addToList(currentTask);
+				}
 			}
 			
 			bufferedReader.close();
@@ -88,6 +95,9 @@ public class FileHandler {
 			if (!file.exists()) {
 				file.createNewFile();
 			}
+			
+			content = taskList.getLastSyncTime() + LINE_BREAK;
+			bufferedWriter.write(content);
 			
 			for (Task task : taskList.getList()) {
 				content = task.toFileString() + LINE_BREAK;
