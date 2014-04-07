@@ -13,6 +13,20 @@ public class Task {
 	private static final String SEPERATOR = "#";
 	private static final String PRIORITY_LOW = "LOW";
 	private static final String IS_TRUE = "true";
+	private static int INDEX_OF_DESC = 0;
+	private static int INDEX_OF_START_TIME = 1;
+	private static int INDEX_OF_END_TIME = 2;
+	private static int INDEX_OF_START_DATE = 3;
+	private static int INDEX_OF_END_DATE = 4;
+	private static int INDEX_OF_LOCATION = 5;
+	private static int INDEX_OF_RECUR = 6;
+	private static int INDEX_OF_ID = 7;
+	private static int INDEX_OF_TIME_CREATED = 8;
+	private static int INDEX_OF_PRIORITY = 9;
+	private static int INDEX_OF_IS_COMPLETED = 10;
+	private static int INDEX_OF_EVENT_ID = 11;
+	private static int INDEX_OF_UPDATE_TIME = 12;
+	private static int INDEX_OF_NOTICE_TIME = 13;
 
 	private String description;
 	private DateTime startTime;
@@ -146,7 +160,7 @@ public class Task {
 	 */
 	public static Task createTaskFromFileString(String fileInput) {
 		String[] parts = fileInput.split(SEPERATOR);
-		String description = parts[0];
+		String description = parts[INDEX_OF_DESC];
 		DateTime startTime = null;
 		DateTime endTime = null;
 		DateTime startDate = null;
@@ -155,35 +169,35 @@ public class Task {
 		String eventId = null;
 		DateTime updateTime = null;
 		DateTime noticeTime = null;
-		if (DateTime.isParseable(parts[1])) {
-			startTime = new DateTime(parts[1]);
+		if (DateTime.isParseable(parts[INDEX_OF_START_TIME])) {
+			startTime = new DateTime(parts[INDEX_OF_START_TIME]);
 		}
-		if (DateTime.isParseable(parts[2])) {
-			endTime = new DateTime(parts[2]);
+		if (DateTime.isParseable(parts[INDEX_OF_END_TIME])) {
+			endTime = new DateTime(parts[INDEX_OF_END_TIME]);
 		}
-		if (DateTime.isParseable(parts[3])) {
-			startDate = new DateTime(parts[3]);
+		if (DateTime.isParseable(parts[INDEX_OF_START_DATE])) {
+			startDate = new DateTime(parts[INDEX_OF_START_DATE]);
 		}
-		if (DateTime.isParseable(parts[4])) {
-			endDate = new DateTime(parts[4]);
+		if (DateTime.isParseable(parts[INDEX_OF_END_DATE])) {
+			endDate = new DateTime(parts[INDEX_OF_END_DATE]);
 		}
-		if (!parts[5].equals("null")) {
-			location = parts[5];
+		if (!parts[INDEX_OF_LOCATION].equals("null")) {
+			location = parts[INDEX_OF_LOCATION];
 		}
-		int recurrencePeriod = Integer.parseInt(parts[6]);
-		int id = Integer.parseInt(parts[7]);
-		DateTime timeCreated = new DateTime(parts[8]);
-		String prioritylevel = parts[9];
-		Boolean isComplete = false;
-		if (parts[10].equals(IS_TRUE)) {
-			isComplete = true;
+		int recurrencePeriod = Integer.parseInt(parts[INDEX_OF_RECUR]);
+		int id = Integer.parseInt(parts[INDEX_OF_ID]);
+		DateTime timeCreated = new DateTime(parts[INDEX_OF_TIME_CREATED]);
+		String prioritylevel = parts[INDEX_OF_PRIORITY];
+		Boolean isCompleted = false;
+		if (parts[INDEX_OF_IS_COMPLETED].equals(IS_TRUE)) {
+			isCompleted = true;
 		}
-		eventId = parts[11];
-		if (DateTime.isParseable(parts[12])) {
-			updateTime = new DateTime(parts[12]);
+		eventId = parts[INDEX_OF_EVENT_ID];
+		if (DateTime.isParseable(parts[INDEX_OF_UPDATE_TIME])) {
+			updateTime = new DateTime(parts[INDEX_OF_UPDATE_TIME]);
 		}
-		if (DateTime.isParseable(parts[13])) {
-			noticeTime = new DateTime(parts[13]);
+		if (DateTime.isParseable(parts[INDEX_OF_NOTICE_TIME])) {
+			noticeTime = new DateTime(parts[INDEX_OF_NOTICE_TIME]);
 		}
 		Task userTask = new Task(description);
 		userTask.setStartTime(startTime);
@@ -195,7 +209,7 @@ public class Task {
 		userTask.setId(id);
 		userTask.setTimeCreated(timeCreated);
 		userTask.setPriorityLevel(prioritylevel);
-		userTask.setCompleted(isComplete);
+		userTask.setCompleted(isCompleted);
 		userTask.setEventId(eventId);
 		userTask.setUpdateTime(updateTime);
 		userTask.setNoticeTime(noticeTime);
