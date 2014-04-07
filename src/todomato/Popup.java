@@ -60,9 +60,8 @@ public class Popup extends Processor {
 				}
 			}
 		}
-		for (int i = 0; i < myownlist.getSize(); i++) {
-			// allowing pop up to stack on top of another
-			Notification.popUpNotice(myownlist.getListItem(i).toString(), i);
+		if (myownlist.getSize() != 0) {
+			Notification.popUpNotice();
 		}
 	}
 }
