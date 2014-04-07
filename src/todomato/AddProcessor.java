@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 public class AddProcessor extends Processor {
 
 
-	private static String[] keywords = new String[] { " at ", " from ", 
+	private static String[] keywords = new String[] { " from ", " at ", 
 			" until ", " due ", " on ", " in ", " @", " recur ", " priority ", " !"};
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
@@ -238,13 +238,13 @@ public class AddProcessor extends Processor {
 		}
 		switch (keywordType) {
 			case 0:
-			case 1:
 				try {
 					taskDetails[INDEX_OF_START_TIME] = retrieveStartTime(input);
 				} catch (InvalidInputException invalidStartTime) {
 					errorsInInput[INDEX_OF_START_TIME] = true;
 				}
 				break;
+			case 1:
 			case 2:
 			case 3:
 				try {
