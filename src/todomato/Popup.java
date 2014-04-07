@@ -29,13 +29,13 @@ public class Popup extends Processor {
 		for (int i = 0; i < Processor.getList().getSize(); i++) {
 			Task item = Processor.getList().getListItem(i);
 			// task has date and is not completed
-			if ((item.getEndDate() != null) && !item.getCompleted()) {
+			if ((item.getDate() != null) && !item.getCompleted()) {
 				int m = now.get(Calendar.MONTH) + 1;
 				String deadline = convertDateToStandardForm("" + m,
 						"" + now.get(Calendar.DATE));
 				String present = CurrentDate.date();
-				String item_date = convertDateToStandardForm(item.getEndDate()
-						.getMonth().toString(), item.getEndDate().getDay()
+				String item_date = convertDateToStandardForm(item.getDate()
+						.getMonth().toString(), item.getDate().getDay()
 						.toString());
 				try {
 					Date max = sdf.parse(deadline);
@@ -60,9 +60,8 @@ public class Popup extends Processor {
 				}
 			}
 		}
-		for (int i = 0; i < myownlist.getSize(); i++) {
-			// allowing pop up to stack on top of another
-			Notification.popUpNotice(myownlist.getListItem(i).toString(), i);
+		if (myownlist.getSize() != 0) {
+			Notification.popUpNotice();
 		}
 	}
 }

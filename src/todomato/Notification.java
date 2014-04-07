@@ -3,19 +3,21 @@
  */
 package todomato;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.plaf.basic.BasicArrowButton;
 
 /**
  * This class creates a pop up notification to appear on the desktop.
@@ -25,15 +27,16 @@ import javax.swing.WindowConstants;
  *         http://www.javacodegeeks.com/2012/10/create-new-message-notification
  *         -pop-up.html
  */
-public class Notification {
+public abstract class Notification extends Popup implements ActionListener {
+	private static int count = 0;
 
 	/**
 	 * @param taskToDo
 	 */
-	protected static void popUpNotice(String taskToDo, int n) {
+	protected static void popUpNotice() {
 		String msg = "~~~Reminder! Do now or never!~~~";
-		// pop up disappeared after 7sec
-		final int waitfor = 7000;
+		// pop up disappeared after 10sec
+		final int waitfor = 20000;
 		// create and set up the window
 		final JFrame frame = new JFrame("Reminder");
 		frame.setSize(300, 125);
@@ -46,7 +49,7 @@ public class Notification {
 		Insets toolHeight = Toolkit.getDefaultToolkit().getScreenInsets(
 				frame.getGraphicsConfiguration());
 		frame.setLocation((scrSize.width - frame.getWidth()), (scrSize.height
-				- (frame.getHeight() * (n + 1)) - toolHeight.bottom));
+				- (frame.getHeight()) - toolHeight.bottom));
 		frame.setLayout(new GridBagLayout());
 		frame.setAlwaysOnTop(true);
 
@@ -58,7 +61,11 @@ public class Notification {
 		constraints.insets = new Insets(5, 5, 5, 5);
 		constraints.fill = GridBagConstraints.BOTH;
 
-		JLabel textLabel = new JLabel(taskToDo, SwingConstants.CENTER);
+		JLabel textLabel = new JLabel();
+		buttonsAction(textLabel);
+
+		// (taskToDo, SwingConstants.CENTER);
+
 		textLabel.setPreferredSize(new Dimension(300, 100));
 		// frame.getContentPane().add(textLabel, BorderLayout.CENTER);
 		textLabel.setOpaque(false);
@@ -77,11 +84,7 @@ public class Notification {
 				frame.dispose();
 			}
 		});
-		/*
-		 * frame.add(new BasicArrowButton(BasicArrowButton.EAST),
-		 * BorderLayout.EAST); frame.add(new
-		 * BasicArrowButton(BasicArrowButton.WEST), BorderLayout.WEST);
-		 */
+
 		closeBt.setMargin(new Insets(1, 4, 1, 4));
 		closeBt.setFocusable(false);
 		frame.add(closeBt, constraints);
@@ -111,5 +114,55 @@ public class Notification {
 				}
 			};
 		}.start();
+	}
+
+	/**
+	 * @param textLabel
+	 * @return
+	 */
+	protected static void buttonsAction(final JLabel textLabel) {
+		// allow the next task to be shown after clicking the button
+		ActionListener actionListener_prev = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				// get the prev item in myownlist
+				if (count == 0) {
+					count = Popup.myownlist.getSize() - 1;
+					textLabel.setText(Popup.myownlist.getListItem(count)
+							.toString());
+
+				} else {
+					count--;
+					textLabel.setText(Popup.myownlist.getListItem(count)
+							.toString());
+				}
+			}
+		};
+		// allow the next task to be shown after clicking the button
+		ActionListener actionListener_next = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				// get the next item in myownlist
+				if (count == (Popup.myownlist.getSize())) {
+					textLabel.setText(Popup.myownlist.getListItem(count - 1)
+							.toString());
+					count = 0;
+				}
+				textLabel
+						.setText(Popup.myownlist.getListItem(count).toString());
+				count++;
+			}
+		};
+
+		// implementing buttons on the label
+		textLabel.setLayout(new BorderLayout());
+		JButton next = new BasicArrowButton(BasicArrowButton.EAST);
+		JButton prev = new BasicArrowButton(BasicArrowButton.WEST);
+		prev.addActionListener(actionListener_prev);
+		next.addActionListener(actionListener_next);
+		textLabel.add(prev, BorderLayout.WEST);
+		textLabel.add(next, BorderLayout.EAST);
+		textLabel.setText(Popup.myownlist.getListItem(0).toString());
+		count = 1;
 	}
 }
