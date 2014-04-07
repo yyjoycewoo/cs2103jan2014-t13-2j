@@ -94,6 +94,24 @@ public class Processor {
 		}
 		return -1;
 	}
+	
+	protected static Boolean isParseableByDate (String input) {
+		try {
+			parseDateString(input);
+		} catch (InvalidInputException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	protected static Boolean isParseableByTime (String input) {
+		try {
+			parseTimeString(input);
+		} catch (InvalidInputException e) {
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Converts "Jan 1" to "YYYY-MM-DD" (DateTime format) Other input formats
@@ -240,7 +258,7 @@ public class Processor {
 	 * @throws InvalidInputException
 	 */
 
-	protected static String parseTimeStringFromInput(String input)
+	protected static String parseTimeString(String input)
 			throws InvalidInputException {
 		String timeString = null;
 		if (input == null) {
@@ -382,8 +400,7 @@ public class Processor {
 		return PRIORITY_LOW;
 		
 	}
-	
-	
+		
 	protected static int parseRecurrencePeriodFromString(String input) {
 		if (isParseableByInt(input)) {
 			return Integer.parseInt(input);

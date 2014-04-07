@@ -12,6 +12,7 @@ import java.util.Collections;
 public class TaskList {
 	private static final String LINE_BREAK = "\r\n";
 	private ArrayList<Task> list;
+	private DateTime lastSyncTime;
 	
 	/**
 	 * Create a new empty TaskDTList
@@ -111,5 +112,13 @@ public class TaskList {
 	
 	public void reverse() {
 		Collections.reverse(list);
+	}
+	
+	public void setLastSyncTime (DateTime lastSyncTime) {
+		this.lastSyncTime = lastSyncTime;
+	}
+	
+	public DateTime getLastSyncTime () {
+		return lastSyncTime;
 	}
 }

@@ -27,7 +27,7 @@ public class RecurProcessor extends Processor {
 	protected static void addsRecurringTask(Task task) {
 		if (needsToBeRecurred(task)) {
 			Task newTask = new Task(task);
-			newTask.setDate(task.getDate().plusDays(task.getRecurrencePeriod()));
+			newTask.setEndDate(task.getEndDate().plusDays(task.getRecurrencePeriod()));
 			list.addToList(newTask);
 		}
 	}
@@ -38,12 +38,12 @@ public class RecurProcessor extends Processor {
 	 */
 	protected static Boolean checkIfDuplicateRecurTaskExist (Task task) {
 
-		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
+		DateTime recurDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
 		for (int i = 0; i < list.getSize(); i++) {
-			if (list.getListItem(i).getDate() == null) {
+			if (list.getListItem(i).getEndDate() == null) {
 				return false;
 			}
-			if (list.getListItem(i).getDate().equals(recurDate)) {
+			if (list.getListItem(i).getEndDate().equals(recurDate)) {
 				if (list.getListItem(i).compareDescAndLocation(task)) {
 					return true;
 				}
@@ -67,7 +67,7 @@ public class RecurProcessor extends Processor {
 			return false;
 		}
 		TimeZone SGT = TimeZone.getTimeZone("GMT+8");
-		DateTime recurDate = task.getDate().plusDays(task.getRecurrencePeriod());
+		DateTime recurDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
 		if (DateTime.today(SGT).numDaysFrom(recurDate) < task.getRecurrencePeriod()) {
 			if (!checkIfDuplicateRecurTaskExist(task)) {
 				return true;

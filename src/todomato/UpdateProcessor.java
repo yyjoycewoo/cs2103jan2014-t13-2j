@@ -176,7 +176,7 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
+		DateTime time = convertStringToDateTime(parseTimeString(argument
 				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
 		list.getListItem(index).setStartTime(time);
 		fileHandler.updateFile(list);
@@ -185,7 +185,7 @@ public class UpdateProcessor extends Processor {
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeStringFromInput(argument
+		DateTime time = convertStringToDateTime(parseTimeString(argument
 				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
 		list.getListItem(index).setEndTime(time);
 		fileHandler.updateFile(list);
@@ -196,7 +196,7 @@ public class UpdateProcessor extends Processor {
 			throws InvalidInputException {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_DATE)));
-		list.getListItem(index).setDate(date);
+		list.getListItem(index).setEndDate(date);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -264,7 +264,7 @@ public class UpdateProcessor extends Processor {
 		} catch (NumberFormatException e) {
 			return null;
 		}
-		if (list.getListItem(index).getDate() == null) {
+		if (list.getListItem(index).getEndDate() == null) {
 			return null;
 		}
 		list.getListItem(index).setRecurrencePeriod(userRecurrence);

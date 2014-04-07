@@ -191,7 +191,7 @@ public class TodomatoTable extends JTable {
 				list[i][DESC_COLUNM_INDEX] = checkNull(l.getListItem(i).getDescription());
 				list[i][STARTTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getStartTime());
 				list[i][ENDTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getEndTime());
-				list[i][DATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getDate());				
+				list[i][DATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getEndDate());				
 				list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());
 			}
 		}

@@ -8,7 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class DataSyncer {
+public class DataSyncer extends Processor {
 	
 	TaskList localList;
 	
@@ -23,6 +23,7 @@ public class DataSyncer {
 		JsonObject localJson = prepareData(this.localList, username, password, lastsync);
 		/*JsonObject responseJson = sendRequest(localJson);
 		localList = processResponse(responseJson);
+		
 		return localList;*/
 		return null;
 	}

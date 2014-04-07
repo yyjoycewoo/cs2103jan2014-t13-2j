@@ -64,11 +64,12 @@ public class AddProcessor extends Processor {
 	private static int INDEX_OF_DESC = 0;
 	private static int INDEX_OF_START_TIME = 1;
 	private static int INDEX_OF_END_TIME = 2;
-	private static int INDEX_OF_DATE = 3;
-	private static int INDEX_OF_LOCATION = 4;
-	private static int INDEX_OF_RECUR = 5;
-	private static int INDEX_OF_PRIORITY = 6;
-	private static int NO_OF_TASK_DETAILS = 7;
+	private static int INDEX_OF_START_DATE = 3;
+	private static int INDEX_OF_END_DATE = 4;
+	private static int INDEX_OF_LOCATION = 5;
+	private static int INDEX_OF_RECUR = 6;
+	private static int INDEX_OF_PRIORITY = 7;
+	private static int NO_OF_TASK_DETAILS = 8;
 	private static String TODAY = " today";
 	private static String TOMORROW1 = " tmr";
 	private static String TOMORROW2 = " tomorrow";
@@ -95,7 +96,6 @@ public class AddProcessor extends Processor {
 		}
 		Task userTask = null;
 		userTask = parseTask(input);
-		System.out.print(userTask.toString());
 		list.addToList(userTask);
 		fileHandler.updateFile(list);
 		displayList = list;
@@ -184,7 +184,7 @@ public class AddProcessor extends Processor {
 		Task userTask = new Task(taskDetails[INDEX_OF_DESC]);
 		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME]);
 		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME]);
-		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_DATE]);
+		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
 		int recurPeriod = 0;
 		try {
 			if (date == null && taskDetails[INDEX_OF_RECUR] != null) {
@@ -198,11 +198,10 @@ public class AddProcessor extends Processor {
 		}
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
-		userTask.setDate(date);
+		userTask.setEndDate(date);
 		userTask.setLocation(taskDetails[INDEX_OF_LOCATION]);
 		userTask.setRecurrencePeriod(recurPeriod);
 		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY]));
-		System.out.print(userTask.toString());
 		return userTask;
 	}
 	
@@ -224,7 +223,7 @@ public class AddProcessor extends Processor {
 			case 0:
 			case 1:
 				try {
-					taskDetails[INDEX_OF_START_TIME] = retrieveStartTime(input, spaceIndex);
+					taskDetails[INDEX_OF_START_TIME] = retrieveStartTime(input);
 				} catch (InvalidInputException invalidStartTime) {
 					errorsInInput[INDEX_OF_START_TIME] = true;
 				}
@@ -244,10 +243,10 @@ public class AddProcessor extends Processor {
 				break;
 			case 7:
 				try {
-					taskDetails[INDEX_OF_DATE] = retrieveDate(input);
+					taskDetails[INDEX_OF_END_DATE] = retrieveDate(input);
 				}
 				catch (InvalidInputException invalidDate) {
-					errorsInInput[INDEX_OF_DATE] = true;
+					errorsInInput[INDEX_OF_END_DATE] = true;
 				}
 				break;
 			case 8:
@@ -277,14 +276,24 @@ public class AddProcessor extends Processor {
 	/**
 	 * Retrieves the start time (first word) from input in the DateTime format (HH:MM)
 	 * @param input
-	 * @param spaceIndex
 	 * @return startTimeString
 	 * @throws InvalidInputException 
 	 */
 	
-	private static String retrieveStartTime (String input, int spaceIndex) throws InvalidInputException {
-		String startTimeString = (input.substring(0, spaceIndex));
-		startTimeString = parseTimeStringFromInput(startTimeString);
+	private static String retrieveStartTime (String input) throws InvalidInputException {
+		String startTimeString = null;
+		if (getFirstKeyword(input) == NOT_FOUND) {
+			startTimeString = input;
+		} else {
+			startTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
+		}
+		String parts[] = startTimeString.split(" ");
+		if (parts.length != 1) {
+			if (isParseableByDate(parts[0] + " " + parts[1])) {
+				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0] + " " + parts[1]);
+			} 
+		}
+		startTimeString = parseTimeString(startTimeString);
 		return startTimeString;
 	}
 	
@@ -298,7 +307,7 @@ public class AddProcessor extends Processor {
 	
 	private static String retrieveEndTime (String input, int spaceIndex) throws InvalidInputException {
 		String endTimeString = (input.substring(0, spaceIndex));
-		endTimeString = parseTimeStringFromInput(endTimeString);
+		endTimeString = parseTimeString(endTimeString);
 		return endTimeString;
 	}
 	
@@ -431,13 +440,13 @@ public class AddProcessor extends Processor {
 	
 	private static String setDateForTodayAndTomorrow (String input) {		
 		if (input.contains(TODAY)) {
-			taskDetails[INDEX_OF_DATE] = currentDate.toString();	
+			taskDetails[INDEX_OF_END_DATE] = currentDate.toString();	
 			input = input.substring(0,input.indexOf(TODAY)) + input.substring(input.indexOf(TODAY) + TODAY.length());
 		} else if (input.contains(TOMORROW1)) {
-			taskDetails[INDEX_OF_DATE] = currentDate.plusDays(1).toString();			
+			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(1).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW1)) + input.substring(input.indexOf(TOMORROW1) + TOMORROW1.length());
 		} else if (input.contains(TOMORROW2)) {
-			taskDetails[INDEX_OF_DATE] = currentDate.plusDays(1).toString();			
+			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(1).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW2)) + input.substring(input.indexOf(TOMORROW2) + TOMORROW2.length());
 		}
 		return input;

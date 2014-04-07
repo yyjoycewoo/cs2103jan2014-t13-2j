@@ -170,15 +170,15 @@ public class SortProcessor extends Processor{
 //  list[i] later than list[j]
 //	Tasks without date is considered latest
 	private static boolean compareDate(int i, int j) {
-		if(list.getListItem(i).getDate() == null) {
-			if(list.getListItem(j).getDate() == null) {
+		if(list.getListItem(i).getEndDate() == null) {
+			if(list.getListItem(j).getEndDate() == null) {
 				return false;
 			}
 			return true;
-		} if(list.getListItem(j).getDate() == null) {
+		} if(list.getListItem(j).getEndDate() == null) {
 			return false;
-		} if(list.getListItem(i).getDate()
-				.compareTo(list.getListItem(j).getDate()) > 0) {
+		} if(list.getListItem(i).getEndDate()
+				.compareTo(list.getListItem(j).getEndDate()) > 0) {
 			return true;
 		} 
 		return false;

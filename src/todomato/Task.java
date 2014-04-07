@@ -18,7 +18,8 @@ public class Task {
 	private DateTime startTime;
 	private DateTime endTime;
 	private DateTime noticeTime;
-	private DateTime date;
+	private DateTime startDate;
+	private DateTime endDate;
 	private String location;
 	private String eventId;
 	private DateTime updateTime;
@@ -37,10 +38,10 @@ public class Task {
 	}
 
 	public Task(String userDes, DateTime userStart, DateTime userEnd,
-			DateTime userDate, String userLocation) {
+			DateTime userEndDate, String userLocation) {
 		description = userDes;
 		startTime = userStart;
-		date = userDate;
+		endDate = userEndDate;
 		endTime = userEnd;
 		location = userLocation;
 		recurrencePeriod = 0;
@@ -50,11 +51,12 @@ public class Task {
 		isCompleted = false;
 	}
 
-	public Task(String userDes, DateTime userStart, DateTime userEnd,
-			DateTime userDate, String userLocation, int userRecurrencePeriod) {
+	public Task(String userDes, DateTime userStart, DateTime userEnd, DateTime userStartDate,
+			DateTime userEndDate, String userLocation, int userRecurrencePeriod) {
 		description = userDes;
 		startTime = userStart;
-		date = userDate;
+		startDate = userStartDate;
+		endDate = userEndDate;
 		endTime = userEnd;
 		location = userLocation;
 		recurrencePeriod = userRecurrencePeriod;
@@ -68,13 +70,22 @@ public class Task {
 		description = copy.getDescription();
 		startTime = copy.getStartTime();
 		endTime = copy.getEndTime();
-		date = copy.getDate();
+		startDate = copy.getStartDate();
+		endDate = copy.getEndDate();
 		location = copy.getLocation();
 		recurrencePeriod = copy.getRecurrencePeriod();
 		timeCreated = copy.getTimeCreated();
 		id = copy.getId();
 		priorityLevel = copy.getPriorityLevel();
 		isCompleted = copy.getCompleted();
+	}
+
+	private DateTime getStartDate() {
+		return startDate;
+	}
+	
+	private void setStartDate(DateTime startDate) {
+		this.startDate = startDate;
 	}
 
 	public static boolean isEqual(String string1, String string2) {
@@ -99,8 +110,8 @@ public class Task {
 		if (endTime != null) {
 			task += END_TIME_PREP + endTime;
 		}
-		if (date != null) {
-			task += DATE_PREP + date.format("MMM DD YYYY", new Locale("US"));
+		if (endDate != null) {
+			task += DATE_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
 		}
 		if (location != null) {
 			task += LOCATION_PREP + location;
@@ -122,8 +133,8 @@ public class Task {
 	 */
 	public String toFileString() {
 		String task = description;
-		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + date
-				+ SEPERATOR + location + SEPERATOR + recurrencePeriod
+		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + startDate 
+				+ SEPERATOR + endDate + SEPERATOR + location + SEPERATOR + recurrencePeriod
 				+ SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR
 				+ priorityLevel + SEPERATOR + isCompleted + SEPERATOR + eventId
 				+ SEPERATOR + updateTime + SEPERATOR + noticeTime;
@@ -143,7 +154,8 @@ public class Task {
 		String description = parts[0];
 		DateTime startTime = null;
 		DateTime endTime = null;
-		DateTime date = null;
+		DateTime startDate = null;
+		DateTime endDate = null;
 		String location = null;
 		String eventId = null;
 		DateTime updateTime = null;
@@ -155,30 +167,34 @@ public class Task {
 			endTime = new DateTime(parts[2]);
 		}
 		if (DateTime.isParseable(parts[3])) {
-			date = new DateTime(parts[3]);
+			startDate = new DateTime(parts[3]);
 		}
-		if (!parts[4].equals("null")) {
-			location = parts[4];
+		if (DateTime.isParseable(parts[4])) {
+			endDate = new DateTime(parts[4]);
 		}
-		int recurrencePeriod = Integer.parseInt(parts[5]);
-		int id = Integer.parseInt(parts[6]);
-		DateTime timeCreated = new DateTime(parts[7]);
-		String prioritylevel = parts[8];
+		if (!parts[5].equals("null")) {
+			location = parts[5];
+		}
+		int recurrencePeriod = Integer.parseInt(parts[6]);
+		int id = Integer.parseInt(parts[7]);
+		DateTime timeCreated = new DateTime(parts[8]);
+		String prioritylevel = parts[9];
 		Boolean isComplete = false;
-		if (parts[9].equals(IS_TRUE)) {
+		if (parts[10].equals(IS_TRUE)) {
 			isComplete = true;
 		}
-		eventId = parts[10];
-		if (DateTime.isParseable(parts[10])) {
-			updateTime = new DateTime(parts[10]);
+		eventId = parts[11];
+		if (DateTime.isParseable(parts[12])) {
+			updateTime = new DateTime(parts[12]);
 		}
-		if (DateTime.isParseable(parts[11])) {
-			noticeTime = new DateTime(parts[11]);
+		if (DateTime.isParseable(parts[13])) {
+			noticeTime = new DateTime(parts[13]);
 		}
 		Task userTask = new Task(description);
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
-		userTask.setDate(date);
+		userTask.setStartDate(startDate);
+		userTask.setEndDate(endDate);		
 		userTask.setLocation(location);
 		userTask.setRecurrencePeriod(recurrencePeriod);
 		userTask.setId(id);
@@ -223,12 +239,12 @@ public class Task {
 		this.location = location;
 	}
 
-	public void setDate(DateTime date) {
-		this.date = date;
+	public void setEndDate(DateTime date) {
+		this.endDate = date;
 	}
 
-	public DateTime getDate() {
-		return date;
+	public DateTime getEndDate() {
+		return endDate;
 	}
 
 	public int getRecurrencePeriod() {

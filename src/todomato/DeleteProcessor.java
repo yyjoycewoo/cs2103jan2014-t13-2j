@@ -126,10 +126,10 @@ public class DeleteProcessor extends Processor {
 
 	private static boolean isSameDate(int i, DateTime dateDT) {
 		// TODO Auto-generated method stub
-		if (list.getListItem(i).getDate() == null) {
+		if (list.getListItem(i).getEndDate() == null) {
 			return false;
 		}
-		if (list.getListItem(i).getDate().isSameDayAs(dateDT)) {
+		if (list.getListItem(i).getEndDate().isSameDayAs(dateDT)) {
 			return true;
 		}
 		return false;
