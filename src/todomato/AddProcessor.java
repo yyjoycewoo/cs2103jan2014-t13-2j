@@ -51,15 +51,17 @@ import java.util.regex.Pattern;
  */
 public class AddProcessor extends Processor {
 
+
 	private static String[] keywords = new String[] { " at ", " from ", 
-			" until ", " to ", " due ", " in ", " @", " on ", " recur ", " priority ", " !"};
+			" until ", " due ", " on ", " in ", " @", " recur ", " priority ", " !"};
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
+	private static final int NO_OF_KEYWORDS_FOR_TIME = 5;
 	private static int NOT_FOUND = -1;
 	private static String INVALID_INPUT = "Invalid Input format ";
 	private static String INVALID_START_TIME = "Invalid Start Time ";
 	private static String INVALID_END_TIME = "Invalid End Time ";
-	private static String INVALID_DATE = "Invalid Date format ";
+	private static String INVALID_END_DATE = "Invalid End Date format ";
 	private static String INVALID_RECUR = "Invalid Recur format : Need Date before adding recurrence period";
 	private static int INDEX_OF_DESC = 0;
 	private static int INDEX_OF_START_TIME = 1;
@@ -74,7 +76,7 @@ public class AddProcessor extends Processor {
 	private static String TOMORROW1 = " tmr";
 	private static String TOMORROW2 = " tomorrow";
 	private static String ADD_SUCCESSFUL = "Added ";
-	private static Boolean[] errorsInInput = {false, false, false, false, false, false, false};
+	private static Boolean[] errorsInInput = new Boolean[NO_OF_TASK_DETAILS];
 	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
 	private static DateTime currentDate = DateTime.today(TimeZone.getDefault());
 	
@@ -91,9 +93,7 @@ public class AddProcessor extends Processor {
 	 */
 	public static String processAdd(String input) throws NumberFormatException {
 		storeCurrentList();
-		for (int i = 0; i < errorsInInput.length; i++) {
-			errorsInInput[i] = false;
-		}
+		Arrays.fill(errorsInInput,false);
 		Task userTask = null;
 		userTask = parseTask(input);
 		list.addToList(userTask);
@@ -111,10 +111,10 @@ public class AddProcessor extends Processor {
 				case 2:
 					statusString += INVALID_END_TIME;
 					break;
-				case 3:
-					statusString += INVALID_DATE;
+				case 4:
+					statusString += INVALID_END_DATE;
 					break;
-				case 5:
+				case 6:
 					statusString += INVALID_RECUR;
 					break;
 				}
@@ -148,9 +148,11 @@ public class AddProcessor extends Processor {
 			taskDesExtracted = true;
 		}
 		
-		if (checkForTodayAndTomorrowStrings(input)) {
-			//Removes today and tomorrow from the string so that it does not appear in description
-			input = setDateForTodayAndTomorrow(input);
+		if (!isKeywordForTimePresentFound(input)) {
+			if (isTodayOrTomorrowFound(input)) {
+				//Removes today and tomorrow from the string so that it does not appear in description
+				input = setDateForTodayOrTomorrow(input);
+			}
 		}
 		
 		if (!keywordIsInString(input) && !taskDesExtracted) {
@@ -184,12 +186,26 @@ public class AddProcessor extends Processor {
 		Task userTask = new Task(taskDetails[INDEX_OF_DESC]);
 		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME]);
 		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME]);
-		DateTime date = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
+		DateTime startDate = convertStringToDateTime(taskDetails[INDEX_OF_START_DATE]);
+		DateTime endDate = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
+		if (startDate != null && endDate == null) {
+			endDate = startDate;
+		}
+		if (startDate != null && endDate != null) {
+			if (startDate.gt(endDate)) {
+				endDate = startDate;
+			}
+			if (endTime != null && startTime != null) {
+				if (endTime.lt(startTime)) {
+					endDate = startDate.plusDays(1);
+				}
+			}
+		}
 		int recurPeriod = 0;
 		try {
-			if (date == null && taskDetails[INDEX_OF_RECUR] != null) {
+			if (endDate == null && taskDetails[INDEX_OF_RECUR] != null) {
 				errorsInInput[INDEX_OF_RECUR] = true;
-			} else if (taskDetails[INDEX_OF_RECUR] != null && date != null){
+			} else if (taskDetails[INDEX_OF_RECUR] != null && endDate != null){
 				recurPeriod = parseRecurrencePeriodFromString(taskDetails[INDEX_OF_RECUR]);
 			}
 		}
@@ -198,7 +214,8 @@ public class AddProcessor extends Processor {
 		}
 		userTask.setStartTime(startTime);
 		userTask.setEndTime(endTime);
-		userTask.setEndDate(date);
+		userTask.setStartDate(startDate);
+		userTask.setEndDate(endDate);
 		userTask.setLocation(taskDetails[INDEX_OF_LOCATION]);
 		userTask.setRecurrencePeriod(recurPeriod);
 		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY]));
@@ -230,18 +247,13 @@ public class AddProcessor extends Processor {
 				break;
 			case 2:
 			case 3:
-			case 4:
 				try {
-					taskDetails[INDEX_OF_END_TIME] = retrieveEndTime(input,spaceIndex);
+					taskDetails[INDEX_OF_END_TIME] = retrieveEndTime(input);
 				} catch (InvalidInputException invalidEndTime) {
 					errorsInInput[INDEX_OF_END_TIME] = true;
 				}
 				break;
-			case 5:
-			case 6:
-				taskDetails[INDEX_OF_LOCATION] = retrieveLocation(input);
-				break;
-			case 7:
+			case 4:
 				try {
 					taskDetails[INDEX_OF_END_DATE] = retrieveDate(input);
 				}
@@ -249,11 +261,15 @@ public class AddProcessor extends Processor {
 					errorsInInput[INDEX_OF_END_DATE] = true;
 				}
 				break;
-			case 8:
+			case 5:
+			case 6:
+				taskDetails[INDEX_OF_LOCATION] = retrieveLocation(input);
+				break;
+			case 7:
 				taskDetails[INDEX_OF_RECUR] = retrieveRecurPeriod(input, spaceIndex);
 				break;
+			case 8:
 			case 9:
-			case 10:
 				taskDetails[INDEX_OF_PRIORITY] = retrievePriority(input,spaceIndex);
 				break;
 		}
@@ -287,13 +303,38 @@ public class AddProcessor extends Processor {
 		} else {
 			startTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
 		}
+		startTimeString = retrieveStartDateFromStartTime(startTimeString);
+		startTimeString = parseTimeString(startTimeString);
+		return startTimeString;
+	}
+	
+	private static String retrieveStartDateFromStartTime (String startTimeString) throws InvalidInputException {
 		String parts[] = startTimeString.split(" ");
-		if (parts.length != 1) {
+		if (parts.length == 3) {
 			if (isParseableByDate(parts[0] + " " + parts[1])) {
 				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0] + " " + parts[1]);
-			} 
+				startTimeString = parseTimeString(parts[2]);
+			} else if (isParseableByDate (parts[1] + " " + parts[2])) {
+				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[1] + " " + parts[2]);
+				startTimeString = parseTimeString(parts[0]);
+			}
+		} else if (parts.length == 2) {
+			if (isParseableByDate(parts[0])) {
+				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0]);
+				startTimeString = parts[1];
+			} else if (isParseableByDate(parts[1])) {
+				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[1]);
+				startTimeString = parts[0];
+			} else if (isParseableByDate (parts[0] + " " + parts[1])) {
+				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0] + " " + parts[1]);
+				startTimeString = null;
+			}
+		} else if (parts.length == 1) {
+			if (isParseableByDate(parts[0])) {
+				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0]);
+				startTimeString = parts[0];
+			}
 		}
-		startTimeString = parseTimeString(startTimeString);
 		return startTimeString;
 	}
 	
@@ -305,9 +346,45 @@ public class AddProcessor extends Processor {
 	 * @throws InvalidInputException 
 	 */
 	
-	private static String retrieveEndTime (String input, int spaceIndex) throws InvalidInputException {
-		String endTimeString = (input.substring(0, spaceIndex));
+	private static String retrieveEndTime (String input) throws InvalidInputException {
+		String endTimeString = null;
+		if (getFirstKeyword(input) == NOT_FOUND) {
+			endTimeString = input;
+		} else {
+			endTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
+		}
+		endTimeString = retrieveEndDateFromEndTime(endTimeString);
 		endTimeString = parseTimeString(endTimeString);
+		return endTimeString;
+	}
+	
+	private static String retrieveEndDateFromEndTime (String endTimeString) throws InvalidInputException {
+		String parts[] = endTimeString.split(" ");
+		if (parts.length == 3) {
+			if (isParseableByDate(parts[0] + " " + parts[1])) {
+				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0] + " " + parts[1]);
+				endTimeString = parseTimeString(parts[2]);
+			} else if (isParseableByDate (parts[1] + " " + parts[2])) {
+				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[1] + " " + parts[2]);
+				endTimeString = parseTimeString(parts[0]);
+			}
+		} else if (parts.length == 2) {
+			if (isParseableByDate(parts[0])) {
+				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0]);
+				endTimeString = parts[1];
+			} else if (isParseableByDate(parts[1])) {
+				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[1]);
+				endTimeString = parts[0];
+			} else if (isParseableByDate (parts[0] + " " + parts[1])) {
+				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0] + " " + parts[1]);
+				endTimeString = null;
+			}
+		} else if (parts.length == 1) {
+			if (isParseableByDate(parts[0])) {
+				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0]);
+				endTimeString = parts[0];
+			}
+		}
 		return endTimeString;
 	}
 	
@@ -339,6 +416,15 @@ public class AddProcessor extends Processor {
 	private static String retrieveDate (String input) throws InvalidInputException {
 		String dateString = parseDateString(input);
 		return dateString;
+	}
+	
+	private static Boolean isKeywordForTimePresentFound (String input) {
+		for (int i = 0; i < NO_OF_KEYWORDS_FOR_TIME; i++) {
+			if (input.contains(keywords[i])) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 
@@ -425,7 +511,7 @@ public class AddProcessor extends Processor {
 	 * @return true or false
 	 */
 	
-	private static Boolean checkForTodayAndTomorrowStrings (String input) {
+	private static Boolean isTodayOrTomorrowFound (String input) {
 		if (input.contains(TODAY) || input.contains(TOMORROW1) || input.contains(TOMORROW2)) {
 			return true;
 		}
@@ -438,7 +524,7 @@ public class AddProcessor extends Processor {
 	 * @return input without the today or tomorrow word
 	 */
 	
-	private static String setDateForTodayAndTomorrow (String input) {		
+	private static String setDateForTodayOrTomorrow (String input) {		
 		if (input.contains(TODAY)) {
 			taskDetails[INDEX_OF_END_DATE] = currentDate.toString();	
 			input = input.substring(0,input.indexOf(TODAY)) + input.substring(input.indexOf(TODAY) + TODAY.length());

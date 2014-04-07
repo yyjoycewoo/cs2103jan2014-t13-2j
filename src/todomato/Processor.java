@@ -43,6 +43,7 @@ public class Processor {
 	
 	protected static final String[] days = new String[] { "mon", "tues", "wed",
 			"thurs", "fri", "sat", "sun" };
+	protected static final String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
 	protected static final String meridiems[] = new String[] { "am", "pm" };
 
 	/**
@@ -97,7 +98,10 @@ public class Processor {
 	
 	protected static Boolean isParseableByDate (String input) {
 		try {
-			parseDateString(input);
+			input = parseDateString(input);
+			if (!DateTime.isParseable(input)) {
+				return false;
+			}
 		} catch (InvalidInputException e) {
 			return false;
 		}
@@ -127,7 +131,7 @@ public class Processor {
 	protected static String parseDateString(String input)
 			throws InvalidInputException {
 		if (input == null) {
-			throw new InvalidInputException("INVALID_DATE");
+			throw new InvalidInputException(INVALID_DATE);
 		}
 
 		if (DateTime.isParseable(input)) {
@@ -178,7 +182,6 @@ public class Processor {
 	 */
 	
 	protected static Boolean hasTodayOrTmr (String input) {
-		String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
 		for (int i = 0; i < dateKeywords.length; i++) {
 			if (input.contains(dateKeywords[i])) {
 				return true;
@@ -195,7 +198,6 @@ public class Processor {
 	
 	protected static String getDateIfTdyOrTmrInString (String input) {
 		String userDate;
-		String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
 		for (int i = 0; i < dateKeywords.length; i++) {
 			if (input.contains(dateKeywords[i])) {
 				switch (i) {

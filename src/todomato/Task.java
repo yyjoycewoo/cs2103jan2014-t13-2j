@@ -80,14 +80,6 @@ public class Task {
 		isCompleted = copy.getCompleted();
 	}
 
-	private DateTime getStartDate() {
-		return startDate;
-	}
-	
-	private void setStartDate(DateTime startDate) {
-		this.startDate = startDate;
-	}
-
 	public static boolean isEqual(String string1, String string2) {
 		return (string1 == string2)
 				|| ((string1 != null) && string1.equals(string2));
@@ -106,6 +98,9 @@ public class Task {
 		String task = description;
 		if (startTime != null) {
 			task += START_TIME_PREP + startTime;
+		}
+		if (startDate != null) {
+			task += DATE_PREP + startDate.format("MMM DD YYYY", new Locale("US"));
 		}
 		if (endTime != null) {
 			task += END_TIME_PREP + endTime;
@@ -237,6 +232,14 @@ public class Task {
 
 	public void setLocation(String location) {
 		this.location = location;
+	}
+
+	public void setStartDate(DateTime date) {
+		this.startDate = date;
+	}
+
+	public DateTime getStartDate() {
+		return startDate;
 	}
 
 	public void setEndDate(DateTime date) {
