@@ -55,6 +55,11 @@ public class Processor {
 		lastList.deepCopy(list);
 		undoList.push(lastList);
 	}
+	
+	protected static void setUserNameAndPassword() {
+		list.setPassword("PLACEHOLDER");
+		list.setUserName("PLACEHOLDER");
+	}
 
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"

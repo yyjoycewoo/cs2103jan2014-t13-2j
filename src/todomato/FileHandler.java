@@ -50,6 +50,8 @@ public class FileHandler {
 		
 		try {
 			Boolean isSyncTimeRetrieved = false;
+			Boolean isUserNameRetrieved = false;
+			Boolean isPasswordRetrieved = false;
 			String currentLine;
 			Task currentTask;
 			TaskList taskList = new TaskList();
@@ -59,6 +61,12 @@ public class FileHandler {
 				if (!isSyncTimeRetrieved) {
 					taskList.setLastSyncTime (new DateTime(currentLine));
 					isSyncTimeRetrieved = true;
+				} else if (!isUserNameRetrieved) {
+					taskList.setUserName(currentLine);
+					isUserNameRetrieved = true;
+				} else if (!isPasswordRetrieved) {
+					taskList.setPassword(currentLine);
+					isPasswordRetrieved = true;
 				} else {
 					currentTask = readTask(currentLine);
 					taskList.addToList(currentTask);
@@ -96,7 +104,8 @@ public class FileHandler {
 				file.createNewFile();
 			}
 			
-			content = taskList.getLastSyncTime() + LINE_BREAK;
+			content = taskList.getLastSyncTime() + LINE_BREAK + taskList.getUserName() 
+					+ LINE_BREAK + taskList.getPassword() + LINE_BREAK;
 			bufferedWriter.write(content);
 			
 			for (Task task : taskList.getList()) {

@@ -31,6 +31,7 @@ public class SplitProcessorsHandler {
 	 */
 	public static String processCommand(String userInput)
 			throws InvalidInputException {
+		Processor.setUserNameAndPassword();
 		command = new Command(userInput.split(" ", 2));
 		if (command.getAction().equalsIgnoreCase(EXIT_COMMAND)) {
 			System.exit(0);
