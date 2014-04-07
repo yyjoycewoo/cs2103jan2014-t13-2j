@@ -13,6 +13,8 @@ public class TaskList {
 	private static final String LINE_BREAK = "\r\n";
 	private ArrayList<Task> list;
 	private DateTime lastSyncTime;
+	private String userName;
+	private String password;
 	
 	/**
 	 * Create a new empty TaskDTList
@@ -120,5 +122,21 @@ public class TaskList {
 	
 	public DateTime getLastSyncTime () {
 		return lastSyncTime;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }
