@@ -64,8 +64,6 @@ public abstract class Notification extends Popup implements ActionListener {
 		JLabel textLabel = new JLabel();
 		buttonsAction(textLabel);
 
-		// (taskToDo, SwingConstants.CENTER);
-
 		textLabel.setPreferredSize(new Dimension(300, 100));
 		// frame.getContentPane().add(textLabel, BorderLayout.CENTER);
 		textLabel.setOpaque(false);
@@ -163,6 +161,8 @@ public abstract class Notification extends Popup implements ActionListener {
 		textLabel.add(prev, BorderLayout.WEST);
 		textLabel.add(next, BorderLayout.EAST);
 		textLabel.setText(Popup.myownlist.getListItem(0).toString());
+		// Centralizing the text on the JLabel
+		textLabel.setHorizontalAlignment(JLabel.CENTER);
 		count = 1;
 	}
 }
