@@ -49,7 +49,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 	public TodomatoFrame() {
 		super("Todomato");
-		super.setDefaultLookAndFeelDecorated(true);
 		setSize(680,500);
 		setMinimumSize(new Dimension(400, 200));
 		setLocationRelativeTo(null);
