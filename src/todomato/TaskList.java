@@ -13,8 +13,8 @@ public class TaskList {
 	private static final String LINE_BREAK = "\r\n";
 	private ArrayList<Task> list;
 	private DateTime lastSyncTime;
-	private String userName;
-	private String password;
+	private String userName=null;
+	private String password=null;
 	
 	/**
 	 * Create a new empty TaskDTList
@@ -138,5 +138,10 @@ public class TaskList {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public void setUserNameAndPassword(String username, String password) {
+		setUserName(username);
+		setPassword(password);
 	}
 }
