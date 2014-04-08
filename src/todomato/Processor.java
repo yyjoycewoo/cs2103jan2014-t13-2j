@@ -56,9 +56,8 @@ public class Processor {
 		undoList.push(lastList);
 	}
 	
-	protected static void setUserNameAndPassword() {
-		list.setPassword("PLACEHOLDER");
-		list.setUserName("PLACEHOLDER");
+	protected static void setUserNameAndPassword(String username, String password) {
+		list.setUserNameAndPassword(username, password);
 	}
 
 	/**
