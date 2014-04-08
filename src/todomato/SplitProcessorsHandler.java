@@ -20,6 +20,7 @@ public class SplitProcessorsHandler {
 	private static final String FIND_COMMAND = "find";
 	private static final String RECUR_COMMAND = "recur";
 	private static final String NOTIFY_COMMAND = "notify";
+	private static final String SYNC_COMMAND = "sync";
 
 	private static Command command;
 
@@ -65,6 +66,9 @@ public class SplitProcessorsHandler {
 		}
 		if (command.getAction().equals(NOTIFY_COMMAND)) {
 			return NotifyProcessor.processNotify(command.getArgument());
+		}
+		if (command.getAction().equals(SYNC_COMMAND)) {
+			return SyncProcessor.processSync();
 		}
 		// Do nothing if empty string is entered
 		if (command.getAction().equals("")) {

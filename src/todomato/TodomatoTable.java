@@ -15,7 +15,8 @@ public class TodomatoTable extends JTable {
 	private static final String DESC_HEADER = "Description";
 	private static final String STARTTIME_HEADER = "Start Time";
 	private static final String ENDTIME_HEADER = "End Time";
-	private static final String DATE_HEADER = "Date";
+	private static final String STARTDATE_HEADER = "Start Date";
+	private static final String ENDDATE_HEADER = "End Date";
 	private static final String LOCATION_HEADER = "Location";
 	
 	//constants for preferred column widths
@@ -23,7 +24,8 @@ public class TodomatoTable extends JTable {
 	private static final int DESC_COLUNM_WIDTH = 205;
 	private static final int STARTTIME_COLUNM_WIDTH = 60;
 	private static final int ENDTIME_COLUNM_WIDTH = 60;
-	private static final int DATE_COLUNM_WIDTH = 70;
+	private static final int STARTDATE_COLUNM_WIDTH = 70;
+	private static final int ENDDATE_COLUNM_WIDTH = 70;
 	private static final int LOCATION_COLUNM_WIDTH = 100;
 
 	//constants for column indices
@@ -31,15 +33,17 @@ public class TodomatoTable extends JTable {
 	private static final int DESC_COLUNM_INDEX = 1;
 	private static final int STARTTIME_COLUNM_INDEX = 2;
 	private static final int ENDTIME_COLUNM_INDEX = 3;
-	private static final int DATE_COLUNM_INDEX = 4;
-	private static final int LOCATION_COLUNM_INDEX = 5;
+	private static final int STARTDATE_COLUNM_INDEX = 4;
+	private static final int ENDDATE_COLUNM_INDEX = 5;
+	private static final int LOCATION_COLUNM_INDEX = 6;
 
 	//constants for minimum column widths
 	private static final int INDEX_MIN_WIDTH = 10;
 	private static final int DESC_MIN_WIDTH = 50;
 	private static final int STARTTIME_MIN_WIDTH = 50;
 	private static final int ENDTIME_MIN_WIDTH = 50;
-	private static final int DATE_MIN_WIDTH = 60;
+	private static final int STARTDATE_MIN_WIDTH = 60;
+	private static final int ENDDATE_MIN_WIDTH = 60;
 	private static final int LOCATION_MIN_WIDTH = 50;
 
 	//constants for background colour for the rows
@@ -57,7 +61,10 @@ public class TodomatoTable extends JTable {
 	TaskList list = Processor.getDisplayList();
 	
 	public TodomatoTable() {
-		String[] columnNames = {"Index", "Description", "Start Time", " End Time", "Date", "Location"};
+		String[] columnNames = {INDEX_HEADER, DESC_HEADER,
+				STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,
+				ENDDATE_HEADER, LOCATION_HEADER};
+		
 		data = loadData(Processor.getDisplayList());
 
 		DefaultTableModel model = new DefaultTableModel(data, columnNames) {
@@ -162,14 +169,16 @@ public class TodomatoTable extends JTable {
 		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setPreferredWidth(DESC_COLUNM_WIDTH);		
 		table.getColumnModel().getColumn(STARTTIME_COLUNM_INDEX).setPreferredWidth(STARTTIME_COLUNM_WIDTH);
 		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setPreferredWidth(ENDTIME_COLUNM_WIDTH);
-		table.getColumnModel().getColumn(DATE_COLUNM_INDEX).setPreferredWidth(DATE_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setPreferredWidth(STARTDATE_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setPreferredWidth(ENDDATE_COLUNM_WIDTH);
 		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setPreferredWidth(LOCATION_COLUNM_WIDTH);
 
 		table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setMinWidth(INDEX_MIN_WIDTH);
 		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setMinWidth(DESC_MIN_WIDTH);		
 		table.getColumnModel().getColumn(STARTTIME_COLUNM_INDEX).setMinWidth(STARTTIME_MIN_WIDTH);
 		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setMinWidth(ENDTIME_MIN_WIDTH);
-		table.getColumnModel().getColumn(DATE_COLUNM_INDEX).setMinWidth(DATE_MIN_WIDTH);
+		table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setMinWidth(STARTDATE_MIN_WIDTH);
+		table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setMinWidth(ENDDATE_MIN_WIDTH);
 		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setMinWidth(LOCATION_MIN_WIDTH);
 
 		table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
@@ -191,7 +200,8 @@ public class TodomatoTable extends JTable {
 				list[i][DESC_COLUNM_INDEX] = checkNull(l.getListItem(i).getDescription());
 				list[i][STARTTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getStartTime());
 				list[i][ENDTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getEndTime());
-				list[i][DATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getEndDate());				
+				list[i][STARTDATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getStartDate());		
+				list[i][ENDDATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getEndDate());		
 				list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());
 			}
 		}
@@ -221,8 +231,8 @@ public class TodomatoTable extends JTable {
 
 	class CustModel extends AbstractTableModel {
 		private String[] columnNames = {INDEX_HEADER, DESC_HEADER,
-				STARTTIME_HEADER, ENDTIME_HEADER, DATE_HEADER,
-				LOCATION_HEADER};
+				STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,
+				ENDDATE_HEADER, LOCATION_HEADER};
 		private Object[][] data = loadData(list);
 
 		public CustModel(Object[][] data) {
