@@ -200,7 +200,7 @@ public class AddProcessor extends Processor {
 					endDate = startDate.plusDays(1);
 				}
 				if (startDate.equals(endDate)) {
-					if (startTime.lt(endTime)) {
+					if (startTime.gt(endTime)) {
 						errorsInInput[INDEX_OF_START_TIME] = true;
 						startTime = null;
 					}
