@@ -23,7 +23,7 @@ public class UndoProcessor extends Processor {
 			//get latest list from undoList
 			list = undoList.pop();	
 			fileHandler.updateFile(list);
-			displayList = list;
+			displayList.deepCopy(list);
 			return SUCCESS_MSG;
 		} else {
 			return NO_CHANGES_TO_UNDO_MSG;
