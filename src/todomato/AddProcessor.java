@@ -98,7 +98,7 @@ public class AddProcessor extends Processor {
 		userTask = parseTask(input);
 		list.addToList(userTask);
 		fileHandler.updateFile(list);
-		displayList = list;
+		displayList.deepCopy(list);
 		String statusString = "";
 		Boolean errorPresent = false;
 		for (int i = 0; i < errorsInInput.length; i++) {
@@ -238,13 +238,13 @@ public class AddProcessor extends Processor {
 		}
 		switch (keywordType) {
 			case 0:
+			case 1:
 				try {
 					taskDetails[INDEX_OF_START_TIME] = retrieveStartTime(input);
 				} catch (InvalidInputException invalidStartTime) {
 					errorsInInput[INDEX_OF_START_TIME] = true;
 				}
 				break;
-			case 1:
 			case 2:
 			case 3:
 				try {
@@ -414,6 +414,9 @@ public class AddProcessor extends Processor {
 	 */
 	
 	private static String retrieveDate (String input) throws InvalidInputException {
+		if (!isParseableByDate(input)) {
+			throw new InvalidInputException(INVALID_DATE);
+		} 
 		String dateString = parseDateString(input);
 		return dateString;
 	}

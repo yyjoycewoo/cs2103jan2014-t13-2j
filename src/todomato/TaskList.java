@@ -34,14 +34,14 @@ public class TaskList {
 	}
 	
 	/**
-	 * Delete TaskDT i from the TaskDTList
+	 * Delete Task i from the TaskDTList
 	 * @param i index of TaskDT to be deleted
-	 * @return TaskDT deleted
+	 * @return Task deleted
 	 */
 	public Task deleteListItem(int i){
-		Task TaskDTDeleted = list.get(i);
+		Task TaskDeleted = list.get(i);
 		list.remove(i);
-		return TaskDTDeleted;
+		return TaskDeleted;
 	}
 	
 	/**
@@ -58,6 +58,20 @@ public class TaskList {
 	 */
 	public Task getListItem(int i) {
 		return list.get(i);
+	}
+	
+	/**
+	 * Get the index at which the task with the id id can be found
+	 * @param id id of Task to get
+	 * @return index of Task with id id, or -1 if Task cannot be found
+	 */
+	public int getItem(int id) {
+		for (int i=0; i<list.size(); i++) {
+			if (list.get(i).getId() == id) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	@Override

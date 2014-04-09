@@ -78,9 +78,8 @@ public class DeleteProcessor extends Processor {
 			else {
 				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr);
 			}
+			displayList.deepCopy(list);
 			fileHandler.updateFile(list);
-
-			displayList = list;
 			
 			logger.log(Level.INFO, "end of processing");
 			return statusMessage;
@@ -97,10 +96,14 @@ public class DeleteProcessor extends Processor {
 	
 	private static String deleteCompleted() {
 		int numberOfTasksDeleted = 0;
-		for (int i = list.getSize() - 1; i >= 0 ; i--) { 
-			if (list.getListItem(i).getCompleted()) {
-				list.deleteListItem(i);
-				numberOfTasksDeleted++;				
+		for (int i = displayList.getSize() - 1; i >= 0 ; i--) { 
+			if (displayList.getListItem(i).getCompleted()) {
+				int listIndex = list.getItem(displayList.getListItem(i).getId());
+				
+				displayList.deleteListItem(i);
+				list.deleteListItem(listIndex);
+				
+				numberOfTasksDeleted++;
 			}
 		}
 		return Integer.toString(numberOfTasksDeleted);
@@ -115,9 +118,13 @@ public class DeleteProcessor extends Processor {
 			return INVALID_DATE;
 		}
 		DateTime dateDT = convertStringToDateTime(date);
-		for (int i = list.getSize() - 1; i >= 0; i--) {
+		for (int i = displayList.getSize() - 1; i >= 0; i--) {
 			if(isSameDate(i,dateDT)) {
-				list.deleteListItem(i);
+				int listIndex = list.getItem(displayList.getListItem(i).getId());
+				
+				displayList.deleteListItem(i);
+				list.deleteListItem(listIndex);
+				
 				numberOfTasksDeleted++;
 			}
 		}
@@ -137,8 +144,12 @@ public class DeleteProcessor extends Processor {
 
 	private static String deleteAll() {
 		int numberOfTasksDeleted = 0;
-		while(list.getSize() != 0) {
-			list.deleteListItem(0);
+		while(displayList.getSize() != 0) {
+			int listIndex = list.getItem(displayList.getListItem(0).getId());
+			
+			displayList.deleteListItem(0);
+			list.deleteListItem(listIndex);
+			
 			numberOfTasksDeleted++;
 		}
 		return Integer.toString(numberOfTasksDeleted);
@@ -146,8 +157,13 @@ public class DeleteProcessor extends Processor {
 	
 	private static String deleteSingle(String indexString) {
 		int index = Integer.parseInt(indexString) - 1;
-		Task deletedTask = list.getListItem(index);
-		list.deleteListItem(index);
+		Task deletedTask = displayList.getListItem(index);
+
+		int listIndex = list.getItem(displayList.getListItem(index).getId());
+		
+		displayList.deleteListItem(index);
+		list.deleteListItem(listIndex);
+		
 		return deletedTask.toString();
 	}
 	

@@ -20,7 +20,7 @@ public class RedoProcessor extends Processor {
 			if (!redoList.isEmpty()) {
 				list = redoList.pop();	
 				fileHandler.updateFile(list);
-				displayList = list;
+				displayList.deepCopy(list);
 				return SUCCESS_MSG;
 			} else {
 				return NO_CHANGES_TO_REDO_MSG;
