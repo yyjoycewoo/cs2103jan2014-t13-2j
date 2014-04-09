@@ -63,13 +63,14 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_STIME = 11;
 	private static final int NO_OF_CHAR_IN_ETIME = 9;
 	private static final int NO_OF_CHAR_IN_LOC = 10;
+	private static final int NO_OF_CHAR_IN_SDATE = 11;
 	private static final int NO_OF_CHAR_IN_DESC = 6;
-	private static final int NO_OF_CHAR_IN_DATE = 6;
+	private static final int NO_OF_CHAR_IN_EDATE = 9;
 	private static final int NO_OF_CHAR_IN_RECUR = 7;
 	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
 
 	private static String[] updateKeywords = new String[] { " starttime ",
-			" endtime ", " desc ", " date ", " location ", " recur ",
+			" endtime ", " desc ", " startdate ", " enddate ", " location ", " recur ",
 			" priority ", " complete", " !", " @" };
 
 	/**
@@ -84,7 +85,7 @@ public class UpdateProcessor extends Processor {
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		int index = getTaskIndex(argument) - 1;
 		printInvalidIndexMsg(index);
 		whichToEdit = findDetailToEdit(argument);
@@ -115,25 +116,28 @@ public class UpdateProcessor extends Processor {
 					updateDesc(index, whichToEdit[2], argument);
 					break;
 				case 3:
-					updateDate(index, whichToEdit[3], argument);
+					updateStartDate(index,whichToEdit[3],argument);
 					break;
 				case 4:
-					updateLocation(index, whichToEdit[4], argument);
+					updateEndDate(index, whichToEdit[4], argument);
 					break;
 				case 5:
-					updateRecur(index, whichToEdit[5], argument);
+					updateLocation(index, whichToEdit[5], argument);
 					break;
 				case 6:
-					updatePriority(index, whichToEdit[6], argument);
+					updateRecur(index, whichToEdit[6], argument);
 					break;
 				case 7:
-					updateCompletion(index);
+					updatePriority(index, whichToEdit[7], argument);
 					break;
 				case 8:
+					updateCompletion(index);
+					break;
+				case 9:
 					// for !
 					updatePriority(index, whichToEdit[8], argument);
 					break;
-				case 9:
+				case 10:
 					// for @
 					updateLocation(index, whichToEdit[9], argument);
 					break;
@@ -182,6 +186,7 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
+	
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
@@ -191,12 +196,31 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-
-	private static Task updateDate(int index, int editDate, String argument)
+	
+	private static Task updateStartDate(int index, int editDate, String argument)
 			throws InvalidInputException {
 		DateTime date = convertStringToDateTime(parseDateString(argument
-				.substring(editDate + NO_OF_CHAR_IN_DATE)));
+				.substring(editDate + NO_OF_CHAR_IN_SDATE)));
+		list.getListItem(index).setStartDate(date);
+		if (list.getListItem(index).getEndDate() != null) {
+			if (list.getListItem(index).getStartDate().gt(list.getListItem(index).getEndDate())) {
+				list.getListItem(index).setEndDate(date);
+			}
+		}
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	private static Task updateEndDate(int index, int editDate, String argument)
+			throws InvalidInputException {
+		DateTime date = convertStringToDateTime(parseDateString(argument
+				.substring(editDate + NO_OF_CHAR_IN_EDATE)));
 		list.getListItem(index).setEndDate(date);
+		if (list.getListItem(index).getStartDate() != null) {
+			if (list.getListItem(index).getEndDate().lt(list.getListItem(index).getStartDate())) {
+				list.getListItem(index).setStartDate(date);
+			}
+		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -305,7 +329,11 @@ public class UpdateProcessor extends Processor {
 	 * @return updated tasks
 	 */
 	private static Task updateCompletion(int index) {
-		list.getListItem(index).setCompleted(true);
+		if (list.getListItem(index).getCompleted()) {
+			list.getListItem(index).setCompleted(false);
+		} else {
+			list.getListItem(index).setCompleted(true);
+		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -316,7 +344,7 @@ public class UpdateProcessor extends Processor {
 	 * @return the starting index of which task detail to change
 	 */
 	private static int[] findDetailToEdit(String argument) {
-		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 		for (int i = 0; i < edit.length; i++) {
 			if (argument.contains(updateKeywords[i])) {
 				edit[i] = argument.indexOf(updateKeywords[i]);

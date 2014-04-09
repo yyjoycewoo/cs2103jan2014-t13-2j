@@ -78,9 +78,8 @@ public class DeleteProcessor extends Processor {
 			else {
 				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr);
 			}
-			fileHandler.updateFile(list);
-
 			displayList.deepCopy(list);
+			fileHandler.updateFile(list);
 			
 			logger.log(Level.INFO, "end of processing");
 			return statusMessage;
