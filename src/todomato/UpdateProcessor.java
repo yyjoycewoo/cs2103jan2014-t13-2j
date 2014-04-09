@@ -90,7 +90,7 @@ public class UpdateProcessor extends Processor {
 		whichToEdit = findDetailToEdit(argument);
 		updater(argument, whichToEdit, index);
 
-		displayList = list;
+		displayList.deepCopy(list);
 		return list.getListItem(index).toString();
 	}
 
