@@ -60,7 +60,6 @@ public class SortProcessor extends Processor{
 			return INVALID_INPUT_MISSING_ARGUMENT;
 		}
 		
-		String statusMessage = "";
 		String argArr[] = argument.split(" ", 2);
 		String type = argArr[0];
 		String order = "";
@@ -69,22 +68,19 @@ public class SortProcessor extends Processor{
 		}
 		
 		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_START_DATE)) {
-			statusMessage = sortByStartDate(order);
+			return sortByStartDate(order);
 		}
-		else if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_END_DATE)) {
-			statusMessage = sortByEndDate(order);
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_END_DATE)) {
+			return sortByEndDate(order);
 		}
-		else if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
-			statusMessage = sortByPriority(order);
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
+			return sortByPriority(order);
 		}
-		else if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
-			statusMessage = sortByCompletion(order);
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
+			return sortByCompletion(order);
 		}
-		else {
-			statusMessage = INVALID_INPUT_TYPE;
-		}
-		displayList = list;
-		return statusMessage;
+		
+		return INVALID_INPUT_TYPE;
 	}
 	
 	// Sort in order of..
@@ -115,7 +111,7 @@ public class SortProcessor extends Processor{
 		if (isAscending(order)) {
 			displayList.reverse();
 		}
-		fileHandler.updateFile(list);
+		//fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_PRIORITY;
 	}
 	
@@ -131,7 +127,7 @@ public class SortProcessor extends Processor{
 		if (isDescending(order)) {
 			displayList.reverse();
 		}
-		fileHandler.updateFile(list);
+		//fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
 	}
 	
@@ -147,7 +143,7 @@ public class SortProcessor extends Processor{
 		if (isDescending(order)) {
 			displayList.reverse();
 		}
-		fileHandler.updateFile(list);
+		//fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
 	}
 	
