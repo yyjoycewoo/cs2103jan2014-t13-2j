@@ -42,7 +42,7 @@ package todomato;
 
 public class SortProcessor extends Processor{
 	private static final String ARGUMENT_SORT_BY_START_DATE = "startdate";
-	private static final String ARGUMENT_SORT_BY_END_DATE = "enddate";
+	private static final String ARGUMENT_SORT_BY_DATE = "date";
 	private static final String ARGUMENT_SORT_BY_PRIORITY = "priority";
 	private static final String ARGUMENT_SORT_BY_COMPLETION = "complete";
 	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
@@ -70,8 +70,8 @@ public class SortProcessor extends Processor{
 		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_START_DATE)) {
 			return sortByStartDate(order);
 		}
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_END_DATE)) {
-			return sortByEndDate(order);
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_DATE)) {
+			return sortByDate(order);
 		}
 		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
 			return sortByPriority(order);
@@ -134,12 +134,12 @@ public class SortProcessor extends Processor{
 	// Sort in order of..
 	// Default/Ascending: Most recent -> Least recent -> No date
 	// Descending: No date -> Least recent -> Most recent
-	private static String sortByEndDate(String order) {
+	private static String sortByDate(String order) {
 		if (!isValidOrder(order)) {
 			return INVALID_INPUT_ORDER;
 		}
 		
-		bubbleSort(ARGUMENT_SORT_BY_END_DATE);
+		bubbleSort(ARGUMENT_SORT_BY_DATE);
 		if (isDescending(order)) {
 			displayList.reverse();
 		}
@@ -163,8 +163,8 @@ public class SortProcessor extends Processor{
 				return true;
 			}
 		}
-		if (type.equals(ARGUMENT_SORT_BY_END_DATE)) {
-			if (compareEndDate(j, j + 1)) {
+		if (type.equals(ARGUMENT_SORT_BY_DATE)) {
+			if (compareDate(j, j + 1)) {
 				return true;
 			}
 		}
@@ -214,7 +214,7 @@ public class SortProcessor extends Processor{
 //  Returns true if..
 //  list[i] later than list[j]
 //	Tasks without date is considered latest
-	private static boolean compareEndDate(int i, int j) {
+	private static boolean compareDate(int i, int j) {
 		if(displayList.getListItem(i).getEndDate() == null) {
 			if(displayList.getListItem(j).getEndDate() == null) {
 				return false;
