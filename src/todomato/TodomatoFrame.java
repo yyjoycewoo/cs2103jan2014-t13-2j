@@ -319,14 +319,20 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			status = SplitProcessorsHandler.processCommand(command);
 			assert status != null;
 
-			if (currView.equals("week"))
-				getViewWeek();
-			else if (currView.equals("day") || currView.equals("today"))
-				getViewDay();
-			else if (currView.equals("all"))
-				getViewAll();
+			if ((command.split(" ", 2)[0]).equals("find")) {
+				table.update();
+				lblDate.setText("Search results");  				
+				btnLeft.setVisible(false);
+				btnRight.setVisible(false);
+			} else {
+				if (currView.equals("week"))
+					getViewWeek();
+				else if (currView.equals("day") || currView.equals("today"))
+					getViewDay();
+				else if (currView.equals("all"))
+					getViewAll();
+			}
 
-			//table.update();
 
 			txtCommand.setText("");
 			lblStatus.setText(status);
