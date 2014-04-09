@@ -190,10 +190,10 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		btnRight.addActionListener(new ActionListener() {			 
             public void actionPerformed(ActionEvent e) {
             	//currently viewing by day
-            	if (btnViewPeriod.getText().equals("All")) {
+            	if (!lblDate.getText().contains(" - ")) {
                 	viewDate = viewDate.plusDays(1);
             		lblDate.setText(getViewDay());   
-            	} else if (btnViewPeriod.getText().equals("By day")) {
+            	} else if (lblDate.getText().contains(" - ")) {
             		//currently viewing by week
 	            	viewDate = viewDate.plusDays(numDaysInAWeek);
 	        		lblDate.setText(getViewWeek());
@@ -206,10 +206,11 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		btnLeft.addActionListener(new ActionListener() {			 
             public void actionPerformed(ActionEvent e) {
             	//currently viewing by day
-            	if (btnViewPeriod.getText().equals("All")) {
+            	if (!lblDate.getText().contains(" - ")) {
+            		System.out.println("day");
                 	viewDate = viewDate.minusDays(1);
             		lblDate.setText(getViewDay());            	
-            	} else if (btnViewPeriod.getText().equals("By day")) {
+            	} else if (lblDate.getText().contains(" - ")) {
             		//currently viewing by week
 	            	viewDate = viewDate.minusDays(numDaysInAWeek);
 	        		lblDate.setText(getViewWeek());
