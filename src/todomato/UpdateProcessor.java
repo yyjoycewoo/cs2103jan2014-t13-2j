@@ -68,6 +68,9 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_EDATE = 9;
 	private static final int NO_OF_CHAR_IN_RECUR = 7;
 	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
+	private static final String START_TIME_GT_END_TIME = "Start time cannot be greater than end time";
+	private static final String INVALID_INDEX = "Invalid Index";
+	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
 
 	private static String[] updateKeywords = new String[] { " starttime ",
 			" endtime ", " desc ", " startdate ", " enddate ", " location ", " recur ",
@@ -165,8 +168,7 @@ public class UpdateProcessor extends Processor {
 	private static void printInvalidKeywords(String argument)
 			throws InvalidInputException {
 		if (argument.length() <= 2) {
-			throw new InvalidInputException(
-					"Please include any keywords to update i.e. starttime, endtime, location, desc, date");
+			throw new InvalidInputException(NO_KEYWORDS_FOUND);
 		}
 	}
 
@@ -182,16 +184,10 @@ public class UpdateProcessor extends Processor {
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeString(argument
 				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
-		if (list.getListItem(index).getStartDate() != null && list.getListItem(index).getEndDate() != null) {
-			if (list.getListItem(index).getStartDate().equals(list.getListItem(index).getEndDate())) {
-				if (list.getListItem(index).getEndTime()!= null) {
-					if (list.getListItem(index).getEndTime().lt(time)){
-						list.getListItem(index).setEndTime(time);
-					}
-				}
-			}
-		}
 		list.getListItem(index).setStartTime(time);
+		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -201,16 +197,10 @@ public class UpdateProcessor extends Processor {
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeString(argument
 				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
-		if (list.getListItem(index).getStartDate() != null && list.getListItem(index).getEndDate() != null) {
-			if (list.getListItem(index).getStartDate().equals(list.getListItem(index).getEndDate())) {
-				if (list.getListItem(index).getStartTime()!= null) {
-					if (list.getListItem(index).getStartTime().gt(time)){
-						list.getListItem(index).setStartTime(time);
-					}
-				}
-			}
-		}
 		list.getListItem(index).setEndTime(time);
+		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
@@ -220,10 +210,8 @@ public class UpdateProcessor extends Processor {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_SDATE)));
 		list.getListItem(index).setStartDate(date);
-		if (list.getListItem(index).getEndDate() != null) {
-			if (list.getListItem(index).getStartDate().gt(list.getListItem(index).getEndDate())) {
-				list.getListItem(index).setEndDate(date);
-			}
+		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
@@ -234,10 +222,8 @@ public class UpdateProcessor extends Processor {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_EDATE)));
 		list.getListItem(index).setEndDate(date);
-		if (list.getListItem(index).getStartDate() != null) {
-			if (list.getListItem(index).getEndDate().lt(list.getListItem(index).getStartDate())) {
-				list.getListItem(index).setStartDate(date);
-			}
+		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		}
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
@@ -341,7 +327,7 @@ public class UpdateProcessor extends Processor {
 	}
 
 	/**
-	 * Updates task to completed status
+	 * Toggles task completion status
 	 * 
 	 * @param index
 	 * @return updated tasks
@@ -370,15 +356,39 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
+	
+	private static Boolean isStartTimeLessThanEndTime(Task input) {
+		if (input.getStartDate() != null && input.getEndDate() != null) {
+			if (input.getStartDate().gt(input.getEndDate())) {
+				 return true;
+			}
+			if (input.getStartDate().equals(input.getEndDate())) {
+				if (input.getStartTime() != null && input.getEndTime() != null) {
+					if (input.getStartTime().gt(input.getEndTime())) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * @param argument
 	 * @return task index
 	 * @throws NumberFormatException
+	 * @throws InvalidInputException 
 	 */
 	private static int getTaskIndex(String argument)
-			throws NumberFormatException {
+			throws NumberFormatException, InvalidInputException {
 		int spaceAfterIndex = argument.indexOf(" ");
+		if (spaceAfterIndex == -1) {
+			throw new InvalidInputException(INVALID_INDEX);
+		}
+		if (!isParseableByInt(argument.substring(0,spaceAfterIndex))) {
+			throw new InvalidInputException(INVALID_INDEX);
+		}
 		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
 	}
 }
