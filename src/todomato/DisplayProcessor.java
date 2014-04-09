@@ -28,15 +28,19 @@ public class DisplayProcessor extends Processor {
 	}
 
 	public static void displayBetweenDates(DateTime startDate, DateTime endDate) {
-		TaskList currTasks = new TaskList();
-		for (Task i : list.getList()) {
-			DateTime date = i.getEndDate();
-			if (date == null)
-				currTasks.addToList(i);
-			else if (date.numDaysFrom(startDate) <= 0 && date.numDaysFrom(endDate) >= 0) {
-				currTasks.addToList(i);
+		if (startDate == null && endDate == null) {
+			displayList.deepCopy(list);
+		} else {
+			TaskList currTasks = new TaskList();
+			for (Task i : list.getList()) {
+				DateTime date = i.getEndDate();
+				if (date == null)
+					currTasks.addToList(i);
+				else if (date.numDaysFrom(startDate) <= 0 && date.numDaysFrom(endDate) >= 0) {
+					currTasks.addToList(i);
+				}
 			}
+			displayList.deepCopy(currTasks);
 		}
-		displayList.deepCopy(currTasks);
 	}
 }
