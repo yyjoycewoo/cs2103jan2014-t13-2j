@@ -68,8 +68,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 	public TodomatoFrame() {
 		super("Todomato");
-		setSize(680,500);
-		setMinimumSize(new Dimension(400, 200));
+		setSize(700,500);
+		setMinimumSize(new Dimension(590, 200));
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		initDisplay();
@@ -319,14 +319,20 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			status = SplitProcessorsHandler.processCommand(command);
 			assert status != null;
 
-			if (currView.equals("week"))
-				getViewWeek();
-			else if (currView.equals("day") || currView.equals("today"))
-				getViewDay();
-			else if (currView.equals("all"))
-				getViewAll();
+			if ((command.split(" ", 2)[0]).equals("find")) {
+				table.update();
+				lblDate.setText("Search results");  				
+				btnLeft.setVisible(false);
+				btnRight.setVisible(false);
+			} else {
+				if (currView.equals("week"))
+					getViewWeek();
+				else if (currView.equals("day") || currView.equals("today"))
+					getViewDay();
+				else if (currView.equals("all"))
+					getViewAll();
+			}
 
-			//table.update();
 
 			txtCommand.setText("");
 			lblStatus.setText(status);

@@ -21,14 +21,24 @@ public class TodomatoTable extends JTable {
         private static final String RECUR_HEADER = "Recur";
         
         //constants for preferred column widths
-        private static final int INDEX_COLUNM_WIDTH = 40;
-        private static final int DESC_COLUNM_WIDTH = 205;
+        private static final int INDEX_COLUNM_WIDTH = 10;
+        private static final int DESC_COLUNM_WIDTH = 185;
         private static final int STARTTIME_COLUNM_WIDTH = 60;
         private static final int ENDTIME_COLUNM_WIDTH = 60;
         private static final int STARTDATE_COLUNM_WIDTH = 70;
         private static final int ENDDATE_COLUNM_WIDTH = 70;
-        private static final int LOCATION_COLUNM_WIDTH = 100;
-        private static final int RECUR_COLUNM_WIDTH = 100;
+        private static final int LOCATION_COLUNM_WIDTH = 90;
+        private static final int RECUR_COLUNM_WIDTH = 10;
+
+        //constants for minimum column widths
+        private static final int INDEX_MIN_WIDTH = 10;
+        private static final int DESC_MIN_WIDTH = 50;
+        private static final int STARTTIME_MIN_WIDTH = 50;
+        private static final int ENDTIME_MIN_WIDTH = 50;
+        private static final int STARTDATE_MIN_WIDTH = 60;
+        private static final int ENDDATE_MIN_WIDTH = 60;
+        private static final int LOCATION_MIN_WIDTH = 50;
+        private static final int RECUR_MIN_WIDTH = 10;
 
         //constants for column indices
         private static final int INDEX_COLUNM_INDEX = 0;
@@ -39,16 +49,6 @@ public class TodomatoTable extends JTable {
         private static final int ENDDATE_COLUNM_INDEX = 5;
         private static final int LOCATION_COLUNM_INDEX = 6;
         private static final int RECUR_COLUNM_INDEX = 7;
-
-        //constants for minimum column widths
-        private static final int INDEX_MIN_WIDTH = 10;
-        private static final int DESC_MIN_WIDTH = 50;
-        private static final int STARTTIME_MIN_WIDTH = 50;
-        private static final int ENDTIME_MIN_WIDTH = 50;
-        private static final int STARTDATE_MIN_WIDTH = 60;
-        private static final int ENDDATE_MIN_WIDTH = 60;
-        private static final int LOCATION_MIN_WIDTH = 50;
-        private static final int RECUR_MIN_WIDTH = 50;
 
         //constants for background colour for the rows
         private static final Object PRIORITY_HIGH = "HIGH";
@@ -188,7 +188,7 @@ public class TodomatoTable extends JTable {
                 table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setMinWidth(STARTDATE_MIN_WIDTH);
                 table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setPreferredWidth(ENDDATE_MIN_WIDTH);
                 table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setMinWidth(LOCATION_MIN_WIDTH);
-                table.getColumnModel().getColumn(RECUR_COLUNM_INDEX).setPreferredWidth(RECUR_COLUNM_WIDTH);
+                table.getColumnModel().getColumn(RECUR_COLUNM_INDEX).setPreferredWidth(RECUR_MIN_WIDTH);
 
                 table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
                 //table.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
