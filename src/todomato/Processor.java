@@ -102,6 +102,9 @@ public class Processor {
 	
 	protected static Boolean isParseableByDate (String input) {
 		try {
+			if(isParseableByInt(input)) {
+				return false;
+			}
 			input = parseDateString(input);
 			if (!DateTime.isParseable(input)) {
 				return false;

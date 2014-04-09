@@ -134,8 +134,8 @@ public class Task {
 
 	/**
 	 * Creates a String from task of the following format:
-	 * <desc>#<startTime>#<endTime
-	 * >#<date>#<location>#<recurrencePeriod>#<id>#<timeCreated
+	 * <desc>#<startTime>#<endTime>#<startDate>
+	 * >#<endDate>#<location>#<recurrencePeriod>#<id>#<timeCreated
 	 * >#<priorityLevel>#<isCompleted>#<eventId>#<updateTime>#<noticeTime>
 	 * 
 	 * @return
@@ -151,7 +151,7 @@ public class Task {
 	}
 
 	/**
-	 * Create a new Task object from a standard taskString (from data file)
+	 * Create a new Task object from a taskString in the standard format (from data file)
 	 * 
 	 * @return Task object generated from taskString, null if taskString is
 	 *         empty
