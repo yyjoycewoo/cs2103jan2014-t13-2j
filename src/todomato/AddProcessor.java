@@ -199,7 +199,14 @@ public class AddProcessor extends Processor {
 				if (endTime.lt(startTime)) {
 					endDate = startDate.plusDays(1);
 				}
+				if (startDate.equals(endDate)) {
+					if (startTime.lt(endTime)) {
+						errorsInInput[INDEX_OF_START_TIME] = true;
+						startTime = null;
+					}
+				}
 			}
+			
 		}
 		int recurPeriod = 0;
 		try {
@@ -304,7 +311,9 @@ public class AddProcessor extends Processor {
 			startTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
 		}
 		startTimeString = retrieveStartDateFromStartTime(startTimeString);
-		startTimeString = parseTimeString(startTimeString);
+		if (startTimeString != null) {
+			startTimeString = parseTimeString(startTimeString);
+		}
 		return startTimeString;
 	}
 	
@@ -332,7 +341,7 @@ public class AddProcessor extends Processor {
 		} else if (parts.length == 1) {
 			if (isParseableByDate(parts[0])) {
 				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0]);
-				startTimeString = parts[0];
+				return null;
 			}
 		}
 		return startTimeString;
@@ -354,7 +363,9 @@ public class AddProcessor extends Processor {
 			endTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
 		}
 		endTimeString = retrieveEndDateFromEndTime(endTimeString);
-		endTimeString = parseTimeString(endTimeString);
+		if (endTimeString != null) {
+			endTimeString = parseTimeString(endTimeString);
+		}
 		return endTimeString;
 	}
 	
@@ -382,7 +393,7 @@ public class AddProcessor extends Processor {
 		} else if (parts.length == 1) {
 			if (isParseableByDate(parts[0])) {
 				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0]);
-				endTimeString = parts[0];
+				return null;
 			}
 		}
 		return endTimeString;

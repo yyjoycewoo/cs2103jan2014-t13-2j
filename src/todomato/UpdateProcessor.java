@@ -182,6 +182,15 @@ public class UpdateProcessor extends Processor {
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeString(argument
 				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
+		if (list.getListItem(index).getStartDate() != null && list.getListItem(index).getEndDate() != null) {
+			if (list.getListItem(index).getStartDate().equals(list.getListItem(index).getEndDate())) {
+				if (list.getListItem(index).getEndTime()!= null) {
+					if (list.getListItem(index).getEndTime().lt(time)){
+						list.getListItem(index).setEndTime(time);
+					}
+				}
+			}
+		}
 		list.getListItem(index).setStartTime(time);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
@@ -192,6 +201,15 @@ public class UpdateProcessor extends Processor {
 			String argument) throws InvalidInputException {
 		DateTime time = convertStringToDateTime(parseTimeString(argument
 				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
+		if (list.getListItem(index).getStartDate() != null && list.getListItem(index).getEndDate() != null) {
+			if (list.getListItem(index).getStartDate().equals(list.getListItem(index).getEndDate())) {
+				if (list.getListItem(index).getStartTime()!= null) {
+					if (list.getListItem(index).getStartTime().gt(time)){
+						list.getListItem(index).setStartTime(time);
+					}
+				}
+			}
+		}
 		list.getListItem(index).setEndTime(time);
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
