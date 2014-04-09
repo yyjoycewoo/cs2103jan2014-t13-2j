@@ -18,6 +18,7 @@ public class TodomatoTable extends JTable {
         private static final String STARTDATE_HEADER = "Start Date";
         private static final String ENDDATE_HEADER = "End Date";
         private static final String LOCATION_HEADER = "Location";
+        private static final String RECUR_HEADER = "Recur";
         
         //constants for preferred column widths
         private static final int INDEX_COLUNM_WIDTH = 40;
@@ -27,6 +28,7 @@ public class TodomatoTable extends JTable {
         private static final int STARTDATE_COLUNM_WIDTH = 70;
         private static final int ENDDATE_COLUNM_WIDTH = 70;
         private static final int LOCATION_COLUNM_WIDTH = 100;
+        private static final int RECUR_COLUNM_WIDTH = 100;
 
         //constants for column indices
         private static final int INDEX_COLUNM_INDEX = 0;
@@ -36,6 +38,7 @@ public class TodomatoTable extends JTable {
         private static final int STARTDATE_COLUNM_INDEX = 4;
         private static final int ENDDATE_COLUNM_INDEX = 5;
         private static final int LOCATION_COLUNM_INDEX = 6;
+        private static final int RECUR_COLUNM_INDEX = 7;
 
         //constants for minimum column widths
         private static final int INDEX_MIN_WIDTH = 10;
@@ -45,6 +48,7 @@ public class TodomatoTable extends JTable {
         private static final int STARTDATE_MIN_WIDTH = 60;
         private static final int ENDDATE_MIN_WIDTH = 60;
         private static final int LOCATION_MIN_WIDTH = 50;
+        private static final int RECUR_MIN_WIDTH = 50;
 
         //constants for background colour for the rows
         private static final Object PRIORITY_HIGH = "HIGH";
@@ -63,7 +67,7 @@ public class TodomatoTable extends JTable {
         public TodomatoTable() {
             String[] columnNames = {INDEX_HEADER, DESC_HEADER,
                     STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,
-                    ENDDATE_HEADER, LOCATION_HEADER};
+                    ENDDATE_HEADER, LOCATION_HEADER, RECUR_HEADER};
             
                 data = loadData(Processor.getDisplayList());
 
@@ -175,6 +179,7 @@ public class TodomatoTable extends JTable {
                 table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setPreferredWidth(STARTDATE_COLUNM_WIDTH);
                 table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setPreferredWidth(ENDDATE_COLUNM_WIDTH);
                 table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setPreferredWidth(LOCATION_COLUNM_WIDTH);
+                table.getColumnModel().getColumn(RECUR_COLUNM_INDEX).setPreferredWidth(RECUR_COLUNM_WIDTH);
 
                 table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setMinWidth(INDEX_MIN_WIDTH);
                 table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setMinWidth(DESC_MIN_WIDTH);                
@@ -183,6 +188,7 @@ public class TodomatoTable extends JTable {
                 table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setMinWidth(STARTDATE_MIN_WIDTH);
                 table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setPreferredWidth(ENDDATE_MIN_WIDTH);
                 table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setMinWidth(LOCATION_MIN_WIDTH);
+                table.getColumnModel().getColumn(RECUR_COLUNM_INDEX).setPreferredWidth(RECUR_COLUNM_WIDTH);
 
                 table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
                 //table.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
@@ -205,7 +211,8 @@ public class TodomatoTable extends JTable {
                                 list[i][ENDTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getEndTime());
                                 list[i][STARTDATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getStartDate());  
                                 list[i][ENDDATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getEndDate());                             
-                                list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());
+                                list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());                           
+                                list[i][RECUR_COLUNM_INDEX] = checkNull(l.getListItem(i).getRecurrencePeriod());
                         }
                 }
                 return list;
@@ -236,7 +243,7 @@ public class TodomatoTable extends JTable {
         class CustModel extends AbstractTableModel {
                 private String[] columnNames = {INDEX_HEADER, DESC_HEADER,
                                 STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,
-                                ENDDATE_HEADER, LOCATION_HEADER};
+                                ENDDATE_HEADER, LOCATION_HEADER, RECUR_HEADER};
                 private Object[][] data = loadData(list);
 
                 public CustModel(Object[][] data) {
