@@ -39,8 +39,7 @@ public class UsernamePasswordDialogueBox extends JFrame{
 	
 	private void initButtonAction() {
 		button.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e)
-            {
+            public void actionPerformed(ActionEvent e) {
             	setUsername(txtUsername.getText());
             	setPassword(txtPassword.getText());
             	
