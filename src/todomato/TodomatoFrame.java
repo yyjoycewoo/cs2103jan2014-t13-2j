@@ -31,10 +31,10 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
 	private static final String SORT_DATE_DESC_COMMAND = "sort date desc";
 	private static final String SORT_DATE_ASC_COMMAND = "sort date asc";
-	
+
 	protected static final int INDEX_OFFSET = 1;
 	private static final int numDaysInAWeek = 7;
-	
+
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
 	private static final String SORT_PRIORITY = "Sort by priority";
 	private static final String SORT_COMPLETED = "Sort by completed";
@@ -44,7 +44,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static Icon upArrow = new BevelArrowIcon(0, false, true);
 	private static Icon leftArrow = new ArrowIcon(SwingConstants.LEFT);
 	private static Icon rightArrow = new ArrowIcon(SwingConstants.RIGHT);
-	
+
 	private TodomatoTable table = new TodomatoTable();	
 	private JPanel panel = new JPanel();
 	private JTextField txtCommand = new JTextField(20);
@@ -55,16 +55,17 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private JButton btnLeft = new JButton(leftArrow);
 	private JButton btnRight = new JButton(rightArrow);
 	private JButton btnToday = new JButton("Today");
-	private JButton btnViewPeriod = new JButton("All");
+	private JButton btnViewPeriod = new JButton("By day");
 	JLabel lblDate = new JLabel();
-	
+
 	private DateTime currDate = DateTime.now(TimeZone.getDefault());
 	private DateTime viewDate;
 	private DateTime startDate;
 	private DateTime endDate;
 	private String currDaysViewed;
 	private int currWeekday;
-	
+	private String currView = "week";
+
 	public TodomatoFrame() {
 		super("Todomato");
 		setSize(680,500);
@@ -73,7 +74,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		initDisplay();
 		initShortcuts();
-		
+
 		add(panel);
 		//pack();
 		setVisible(true);
@@ -85,20 +86,20 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		panel.add(btnLeft, "split, center");
 		panel.add(lblDate);
 		panel.add(btnRight, "wrap");
-		
+
 		panel.add(table.getTableDisplay(), "wrap, push, grow");
-		
+
 		panel.add(btnDate, "split");
 		panel.add(btnPriority);
 		panel.add(btnCompleted);
 		panel.add(btnToday, "gapleft push");
 		panel.add(btnViewPeriod, "wrap");
-		
+
 		panel.add(txtCommand, "wrap, pushx, growx");
 		panel.add(lblStatus);
 
 		initWeeklyView();
-		
+
 		initTxtCommandAction(); 
 		initBtnDateAction();
 		initBtnPriorityAction();   
@@ -111,32 +112,29 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 	private void initViewPeriodAction() {
 		btnViewPeriod.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
-            	if (btnViewPeriod.getText().equals("All")) {
-            		btnViewPeriod.setText("By week");
-            		lblDate.setText("Displaying all tasks");
-            		btnLeft.setVisible(false);
-            		btnRight.setVisible(false);
+			public void actionPerformed(ActionEvent e) {
+				if (btnViewPeriod.getText().equals("By week")) {
+					currView = "week";
 
-            		DisplayProcessor.displayBetweenDates(null, null);
-            		table.update();
-            		
-            	} else if (btnViewPeriod.getText().equals("By week")) {
-            		btnViewPeriod.setText("By day");
-            		viewDate = currDate;
-            		lblDate.setText(getViewWeek());  
-            		btnLeft.setVisible(true);
-            		btnRight.setVisible(true);      
-            		
-            	} else if (btnViewPeriod.getText().equals("By day")) {
-            		btnViewPeriod.setText("All");
-            		viewDate = currDate;
-            		lblDate.setText(getViewDay());  
-            		btnLeft.setVisible(true);
-            		btnRight.setVisible(true);          
-            	}
-            }
-        });
+					btnViewPeriod.setText("By day");
+
+					viewDate = currDate;
+					lblDate.setText(getViewWeek());  
+					btnLeft.setVisible(true);
+					btnRight.setVisible(true);      
+
+				} else if (btnViewPeriod.getText().equals("By day")) {
+					currView = "day";
+
+					btnViewPeriod.setText("By week");
+
+					viewDate = currDate;
+					lblDate.setText(getViewDay());  
+					btnLeft.setVisible(true);
+					btnRight.setVisible(true);          
+				}
+			}
+		});
 	}
 
 	private void initWeeklyView() {
@@ -151,23 +149,44 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 	private void initBtnTodayAction() {
 		btnToday.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
-        		lblDate.setText(currDate.format("MMM DD, YYYY", new Locale("US")));
-        		btnLeft.setVisible(false);
-        		btnRight.setVisible(false);
-        		
-            	viewDate = currDate;
-        		getViewDay();
-            }
-        });
+			public void actionPerformed(ActionEvent e) {
+				if (btnToday.getText().equals("All")) {
+					currView = "all";
+
+					btnToday.setText("Today");
+
+					lblDate.setText(getViewAll());
+					btnLeft.setVisible(false);
+					btnRight.setVisible(false);
+
+				} else if (btnToday.getText().equals("Today")) {
+					currView = "today";
+
+					btnToday.setText("All");
+
+					viewDate = currDate;
+					lblDate.setText(getViewDay());  
+					btnLeft.setVisible(false);
+					btnRight.setVisible(false);
+
+				}
+			}
+		});
 	}
 
-	protected String getViewDay() {		
+	private String getViewAll() {
+		DisplayProcessor.displayBetweenDates(null, null);
+		table.update();
+
+		return "Displaying all tasks";
+	}
+
+	private String getViewDay() {		
 		DisplayProcessor.displayBetweenDates(viewDate, viewDate);
 		table.update();
-		
+
 		currDaysViewed = viewDate.format("MMM DD, YYYY", new Locale("US"));
-		
+
 		return currDaysViewed;
 	}
 
@@ -179,49 +198,49 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		currDaysViewed = startDate.format("MMM DD, YYYY", new Locale("US"));
 		currDaysViewed += " - ";
 		currDaysViewed += endDate.format("MMM DD, YYYY", new Locale("US"));
-		
+
 		DisplayProcessor.displayBetweenDates(startDate, endDate);
 		table.update();
-		
+
 		return currDaysViewed;
 	}
 
 	private void initBtnRightAction() {
 		btnRight.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
-            	//currently viewing by day
-            	if (!lblDate.getText().contains(" - ")) {
-                	viewDate = viewDate.plusDays(1);
-            		lblDate.setText(getViewDay());   
-            	} else if (lblDate.getText().contains(" - ")) {
-            		//currently viewing by week
-	            	viewDate = viewDate.plusDays(numDaysInAWeek);
-	        		lblDate.setText(getViewWeek());
-            	}
-            }
-        });
+			public void actionPerformed(ActionEvent e) {
+				//currently viewing by day
+				if (!lblDate.getText().contains(" - ")) {
+					viewDate = viewDate.plusDays(1);
+					lblDate.setText(getViewDay());   
+				} else if (lblDate.getText().contains(" - ")) {
+					//currently viewing by week
+					viewDate = viewDate.plusDays(numDaysInAWeek);
+					lblDate.setText(getViewWeek());
+				}
+			}
+		});
 	}
 
 	private void initBtnLeftAction() {
 		btnLeft.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
-            	//currently viewing by day
-            	if (!lblDate.getText().contains(" - ")) {
-            		System.out.println("day");
-                	viewDate = viewDate.minusDays(1);
-            		lblDate.setText(getViewDay());            	
-            	} else if (lblDate.getText().contains(" - ")) {
-            		//currently viewing by week
-	            	viewDate = viewDate.minusDays(numDaysInAWeek);
-	        		lblDate.setText(getViewWeek());
-            	}
-            }
-        });
+			public void actionPerformed(ActionEvent e) {
+				//currently viewing by day
+				if (!lblDate.getText().contains(" - ")) {
+					System.out.println("day");
+					viewDate = viewDate.minusDays(1);
+					lblDate.setText(getViewDay());            	
+				} else if (lblDate.getText().contains(" - ")) {
+					//currently viewing by week
+					viewDate = viewDate.minusDays(numDaysInAWeek);
+					lblDate.setText(getViewWeek());
+				}
+			}
+		});
 	}
 
 	private void initBtnDateAction() {
 		btnDate.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				String status;
 				try {
 					if (btnDate.getIcon() == upArrow) {
@@ -237,13 +256,13 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}	
-            }
-        });
+			}
+		});
 	}
 
 	private void initBtnCompletedAction() {
 		btnCompleted.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				String status;
 				try {
 					if (btnCompleted.getIcon() == upArrow) {
@@ -259,13 +278,13 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}	
-            }
-        });
+			}
+		});
 	}
 
 	private void initBtnPriorityAction() {
 		btnPriority.addActionListener(new ActionListener() {			 
-            public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				String status = null;
 				try {
 					if (btnPriority.getIcon() == upArrow) {
@@ -281,8 +300,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}	
-            }
-        });
+			}
+		});
 	}
 
 	private void initTxtCommandAction() {
@@ -299,10 +318,16 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		try {
 			status = SplitProcessorsHandler.processCommand(command);
 			assert status != null;
-			
-			getViewWeek();
-			table.update();
-			
+
+			if (currView.equals("week"))
+				getViewWeek();
+			else if (currView.equals("day") || currView.equals("today"))
+				getViewDay();
+			else if (currView.equals("all"))
+				getViewAll();
+
+			//table.update();
+
 			txtCommand.setText("");
 			lblStatus.setText(status);
 		} catch (InvalidInputException e) {
@@ -328,13 +353,13 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 				updateData("redo");
 			}
 		};
-		
+
 		Action searchAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				updateData("find " + txtCommand.getText());
 			}
 		};
-		
+
 		Action deleteAction = new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 				int rowIndex = table.rowSelected + INDEX_OFFSET;
