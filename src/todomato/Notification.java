@@ -8,9 +8,14 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Timer;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -35,10 +40,11 @@ public abstract class Notification extends Popup implements ActionListener {
 	 */
 	protected static void popUpNotice() {
 		String msg = "~~~Reminder! Do now or never!~~~";
-		// pop up disappeared after 10sec
-		final int waitfor = 20000;
+		// pop up disappeared after 3sec
+		final int waitfor = 3000;
 		// create and set up the window
 		final JFrame frame = new JFrame("Reminder");
+
 		frame.setSize(300, 125);
 		// remove the title bar and border
 		frame.setUndecorated(true);
@@ -61,13 +67,14 @@ public abstract class Notification extends Popup implements ActionListener {
 		constraints.insets = new Insets(5, 5, 5, 5);
 		constraints.fill = GridBagConstraints.BOTH;
 
-		JLabel textLabel = new JLabel();
+		final JLabel textLabel = new JLabel();
+
 		buttonsAction(textLabel);
 
 		textLabel.setPreferredSize(new Dimension(300, 100));
 		// frame.getContentPane().add(textLabel, BorderLayout.CENTER);
 		textLabel.setOpaque(false);
-		frame.add(textLabel, constraints);
+		frame.getContentPane().add(textLabel, constraints);
 		constraints.gridx++;
 		constraints.weightx = 0f;
 		constraints.weighty = 0f;
@@ -85,7 +92,7 @@ public abstract class Notification extends Popup implements ActionListener {
 
 		closeBt.setMargin(new Insets(1, 4, 1, 4));
 		closeBt.setFocusable(false);
-		frame.add(closeBt, constraints);
+		frame.getContentPane().add(closeBt, constraints);
 		constraints.gridx = 0;
 		constraints.gridy++;
 		constraints.weightx = 1.0f;
@@ -103,13 +110,41 @@ public abstract class Notification extends Popup implements ActionListener {
 		new Thread() {
 			@Override
 			public void run() {
-				try {
-					// time after which pop up will be disappeared
-					Thread.sleep(waitfor);
-					frame.dispose();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				// ensure that the pop up wont disppear when mouse over
+				frame.addMouseListener(new MouseAdapter() {
+					Timer timer;
+
+					@Override
+					public void mouseEntered(MouseEvent event) {
+						// cos can only cancel timer for one time only!
+						// need new timer every time the mouse enters pop up
+						if (timer != null) {
+							timer.cancel();
+						}
+					}
+
+					@Override
+					public void mouseExited(MouseEvent event) {
+						// If mouse pointer is still within the bounds of the
+						// frame, do not set the timer to close the notification
+						// window
+						Rectangle frameRect = new Rectangle(frame
+								.getLocationOnScreen());
+						frameRect.setSize(frame.getWidth(), frame.getHeight());
+						Point mousePointer = event.getLocationOnScreen();
+						if (!frameRect.contains(mousePointer)) {
+							// Otherwise, schedule a timer
+							timer = new Timer();
+							timer.schedule(new java.util.TimerTask() {
+								@Override
+								public void run() {
+									frame.dispose();
+								}
+							}, waitfor);
+						}
+					}
+
+				});
 			};
 		}.start();
 	}
@@ -151,7 +186,6 @@ public abstract class Notification extends Popup implements ActionListener {
 				count++;
 			}
 		};
-
 		// implementing buttons on the label
 		textLabel.setLayout(new BorderLayout());
 		JButton next = new BasicArrowButton(BasicArrowButton.EAST);
