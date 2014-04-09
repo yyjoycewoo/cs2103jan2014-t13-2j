@@ -8,7 +8,8 @@ package todomato;
  * The following ways to sort are supported: 
  * <ul>
  * <li> sort tasks by date
- * <ul> <li> "sort date" </ul>
+ * <ul> <li> "sort startdate" </ul>
+ * <ul> <li> "sort enddate" </ul>
  * <li> sort tasks by priority from high to low
  * <ul> <li> "sort priority" </ul>
  * <li> sort tasks by completion status
@@ -40,7 +41,8 @@ package todomato;
  */
 
 public class SortProcessor extends Processor{
-	private static final String ARGUMENT_SORT_BY_DATE = "date";
+	private static final String ARGUMENT_SORT_BY_START_DATE = "startdate";
+	private static final String ARGUMENT_SORT_BY_END_DATE = "enddate";
 	private static final String ARGUMENT_SORT_BY_PRIORITY = "priority";
 	private static final String ARGUMENT_SORT_BY_COMPLETION = "complete";
 	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
@@ -58,6 +60,7 @@ public class SortProcessor extends Processor{
 			return INVALID_INPUT_MISSING_ARGUMENT;
 		}
 		
+		String statusMessage = "";
 		String argArr[] = argument.split(" ", 2);
 		String type = argArr[0];
 		String order = "";
@@ -65,17 +68,23 @@ public class SortProcessor extends Processor{
 			order = argArr[1];
 		}
 		
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_DATE)) {
-			return sortByDate(order);
+		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_START_DATE)) {
+			statusMessage = sortByStartDate(order);
 		}
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
-			return sortByPriority(order);
+		else if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_END_DATE)) {
+			statusMessage = sortByEndDate(order);
 		}
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
-			return sortByCompletion(order);
+		else if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
+			statusMessage = sortByPriority(order);
 		}
-		
-		return INVALID_INPUT_TYPE;
+		else if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
+			statusMessage = sortByCompletion(order);
+		}
+		else {
+			statusMessage = INVALID_INPUT_TYPE;
+		}
+		displayList = list;
+		return statusMessage;
 	}
 	
 	// Sort in order of..
@@ -113,12 +122,28 @@ public class SortProcessor extends Processor{
 	// Sort in order of..
 	// Default/Ascending: Most recent -> Least recent -> No date
 	// Descending: No date -> Least recent -> Most recent
-	private static String sortByDate(String order) {
+	private static String sortByStartDate(String order) {
 		if (!isValidOrder(order)) {
 			return INVALID_INPUT_ORDER;
 		}
 		
-		bubbleSort(ARGUMENT_SORT_BY_DATE);
+		bubbleSort(ARGUMENT_SORT_BY_START_DATE);
+		if (isDescending(order)) {
+			displayList.reverse();
+		}
+		fileHandler.updateFile(list);
+		return SUCCESS_SORT_BY_DATE;
+	}
+	
+	// Sort in order of..
+	// Default/Ascending: Most recent -> Least recent -> No date
+	// Descending: No date -> Least recent -> Most recent
+	private static String sortByEndDate(String order) {
+		if (!isValidOrder(order)) {
+			return INVALID_INPUT_ORDER;
+		}
+		
+		bubbleSort(ARGUMENT_SORT_BY_END_DATE);
 		if (isDescending(order)) {
 			displayList.reverse();
 		}
@@ -137,8 +162,13 @@ public class SortProcessor extends Processor{
 	}
 
 	private static boolean needSwap(String type, int j) {
-		if (type.equals(ARGUMENT_SORT_BY_DATE)) {
-			if (compareDate(j, j + 1)) {
+		if (type.equals(ARGUMENT_SORT_BY_START_DATE)) {
+			if (compareStartDate(j, j + 1)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_SORT_BY_END_DATE)) {
+			if (compareEndDate(j, j + 1)) {
 				return true;
 			}
 		}
@@ -169,7 +199,26 @@ public class SortProcessor extends Processor{
 //  Returns true if..
 //  list[i] later than list[j]
 //	Tasks without date is considered latest
-	private static boolean compareDate(int i, int j) {
+	private static boolean compareStartDate(int i, int j) {
+		if(displayList.getListItem(i).getStartDate() == null) {
+			if(displayList.getListItem(j).getStartDate() == null) {
+				return false;
+			}
+			return true;
+		} if(displayList.getListItem(j).getStartDate() == null) {
+			return false;
+		} if(displayList.getListItem(i).getStartDate()
+				.compareTo(displayList.getListItem(j).getStartDate()) > 0) {
+			return true;
+		} 
+		return false;
+	}
+	
+	
+//  Returns true if..
+//  list[i] later than list[j]
+//	Tasks without date is considered latest
+	private static boolean compareEndDate(int i, int j) {
 		if(displayList.getListItem(i).getEndDate() == null) {
 			if(displayList.getListItem(j).getEndDate() == null) {
 				return false;
