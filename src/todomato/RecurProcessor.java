@@ -1,3 +1,4 @@
+//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -6,7 +7,6 @@ import java.util.TimeZone;
 
 import todomato.Processor;
 
-//@author A0096620E
 public class RecurProcessor extends Processor {
 	
 
