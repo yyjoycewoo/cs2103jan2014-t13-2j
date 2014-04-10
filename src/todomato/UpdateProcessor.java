@@ -3,6 +3,8 @@
  */
 package todomato;
 
+import java.util.TimeZone;
+
 import hirondelle.date4j.DateTime;
 
 /**
@@ -147,6 +149,7 @@ public class UpdateProcessor extends Processor {
 					break;
 				}
 			}
+			list.getListItem(index).setUpdateTime(DateTime.now(TimeZone.getDefault()));
 		}
 	}
 
