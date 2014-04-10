@@ -1,3 +1,4 @@
+//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -11,7 +12,6 @@ import java.util.TimeZone;
  * contains methods to parse a command's arguments.
  * 
  */
-//@author A0096620E
 public class Processor {
 
 	protected static String fileLoc = "tasks.txt";
@@ -41,7 +41,8 @@ public class Processor {
 	protected static final String SG_TIMEZONE = "GMT+8:00";
 	protected static final String DEFAULT_MINUTE_FORMAT = "00";
 	protected static final String DATETIME_PADDING = "0";
-	protected static final String DATETIME_FORMAT_SYMBOL = "-";
+	protected static final String DATE_FORMAT_SYMBOL = "-";
+	protected static final String TIME_FORMAT_SYMBOL = ":";
 	protected static final String INVALID_DATE = "Invalid Date";
 	protected static final String INVALID_TIME = "Invalid Time";
 	
@@ -92,7 +93,7 @@ public class Processor {
 		if (day.length() == ONE_DIGIT) {
 			day = DATETIME_PADDING + day;
 		}
-		return year + DATETIME_FORMAT_SYMBOL + day + DATETIME_FORMAT_SYMBOL + month;
+		return year + DATE_FORMAT_SYMBOL + day + DATE_FORMAT_SYMBOL + month;
 	}
 
 	/**
@@ -122,6 +123,9 @@ public class Processor {
 	protected static Boolean isParseableByDate (String input) {
 		try {
 			if(isParseableByInt(input)) {
+				return false;
+			}
+			if (isParseableByTime(input)) {
 				return false;
 			}
 			input = parseDateString(input);
@@ -305,7 +309,7 @@ public class Processor {
 		if (input.length() > MAX_TIME_LENGTH) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
-		if ((input.length() == MAX_TIME_LENGTH) && input.contains(":")) {
+		if ((input.length() == MAX_TIME_LENGTH) && input.contains(TIME_FORMAT_SYMBOL)) {
 			if (DateTime.isParseable(input)) {
 				return input;		
 			}
@@ -361,7 +365,7 @@ public class Processor {
 			// pads a single digit hour to fit the DateTime format
 			userHour = DATETIME_PADDING + userHour;
 		}
-		timeString = userHour + ":" + userMinute;
+		timeString = userHour + TIME_FORMAT_SYMBOL + userMinute;
 		return timeString;
 	}
 	/**
@@ -472,7 +476,10 @@ public class Processor {
 	}
 	
 	/**
-	 * 
+	 * Checks if the String contains "daily" or "weekly" and
+	 * returns an integer
+	 * Daily = 1
+	 * Weekly = 7
 	 * @param input
 	 * @return
 	 */
