@@ -1,3 +1,4 @@
+//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -5,8 +6,6 @@ import hirondelle.date4j.DateTime;
 import java.util.Locale;
 import java.util.TimeZone;
 
-
-//@author A0096620E
 public class Task {
 
 	private static final String START_TIME_PREP = " at ";
@@ -122,8 +121,12 @@ public class Task {
 		if (endTime != null) {
 			task += END_TIME_PREP + endTime;
 		}
-		if (endDate != null) {
+		if (startDate == null && endDate != null) {
 			task += DATE_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+		} else if (endDate != null && endTime == null) {
+			if (!endDate.equals(startDate)) {
+				task += END_TIME_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+			}
 		}
 		if (location != null) {
 			task += LOCATION_PREP + location;
