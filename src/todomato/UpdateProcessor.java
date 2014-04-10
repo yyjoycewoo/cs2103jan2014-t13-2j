@@ -182,8 +182,9 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeString(argument
-				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
+		argument = argument.substring(editStartTime + NO_OF_CHAR_IN_STIME);
+		String[] parts = argument.split(" ");
+		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
 		list.getListItem(index).setStartTime(time);
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
@@ -195,8 +196,9 @@ public class UpdateProcessor extends Processor {
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeString(argument
-				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
+		argument = argument.substring(editEndTime + NO_OF_CHAR_IN_ETIME);
+		String[] parts = argument.split(" ");
+		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
 		list.getListItem(index).setEndTime(time);
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
@@ -210,6 +212,10 @@ public class UpdateProcessor extends Processor {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_SDATE)));
 		list.getListItem(index).setStartDate(date);
+		//Ensures that any task with a start date has an end date
+		if (list.getListItem(index).getEndDate() == null) {
+			list.getListItem(index).setEndDate(date);
+		}
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		}
