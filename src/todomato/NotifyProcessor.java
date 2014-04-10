@@ -5,52 +5,52 @@ package todomato;
 
 import hirondelle.date4j.DateTime;
 
+//@author A0101324A
 /**
- * @author Hao Eng
  * 
- *         This class contains method to change notification commands by the
- *         user. It changes the time or date to notify the user.
+ * This class contains method to change notification commands by the user. It
+ * changes the time or date to notify the user.
  * 
- *         <p>
- *         It can process command that allows pop-up window at the new
- *         notification time or date.
+ * <p>
+ * It can process command that allows pop-up window at the new notification time
+ * or date.
  * 
- *         <p>
- *         To change the notification of a task, start by typing "notify"
- *         followed by a valid index. The following keywords are necessary for
- *         the attributes, while the order is flexible:
- *         <ul>
- *         <li>"time" for the time
- *         <li>"date" for the date
- *         </ul>
+ * <p>
+ * To change the notification of a task, start by typing "notify" followed by a
+ * valid index. The following keywords are necessary for the attributes, while
+ * the order is flexible:
+ * <ul>
+ * <li>"time" for the time
+ * <li>"date" for the date
+ * </ul>
  * 
- *         <p>
- *         Each keyword should be proceeded by the new attribute.
+ * <p>
+ * Each keyword should be proceeded by the new attribute.
  * 
- *         <p>
- *         Examples:
- *         <ul>
- *         <li>"notify 2 date 4 Jan"
- *         <li>"notify 1 time 1900"
- *         </ul>
+ * <p>
+ * Examples:
+ * <ul>
+ * <li>"notify 2 date 4 Jan"
+ * <li>"notify 1 time 1900"
+ * </ul>
  * 
- *         <p>
- *         The following time formats are supported:
- *         <ul>
- *         <li>930am/pm
- *         <li>9am/pm
- *         <li>1230
- *         <li>0730
- *         <li>0730pm
- *         </ul>
+ * <p>
+ * The following time formats are supported:
+ * <ul>
+ * <li>930am/pm
+ * <li>9am/pm
+ * <li>1230
+ * <li>0730
+ * <li>0730pm
+ * </ul>
  * 
- *         <p>
- *         The following date formats are supported (case does not matter):
- *         <ul>
- *         <li>jan 1
- *         <li>1 january
- *         <li>january 1
- *         </ul>
+ * <p>
+ * The following date formats are supported (case does not matter):
+ * <ul>
+ * <li>jan 1
+ * <li>1 january
+ * <li>january 1
+ * </ul>
  */
 public class NotifyProcessor extends Processor {
 

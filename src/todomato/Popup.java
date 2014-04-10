@@ -8,10 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * @author Hao Eng
- * 
- */
+//@author A0101324A
 public class Popup extends Processor {
 
 	protected static TaskList myownlist = new TaskList();

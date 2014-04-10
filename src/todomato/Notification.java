@@ -24,14 +24,15 @@ import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
 
+//@author A0101324A
 /**
  * This class creates a pop up notification to appear on the desktop.
  * 
- * @author Hao Eng
  * @source from
  *         http://www.javacodegeeks.com/2012/10/create-new-message-notification
  *         -pop-up.html
  */
+
 public abstract class Notification extends Popup implements ActionListener {
 	private static int count = 0, width = 200;
 
@@ -71,7 +72,6 @@ public abstract class Notification extends Popup implements ActionListener {
 		buttonsAction(textLabel);
 
 		textLabel.setPreferredSize(new Dimension(300, 100));
-		// frame.getContentPane().add(textLabel, BorderLayout.CENTER);
 		textLabel.setOpaque(false);
 		frame.getContentPane().add(textLabel, constraints);
 		constraints.gridx++;

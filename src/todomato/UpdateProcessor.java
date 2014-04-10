@@ -5,6 +5,7 @@ package todomato;
 
 import hirondelle.date4j.DateTime;
 
+//@author A0101324A
 /**
  * This class contains methods to process update commands by the user. It
  * updates the user's lists of tasks, and saves it to disk.
@@ -56,8 +57,6 @@ import hirondelle.date4j.DateTime;
  * <li>january 1
  * </ul>
  * 
- * @author Hao Eng
- * 
  */
 public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_STIME = 11;
@@ -74,8 +73,8 @@ public class UpdateProcessor extends Processor {
 	private static final String INVALID_RECUR = "Need Date before adding recurrence period";
 
 	private static String[] updateKeywords = new String[] { " starttime ",
-			" endtime ", " desc ", " startdate ", " enddate ", " location ", " recur ",
-			" priority ", " complete", " !", " @" };
+			" endtime ", " desc ", " startdate ", " enddate ", " location ",
+			" recur ", " priority ", " complete", " !", " @" };
 
 	/**
 	 * @author Hao Eng
@@ -120,7 +119,7 @@ public class UpdateProcessor extends Processor {
 					updateDesc(index, whichToEdit[2], argument);
 					break;
 				case 3:
-					updateStartDate(index,whichToEdit[3],argument);
+					updateStartDate(index, whichToEdit[3], argument);
 					break;
 				case 4:
 					updateEndDate(index, whichToEdit[4], argument);
@@ -193,7 +192,6 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
@@ -207,7 +205,7 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
+
 	private static Task updateStartDate(int index, int editDate, String argument)
 			throws InvalidInputException {
 		DateTime date = convertStringToDateTime(parseDateString(argument
@@ -364,21 +362,22 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
-	
+
 	private static Boolean isStartTimeLessThanEndTime(Task input) {
-		if (input.getStartDate() != null && input.getEndDate() != null) {
+		if ((input.getStartDate() != null) && (input.getEndDate() != null)) {
 			if (input.getStartDate().gt(input.getEndDate())) {
-				 return true;
+				return true;
 			}
 			if (input.getStartDate().equals(input.getEndDate())) {
-				if (input.getStartTime() != null && input.getEndTime() != null) {
+				if ((input.getStartTime() != null)
+						&& (input.getEndTime() != null)) {
 					if (input.getStartTime().gt(input.getEndTime())) {
 						return true;
 					}
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -386,7 +385,7 @@ public class UpdateProcessor extends Processor {
 	 * @param argument
 	 * @return task index
 	 * @throws NumberFormatException
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	private static int getTaskIndex(String argument)
 			throws NumberFormatException, InvalidInputException {
@@ -394,7 +393,7 @@ public class UpdateProcessor extends Processor {
 		if (spaceAfterIndex == NOT_FOUND) {
 			throw new InvalidInputException(INVALID_INDEX);
 		}
-		if (!isParseableByInt(argument.substring(0,spaceAfterIndex))) {
+		if (!isParseableByInt(argument.substring(0, spaceAfterIndex))) {
 			throw new InvalidInputException(INVALID_INDEX);
 		}
 		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
