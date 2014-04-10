@@ -33,9 +33,15 @@ public class Processor {
 	protected static final int DAY_OFFSET = 1;
 	protected static final int DAYS_IN_A_WEEK = 7;
 	protected static final int SUNDAY_IN_DATETIME = 0;
+	protected static final int NOON = 12;
+	protected static final int PM_OFFSET = 12;
+	protected static final int POSITION_OFFSET = 1;
+	protected static final int ONE_DIGIT = 1;
 	
-	
+	protected static final String SG_TIMEZONE = "GMT+8:00";
 	protected static final String DEFAULT_MINUTE_FORMAT = "00";
+	protected static final String DATETIME_PADDING = "0";
+	protected static final String DATETIME_FORMAT_SYMBOL = "-";
 	protected static final String INVALID_DATE = "Invalid Date";
 	protected static final String INVALID_TIME = "Invalid Time";
 	
@@ -79,14 +85,14 @@ public class Processor {
 	 */
 	protected static String convertDateToStandardForm(String month, String day) {
 		String year = Integer.toString(DateTime.now(
-				TimeZone.getTimeZone("GMT+8:00")).getYear());
-		if (month.length() == 1) {
-			month = "0" + month;
+				TimeZone.getTimeZone(SG_TIMEZONE)).getYear());
+		if (month.length() == ONE_DIGIT) {
+			month = DATETIME_PADDING + month;
 		}
-		if (day.length() == 1) {
-			day = "0" + day;
+		if (day.length() == ONE_DIGIT) {
+			day = DATETIME_PADDING + day;
 		}
-		return year + "-" + day + "-" + month;
+		return year + DATETIME_FORMAT_SYMBOL + day + DATETIME_FORMAT_SYMBOL + month;
 	}
 
 	/**
@@ -186,10 +192,10 @@ public class Processor {
 			if (parts.length > 1) {
 				if (parts[0].contains(months[i])) {
 					standardFormDate = convertDateToStandardForm(parts[1],
-							String.valueOf(i + 1));
+							String.valueOf(i + POSITION_OFFSET));
 				} else if (parts[1].contains(months[i])) {
 					standardFormDate = convertDateToStandardForm(parts[0],
-							String.valueOf(i + 1));
+							String.valueOf(i + POSITION_OFFSET));
 				}
 			}
 		}
@@ -231,7 +237,7 @@ public class Processor {
 					return userDate;
 				case 1:
 				case 2:
-					userDate = currentDate.plusDays(1).toString();
+					userDate = currentDate.plusDays(ONE_DAY).toString();
 					return userDate;
 				}
 			}
@@ -250,10 +256,10 @@ public class Processor {
 	protected static int daysFromCurrentDay(String input) {
 		int currentDay = currentDate.getWeekDay();
 		int userDay = checkForDay(input);
-		/*
-		 * 1 is used as Sunday is the first day in DateTime, while Monday is
-		 * first day in this program, the next 3 lines is to readjust
-		 */
+		
+		//1 is used as Sunday is the first day in DateTime, while Monday is
+		// first day in this program, the next 3 lines is to readjust
+		 
 		currentDay -= DAY_OFFSET;
 		if (currentDay == SUNDAY_IN_DATETIME) {
 			currentDay = DAYS_IN_A_WEEK;
@@ -275,7 +281,7 @@ public class Processor {
 		int dayValue = 0;
 		for (int i = 0; i < days.length; i++) {
 			if (input.contains(days[i])) {
-				dayValue = i + 1;
+				dayValue = i + POSITION_OFFSET;
 				return dayValue;
 			}
 		}
@@ -296,6 +302,15 @@ public class Processor {
 		if (input == null) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
+		if (input.length() > MAX_TIME_LENGTH) {
+			throw new InvalidInputException(INVALID_TIME);
+		}
+		if ((input.length() == MAX_TIME_LENGTH) && input.contains(":")) {
+			if (DateTime.isParseable(input)) {
+				return input;		
+			}
+		}
+		
 		timeString = convertStringToStdTimeString(input);
 		return timeString;
 	}
@@ -317,17 +332,11 @@ public class Processor {
 		String userMinute = DEFAULT_MINUTE_FORMAT;
 		String timeString = null;
 		int meridiemIndex = checkMeridiem(input);
+		
+		//if am or pm is present, removes them from the string
 		if (meridiemIndex != NOT_FOUND) {
-			//truncates 930pm to 930
 			input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
 		}
-		if (input.length() > MAX_TIME_LENGTH) {
-			throw new InvalidInputException(INVALID_TIME);
-		}
-		if ((input.length() == MAX_TIME_LENGTH) && input.contains(":")) {
-			return input;
-		} 
-		
 		if (!isParseableByInt(input)) {
 			throw new InvalidInputException(INVALID_TIME);
 		} else {
@@ -343,14 +352,14 @@ public class Processor {
 			}
 		}
 		if (meridiemIndex == PM) { 	
-			if (Integer.parseInt(userHour) != 12) {
+			if (Integer.parseInt(userHour) != NOON) {
 				// Adds 12 hours to the hour if there is PM
-				userHour = Integer.toString(Integer.parseInt(userHour) + 12);
+				userHour = Integer.toString(Integer.parseInt(userHour) + PM_OFFSET);
 			}
 		}
 		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
 			// pads a single digit hour to fit the DateTime format
-			userHour = "0" + userHour;
+			userHour = DATETIME_PADDING + userHour;
 		}
 		timeString = userHour + ":" + userMinute;
 		return timeString;
