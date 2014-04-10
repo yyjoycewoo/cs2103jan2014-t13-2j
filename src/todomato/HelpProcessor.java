@@ -1,3 +1,4 @@
+//@author A0101578H
 package todomato;
 
 import java.awt.Dimension;
@@ -11,7 +12,6 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This class shows a popup help window when command is given
  * 
- * @author A0101578H
  * 
  */
 public class HelpProcessor {

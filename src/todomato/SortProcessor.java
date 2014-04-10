@@ -1,3 +1,4 @@
+//@author A0101578H
 package todomato;
 
 /**
@@ -36,7 +37,6 @@ package todomato;
  * <li> "descending"
  * </ul>
  * 
- * @author A0101578H
  * 
  */
 
