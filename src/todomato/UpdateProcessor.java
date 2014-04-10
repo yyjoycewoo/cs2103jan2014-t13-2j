@@ -71,6 +71,7 @@ public class UpdateProcessor extends Processor {
 	private static final String START_TIME_GT_END_TIME = "Start time cannot be greater than end time";
 	private static final String INVALID_INDEX = "Invalid Index";
 	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
+	private static final String INVALID_RECUR = "Need Date before adding recurrence period";
 
 	private static String[] updateKeywords = new String[] { " starttime ",
 			" endtime ", " desc ", " startdate ", " enddate ", " location ", " recur ",
@@ -182,8 +183,9 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static Task updateStartTime(int index, int editStartTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeString(argument
-				.substring(editStartTime + NO_OF_CHAR_IN_STIME)));
+		argument = argument.substring(editStartTime + NO_OF_CHAR_IN_STIME);
+		String[] parts = argument.split(" ");
+		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
 		list.getListItem(index).setStartTime(time);
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
@@ -195,8 +197,9 @@ public class UpdateProcessor extends Processor {
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
-		DateTime time = convertStringToDateTime(parseTimeString(argument
-				.substring(editEndTime + NO_OF_CHAR_IN_ETIME)));
+		argument = argument.substring(editEndTime + NO_OF_CHAR_IN_ETIME);
+		String[] parts = argument.split(" ");
+		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
 		list.getListItem(index).setEndTime(time);
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
@@ -210,6 +213,10 @@ public class UpdateProcessor extends Processor {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_SDATE)));
 		list.getListItem(index).setStartDate(date);
+		//Ensures that any task with a start date has an end date
+		if (list.getListItem(index).getEndDate() == null) {
+			list.getListItem(index).setEndDate(date);
+		}
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		}
@@ -281,9 +288,10 @@ public class UpdateProcessor extends Processor {
 	 * @param argument
 	 *            that contains recurrence period
 	 * @return updated task
+	 * @throws InvalidInputException 
 	 */
 
-	private static Task updateRecur(int index, int recurDesc, String argument) {
+	private static Task updateRecur(int index, int recurDesc, String argument) throws InvalidInputException {
 		int stopIndex = argument.length();
 		int userRecurrence = list.getListItem(index).getRecurrencePeriod();
 		try {
@@ -293,7 +301,7 @@ public class UpdateProcessor extends Processor {
 			return null;
 		}
 		if (list.getListItem(index).getEndDate() == null) {
-			return null;
+			throw new InvalidInputException(INVALID_RECUR);
 		}
 		list.getListItem(index).setRecurrencePeriod(userRecurrence);
 		fileHandler.updateFile(list);
@@ -383,7 +391,7 @@ public class UpdateProcessor extends Processor {
 	private static int getTaskIndex(String argument)
 			throws NumberFormatException, InvalidInputException {
 		int spaceAfterIndex = argument.indexOf(" ");
-		if (spaceAfterIndex == -1) {
+		if (spaceAfterIndex == NOT_FOUND) {
 			throw new InvalidInputException(INVALID_INDEX);
 		}
 		if (!isParseableByInt(argument.substring(0,spaceAfterIndex))) {
