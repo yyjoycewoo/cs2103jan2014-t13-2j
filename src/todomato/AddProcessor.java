@@ -558,7 +558,7 @@ public class AddProcessor extends Processor {
 	private static Boolean checkForInvertedCommas (String input) {
 		if (input.contains("\"")) {
 			if (input.substring(input.indexOf("\"")+1).contains("\"")) {
-			return true;
+				return true;
 			}
 		} 
 		return false;
