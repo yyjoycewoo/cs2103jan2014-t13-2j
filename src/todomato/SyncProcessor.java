@@ -9,6 +9,13 @@ public class SyncProcessor extends Processor {
 			fileHandler.updateFile(list);
 		}
 		
-		return "syncing...";
+		String username = list.getUserName();
+		String password = list.getPassword();
+		
+		DataSyncer Syncer = new DataSyncer(list);
+		TaskList newList = Syncer.sync(username, password, list.getLastSyncTime());
+		fileHandler.updateFile(newList);
+		
+		return "sync completed";
 	}
 }
