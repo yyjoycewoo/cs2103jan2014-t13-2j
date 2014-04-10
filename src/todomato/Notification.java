@@ -24,14 +24,12 @@ import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
 
+//@author A0101324A
 /**
  * This class creates a pop up notification to appear on the desktop.
  * 
- * @author Hao Eng
- * @source from
- *         http://www.javacodegeeks.com/2012/10/create-new-message-notification
- *         -pop-up.html
  */
+
 public abstract class Notification extends Popup implements ActionListener {
 	private static int count = 0, width = 200;
 
@@ -40,8 +38,8 @@ public abstract class Notification extends Popup implements ActionListener {
 	 */
 	protected static void popUpNotice() {
 		String msg = "~~~Reminder! Do now or never!~~~";
-		// pop up disappeared after 3sec
-		final int waitfor = 3000;
+		// pop up disappeared after 2sec
+		final int waitfor = 2000;
 		// create and set up the window
 		final JFrame frame = new JFrame("Reminder");
 
@@ -71,7 +69,6 @@ public abstract class Notification extends Popup implements ActionListener {
 		buttonsAction(textLabel);
 
 		textLabel.setPreferredSize(new Dimension(300, 100));
-		// frame.getContentPane().add(textLabel, BorderLayout.CENTER);
 		textLabel.setOpaque(false);
 		frame.getContentPane().add(textLabel, constraints);
 		constraints.gridx++;
@@ -111,44 +108,52 @@ public abstract class Notification extends Popup implements ActionListener {
 		new Thread() {
 			@Override
 			public void run() {
-				// ensure that the pop up wont disppear when mouse over
-				frame.addMouseListener(new MouseAdapter() {
-					Timer timer;
-
-					@Override
-					public void mouseEntered(MouseEvent event) {
-						// cos can only cancel timer for one time only!
-						// need new timer every time the mouse enters pop up
-						if (timer != null) {
-							timer.cancel();
-						}
-					}
-
-					@Override
-					public void mouseExited(MouseEvent event) {
-						// If mouse pointer is still within the bounds of the
-						// frame, do not set the timer to close the notification
-						// window
-						Rectangle frameRect = new Rectangle(frame
-								.getLocationOnScreen());
-						frameRect.setSize(frame.getWidth(), frame.getHeight());
-						Point mousePointer = event.getLocationOnScreen();
-						if (!frameRect.contains(mousePointer)) {
-							// Otherwise, schedule a timer
-							timer = new Timer();
-							timer.schedule(new java.util.TimerTask() {
-								@Override
-								public void run() {
-									frame.dispose();
-								}
-							}, waitfor);
-						}
-					}
-
-				});
-			};
+				// when mouse over, it wont disappear until the mouse exits
+				mouseActions(waitfor, frame);
+			}
 		}.start();
 	}
+
+	/**
+	 * @param waitfor
+	 * @param frame
+	 */
+	protected static void mouseActions(final int waitfor, final JFrame frame) {
+		// ensure that the pop up wont disappear when mouse over
+		frame.addMouseListener(new MouseAdapter() {
+			Timer timer;
+
+			@Override
+			public void mouseEntered(MouseEvent event) {
+				// cos can only cancel timer for one time only!
+				// need new timer every time the mouse enters pop up
+				if (timer != null) {
+					timer.cancel();
+				}
+			}
+
+			@Override
+			public void mouseExited(MouseEvent event) {
+				// If mouse pointer is still within the bounds of the
+				// frame, do not set the timer to close the notification
+				// window
+				Rectangle frameRect = new Rectangle(frame.getLocationOnScreen());
+				frameRect.setSize(frame.getWidth(), frame.getHeight());
+				Point mousePointer = event.getLocationOnScreen();
+				if (!frameRect.contains(mousePointer)) {
+					// Otherwise, schedule a timer
+					timer = new Timer();
+					timer.schedule(new java.util.TimerTask() {
+						@Override
+						public void run() {
+							frame.dispose();
+						}
+					}, waitfor);
+				}
+			}
+
+		});
+	};
 
 	/**
 	 * @param textLabel
@@ -157,48 +162,62 @@ public abstract class Notification extends Popup implements ActionListener {
 	protected static void buttonsAction(final JLabel textLabel) {
 		// allow the next task to be shown after clicking the button
 		ActionListener actionListener_prev = new ActionListener() {
+			private String text;
+
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				// get the prev item in myownlist
-				if (count == 0) {
-					count = Popup.myownlist.getSize() - 1;
+				if (count <= 0) {
+					count = 0;
 					// allow text to be within the JLabel border
-					String text = String.format(
-							"<html><div WIDTH=%d>%s</div><html>", width,
-							Popup.myownlist.getListItem(count).toString());
-					textLabel.setText(text);
-
+					text = String.format("<html><div WIDTH=%d>%s</div><html>",
+							width, Popup.myownlist.getListItem(count)
+									.toString());
 				} else {
 					count--;
-					// allow text to be within the JLabel border
-					String text = String.format(
-							"<html><div WIDTH=%d>%s</div><html>", width,
-							Popup.myownlist.getListItem(count).toString());
-					textLabel.setText(text);
+					text = String.format("<html><div WIDTH=%d>%s</div><html>",
+							width, Popup.myownlist.getListItem(count)
+									.toString());
 				}
+				textLabel.setText(text);
 			}
 		};
+
 		// allow the next task to be shown after clicking the button
 		ActionListener actionListener_next = new ActionListener() {
+			private String text;
+
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
+
 				// get the next item in myownlist
-				if (count == (Popup.myownlist.getSize())) {
+				if (count >= (Popup.myownlist.getSize() - 1)) {
+					count = Popup.myownlist.getSize() - 1;
+					text = String.format("<html><div WIDTH=%d>%s</div><html>",
+							width, Popup.myownlist.getListItem(count)
+									.toString());
+
+				} else {
+					count++;
 					// allow text to be within the JLabel border
-					String text = String.format(
-							"<html><div WIDTH=%d>%s</div><html>", width,
-							Popup.myownlist.getListItem(count - 1).toString());
-					textLabel.setText(text);
-					count = 0;
+					text = String.format("<html><div WIDTH=%d>%s</div><html>",
+							width, Popup.myownlist.getListItem(count)
+									.toString());
 				}
-				// allow text to be within the JLabel border
-				String text = String.format(
-						"<html><div WIDTH=%d>%s</div><html>", width,
-						Popup.myownlist.getListItem(count).toString());
 				textLabel.setText(text);
-				count++;
 			}
 		};
+		putButtonsOnLabel(textLabel, actionListener_prev, actionListener_next);
+	}
+
+	/**
+	 * @param textLabel
+	 * @param actionListener_prev
+	 * @param actionListener_next
+	 */
+	protected static void putButtonsOnLabel(final JLabel textLabel,
+			ActionListener actionListener_prev,
+			ActionListener actionListener_next) {
+
 		// implementing buttons on the label
 		textLabel.setLayout(new BorderLayout());
 		JButton next = new BasicArrowButton(BasicArrowButton.EAST);
@@ -207,9 +226,10 @@ public abstract class Notification extends Popup implements ActionListener {
 		next.addActionListener(actionListener_next);
 		textLabel.add(prev, BorderLayout.WEST);
 		textLabel.add(next, BorderLayout.EAST);
-		textLabel.setText(Popup.myownlist.getListItem(0).toString());
+		String text = String.format("<html><div WIDTH=%d>%s</div><html>",
+				width, Popup.myownlist.getListItem(0).toString());
+		textLabel.setText(text);
 		// Centralizing the text on the JLabel
 		textLabel.setHorizontalAlignment(JLabel.CENTER);
-		count = 1;
 	}
 }

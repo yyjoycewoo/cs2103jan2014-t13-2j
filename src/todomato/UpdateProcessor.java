@@ -5,6 +5,7 @@ package todomato;
 
 import hirondelle.date4j.DateTime;
 
+//@author A0101324A
 /**
  * This class contains methods to process update commands by the user. It
  * updates the user's lists of tasks, and saves it to disk.
@@ -20,8 +21,8 @@ import hirondelle.date4j.DateTime;
  * <ul>
  * <li>"starttime" for the start time
  * <li>"endtime" for the end time
- * <li>"desc" for the description, followed by '\' afterwards
- * <li>"location" for the location, followed by '\' afterwards
+ * <li>"desc" for the description, followed by '\\' afterwards
+ * <li>"location" for the location, followed by '\\' afterwards
  * <li>"date" for the date
  * <li>"recur" for recurrence interval
  * <li>"priority" or "!" for priority level
@@ -34,7 +35,8 @@ import hirondelle.date4j.DateTime;
  * <p>
  * Examples:
  * <ul>
- * <li>"update 2 date 4 Jan"
+ * <li>"update 2 enddate 4 Jan"
+ * <li>"update 2,3,4 !high"
  * <li>"update 1 starttime 1900 desc dinner with parents\ location home\
  * </ul>
  * 
@@ -56,8 +58,6 @@ import hirondelle.date4j.DateTime;
  * <li>january 1
  * </ul>
  * 
- * @author Hao Eng
- * 
  */
 public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_STIME = 11;
@@ -72,10 +72,11 @@ public class UpdateProcessor extends Processor {
 	private static final String INVALID_INDEX = "Invalid Index";
 	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
 	private static final String INVALID_RECUR = "Need Date before adding recurrence period";
+	private static final String UPDATED = "Updated the task(s)";
 
 	private static String[] updateKeywords = new String[] { " starttime ",
-			" endtime ", " desc ", " startdate ", " enddate ", " location ", " recur ",
-			" priority ", " complete", " !", " @" };
+			" endtime ", " desc ", " startdate ", " enddate ", " location ",
+			" recur ", " priority ", " complete", " !", " @" };
 
 	/**
 	 * @author Hao Eng
@@ -90,13 +91,15 @@ public class UpdateProcessor extends Processor {
 		storeCurrentList();
 		printInvalidKeywords(argument);
 		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-		int index = getTaskIndex(argument) - 1;
-		printInvalidIndexMsg(index);
-		whichToEdit = findDetailToEdit(argument);
-		updater(argument, whichToEdit, index);
-
-		displayList.deepCopy(list);
-		return list.getListItem(index).toString();
+		int[] indices = getTaskIndex(argument);
+		for (int indice : indices) {
+			int index = indice - 1;
+			printInvalidIndexMsg(index);
+			whichToEdit = findDetailToEdit(argument);
+			updater(argument, whichToEdit, index);
+			displayList.deepCopy(list);
+		}
+		return UPDATED;
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class UpdateProcessor extends Processor {
 					updateDesc(index, whichToEdit[2], argument);
 					break;
 				case 3:
-					updateStartDate(index,whichToEdit[3],argument);
+					updateStartDate(index, whichToEdit[3], argument);
 					break;
 				case 4:
 					updateEndDate(index, whichToEdit[4], argument);
@@ -193,7 +196,6 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
 
 	private static Task updateEndTime(int index, int editEndTime,
 			String argument) throws InvalidInputException {
@@ -207,13 +209,13 @@ public class UpdateProcessor extends Processor {
 		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
-	
+
 	private static Task updateStartDate(int index, int editDate, String argument)
 			throws InvalidInputException {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_SDATE)));
 		list.getListItem(index).setStartDate(date);
-		//Ensures that any task with a start date has an end date
+		// Ensures that any task with a start date has an end date
 		if (list.getListItem(index).getEndDate() == null) {
 			list.getListItem(index).setEndDate(date);
 		}
@@ -288,10 +290,11 @@ public class UpdateProcessor extends Processor {
 	 * @param argument
 	 *            that contains recurrence period
 	 * @return updated task
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 
-	private static Task updateRecur(int index, int recurDesc, String argument) throws InvalidInputException {
+	private static Task updateRecur(int index, int recurDesc, String argument)
+			throws InvalidInputException {
 		int stopIndex = argument.length();
 		int userRecurrence = list.getListItem(index).getRecurrencePeriod();
 		try {
@@ -364,21 +367,22 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
-	
+
 	private static Boolean isStartTimeLessThanEndTime(Task input) {
-		if (input.getStartDate() != null && input.getEndDate() != null) {
+		if ((input.getStartDate() != null) && (input.getEndDate() != null)) {
 			if (input.getStartDate().gt(input.getEndDate())) {
-				 return true;
+				return true;
 			}
 			if (input.getStartDate().equals(input.getEndDate())) {
-				if (input.getStartTime() != null && input.getEndTime() != null) {
+				if ((input.getStartTime() != null)
+						&& (input.getEndTime() != null)) {
 					if (input.getStartTime().gt(input.getEndTime())) {
 						return true;
 					}
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -386,17 +390,36 @@ public class UpdateProcessor extends Processor {
 	 * @param argument
 	 * @return task index
 	 * @throws NumberFormatException
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
-	private static int getTaskIndex(String argument)
+	private static int[] getTaskIndex(String argument)
 			throws NumberFormatException, InvalidInputException {
 		int spaceAfterIndex = argument.indexOf(" ");
+		// no index found
 		if (spaceAfterIndex == NOT_FOUND) {
 			throw new InvalidInputException(INVALID_INDEX);
 		}
-		if (!isParseableByInt(argument.substring(0,spaceAfterIndex))) {
-			throw new InvalidInputException(INVALID_INDEX);
+		// split different index
+		String[] index = argument.substring(0, spaceAfterIndex).split(",");
+		int[] indices = new int[index.length];
+
+		// only single index
+		if (index.length == 1) {
+			if (!isParseableByInt(index[0])) {
+				throw new InvalidInputException(INVALID_INDEX);
+			} else {
+				indices[0] = Integer.parseInt(index[0]);
+				return indices;
+			}
 		}
-		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
+		// multiple index
+		else {
+
+			// change all strings to integers
+			for (int i = 0; i < index.length; i++) {
+				indices[i] = Integer.parseInt(index[i]);
+			}
+			return indices;
+		}
 	}
 }

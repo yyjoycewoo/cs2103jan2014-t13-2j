@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.TimeZone;
 
 
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 
 
 import org.apache.http.HttpResponse;
@@ -23,7 +25,7 @@ import org.apache.http.util.EntityUtils;
 
 /**
  * This class is the process for the Google Sync of the application.
- * @author yiwen
+ * @author A0099332Y
  *
  */
 
@@ -31,19 +33,21 @@ public class DataSyncer extends Processor {
 	
 	TaskList localList;
 	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	// static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+
 	
-	/**
-	 * @param fileLoc
-	 */
 	public DataSyncer (TaskList localList) {
 		this.localList = localList;
 	}
 			
 	public TaskList sync(String username, String password, DateTime lastsync) {
 		JsonObject localJson = prepareData(this.localList, username, password, lastsync);
-		list.setLastSyncTime(DateTime.now(TimeZone.getDefault()));
+		System.out.println(localJson);
 		JsonObject responseJson = sendRequest(localJson);
 		localList = processResponse(responseJson);
+		localList.setLastSyncTime(DateTime.now(TimeZone.getDefault()));
+		localList.setUserName(username);
+		localList.setPassword(password);
 		return localList;
 	}
 	
@@ -63,6 +67,7 @@ public class DataSyncer extends Processor {
 				HttpResponse response = client.execute(post);
 				String json = EntityUtils.toString(response.getEntity());
 				JsonParser jsonParser = new JsonParser();
+				System.out.println(json);
 				JsonObject tJson = (JsonObject)jsonParser.parse(json);
 				
 				return tJson;
@@ -91,10 +96,14 @@ public class DataSyncer extends Processor {
 			JsonObject tJson = t.getAsJsonObject();
 			String eventId = tJson.get("eid").getAsString();
 			String description = tJson.get("description").getAsString();
-			Integer id = Integer.parseInt(tJson.get("description").getAsString());
+			Integer id = null;
+			if (!tJson.get("id").isJsonNull()){
+				id = Integer.parseInt(tJson.get("id").getAsString());
+			}
+			
 			String location = tJson.get("location").getAsString();
 			ArrayList<DateTime> startDTList = stringToDateAndTime(tJson.get("starttime").getAsString());
-			ArrayList<DateTime> endDTList = stringToDateAndTime(tJson.get("starttime").getAsString());
+			ArrayList<DateTime> endDTList = stringToDateAndTime(tJson.get("endtime").getAsString());
 			
 			DateTime startDate = startDTList.get(0);
 			DateTime startTime = startDTList.get(1);
@@ -109,11 +118,16 @@ public class DataSyncer extends Processor {
 			task.setStartDate(startDate);
 			task.setEndDate(endDate);		
 			task.setLocation(location);
-			task.setId(id);
+			
+			if(id != null){
+				task.setId(id);
+			}
+			
 			task.setTimeCreated(timeCreated);
+			System.out.println(eventId);
 			task.setEventId(eventId);
 			task.setUpdateTime(updateTime);
-			// task.setPriorityLevel(prioritylevel);
+			// task.setPriorityLevel(priorityLevel);
 			// task.setCompleted(isCompleted);
 			// task.setNoticeTime(noticeTime);
 			output.addToList(task);
@@ -123,34 +137,46 @@ public class DataSyncer extends Processor {
 	}
 
 	private String formatTime(DateTime d, DateTime t) {
-		if (d == null || t == null) {
-			return null;
+		if (d == null || d.toString().equals("null")) {
+			return "";
+		} else if (t == null || t.toString().equals("null")) {
+			return d.format("YYYY-MM-DD");
 		} else {
-			return d.format("YYYY-MM-DD") + "T" + t.format("hh:mm:ss") + ".000+08:00";
+			return d.format("YYYY-MM-DD") + "T" + t.format("hh:mm:") + "00.000+08:00";
 		}
 	}
 	
 	private String formatTime(DateTime dt) {
-		if (dt == null) {
-			return null;
+		if (dt == null || dt.toString().equals("null")  ) {
+			return "";
 		} else {
 			return dt.format("YYYY-MM-DD") + "T" + dt.format("hh:mm:ss") + ".000+08:00";
 		}
 	}
 	
 	private DateTime stringToDateTime(String s) {
-		DateTime dt = new DateTime(s.split("+")[0]);
+		DateTime dt = new DateTime(s.substring(0,19));
 		return dt;
 	}
 	
 	private ArrayList<DateTime> stringToDateAndTime(String s) {
 		ArrayList<DateTime> datetimeList = new ArrayList<DateTime>();
-		DateTime dt = new DateTime(s.split("+")[0]);
-		DateTime d = DateTime.forDateOnly(dt.getYear(), dt.getMonth(), dt.getDay()); 
-		DateTime t = DateTime.forTimeOnly(dt.getHour(), dt.getMinute(), dt.getSecond(), dt.getNanoseconds());
+		DateTime t = null;
+		DateTime d = null;
+		if(s.length() >= 19){
+			d = new DateTime(s.substring(0,10));
+			t = new DateTime(s.substring(11,19));
+		} else {
+			d = new DateTime(s.substring(0,10));
+		}
 		datetimeList.add(d);
 		datetimeList.add(t);
 		return datetimeList;
+	}
+	
+	private boolean notNullString(String s) {
+		boolean isNullString = (s == null || s.equals("null"));
+		return !isNullString;
 	}
 
 	private JsonObject prepareData(TaskList localList, String username, String password, DateTime lastsync) {
@@ -170,6 +196,12 @@ public class DataSyncer extends Processor {
 			
 			String id = Integer.toString(t.getId());
 			String description = t.getDescription();
+			if(t.getStartDate() == null) {
+				t.setStartDate(t.getEndDate());
+			}
+			if(t.getUpdateTime() == null) {
+				t.setUpdateTime(t.getTimeCreated());
+			}
 			String starttime = formatTime(t.getStartDate(), t.getStartTime());
 			String endtime = formatTime(t.getEndDate(), t.getEndTime());
 			String created = formatTime(t.getTimeCreated());
@@ -177,35 +209,35 @@ public class DataSyncer extends Processor {
 			String location = t.getLocation();
 			String eid = t.getEventId();
 			
-			if (id != null){
-				tJson.addProperty("id", id);
-			}
-			
-			if (description != null){
+			tJson.addProperty("id", id);
+
+			if (notNullString(description)){
 				tJson.addProperty("description", description);
 			}
 			
-			if (starttime != null){
+			if (notNullString(starttime)){
 				tJson.addProperty("starttime", starttime);
 			}
 			
-			if (endtime != null){
+			if (notNullString(endtime)){
 				tJson.addProperty("endtime", endtime);
 			}
 			
-			if (created != null){
+			if (notNullString(created)){
 				tJson.addProperty("created", created);
 			}
 			
-			if (location != null){
+			if (notNullString(location)){
 				tJson.addProperty("location", location);
+			} else {
+				tJson.addProperty("location", "");
 			}
 			
-			if (eid != null){
+			if (notNullString(eid)){
 				tJson.addProperty("eid", eid);
 			}
 			
-			if (edit != null){
+			if (notNullString(edit)){
 				tJson.addProperty("edit", edit);
 			}
 			
