@@ -12,7 +12,7 @@ import java.util.Collections;
 public class TaskList {
 	private static final String LINE_BREAK = "\r\n";
 	private ArrayList<Task> list;
-	private DateTime lastSyncTime;
+	private DateTime lastSyncTime=null;
 	private String userName=null;
 	private String password=null;
 	
