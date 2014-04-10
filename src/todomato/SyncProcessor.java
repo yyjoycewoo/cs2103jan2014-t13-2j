@@ -7,6 +7,7 @@ public class SyncProcessor extends Processor {
 		(list.getUserName().equals("null") && list.getPassword().equals("null"))){
 			new UsernamePasswordDialogueBox();
 			fileHandler.updateFile(list);
+
 		}
 		
 		String username = list.getUserName();
@@ -14,8 +15,11 @@ public class SyncProcessor extends Processor {
 		
 		DataSyncer Syncer = new DataSyncer(list);
 		TaskList newList = Syncer.sync(username, password, list.getLastSyncTime());
-		fileHandler.updateFile(newList);
+		list = newList;
+		fileHandler.updateFile(list);
+		displayList.deepCopy(list);
 		
 		return "sync completed";
+
 	}
 }
