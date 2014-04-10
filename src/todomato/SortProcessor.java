@@ -232,8 +232,14 @@ public class SortProcessor extends Processor{
 //	Returns true if..
 //	list[i] has lower priority than list[j]
 	private static boolean comparePriority(int i, int j) {
-		if(displayList.getListItem(i).getPriorityLevel().equals(PRIORITY_LOW)) {
-			if(displayList.getListItem(j).getPriorityLevel().equals(PRIORITY_LOW)) {
+		if (displayList.getListItem(i).getCompleted()) {
+			if (displayList.getListItem(j).getCompleted()) {
+				return false;
+			}
+			return true;
+		}
+		if (displayList.getListItem(i).getPriorityLevel().equals(PRIORITY_LOW)) {
+			if (displayList.getListItem(j).getPriorityLevel().equals(PRIORITY_LOW)) {
 				return false;
 			}
 			return true;
