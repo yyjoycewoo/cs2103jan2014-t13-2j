@@ -21,8 +21,8 @@ import hirondelle.date4j.DateTime;
  * <ul>
  * <li>"starttime" for the start time
  * <li>"endtime" for the end time
- * <li>"desc" for the description, followed by '\\' afterwards
- * <li>"location" for the location, followed by '\\' afterwards
+ * <li>"desc" for the description, followed by '\' afterwards
+ * <li>"location" for the location, followed by '\' afterwards
  * <li>"date" for the date
  * <li>"recur" for recurrence interval
  * <li>"priority" or "!" for priority level
@@ -402,6 +402,8 @@ public class UpdateProcessor extends Processor {
 		// split different index
 		String[] index = argument.substring(0, spaceAfterIndex).split(",");
 		int[] indices = new int[index.length];
+
+		System.out.println("indices len: " + indices.length);
 
 		// only single index
 		if (index.length == 1) {
