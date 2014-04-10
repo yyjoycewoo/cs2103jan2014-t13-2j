@@ -1,3 +1,4 @@
+//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -48,8 +49,6 @@ import java.util.regex.Pattern;
  * 
  * 
  */
-
-//@author A0096620E
 public class AddProcessor extends Processor {
 
 
