@@ -35,9 +35,7 @@ public class DataSyncer extends Processor {
 	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
 	// static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 
-	/**
-	 * @param fileLoc
-	 */
+	
 	public DataSyncer (TaskList localList) {
 		this.localList = localList;
 	}
