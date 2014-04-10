@@ -1,3 +1,4 @@
+//@author A0101578H
 package todomato;
 
 import java.awt.Dimension;
@@ -8,6 +9,11 @@ import javax.swing.JTextArea;
 
 import net.miginfocom.swing.MigLayout;
 
+/**
+ * This class shows a popup help window when command is given
+ * 
+ * 
+ */
 public class HelpProcessor {
 	private static final String HELP_TEXT = 
 			"1. Adding task: \n" +

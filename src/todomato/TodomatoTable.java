@@ -4,6 +4,7 @@ import hirondelle.date4j.DateTime;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Locale;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -222,7 +223,7 @@ public class TodomatoTable extends JTable {
                 if (date == null) {
                         return "";
                 } else {
-                        return date.format("DD-MM-YYYY");
+                        return date.format("MMM DD YYYY", new Locale("US"));
                 }
         }
 

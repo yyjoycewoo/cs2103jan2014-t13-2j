@@ -24,16 +24,17 @@ import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
 
+//@author A0101324A
 /**
  * This class creates a pop up notification to appear on the desktop.
  * 
- * @author Hao Eng
  * @source from
  *         http://www.javacodegeeks.com/2012/10/create-new-message-notification
  *         -pop-up.html
  */
+
 public abstract class Notification extends Popup implements ActionListener {
-	private static int count = 0;
+	private static int count = 0, width = 200;
 
 	/**
 	 * @param taskToDo
@@ -68,11 +69,9 @@ public abstract class Notification extends Popup implements ActionListener {
 		constraints.fill = GridBagConstraints.BOTH;
 
 		final JLabel textLabel = new JLabel();
-
 		buttonsAction(textLabel);
 
 		textLabel.setPreferredSize(new Dimension(300, 100));
-		// frame.getContentPane().add(textLabel, BorderLayout.CENTER);
 		textLabel.setOpaque(false);
 		frame.getContentPane().add(textLabel, constraints);
 		constraints.gridx++;
@@ -101,6 +100,8 @@ public abstract class Notification extends Popup implements ActionListener {
 		constraints.fill = GridBagConstraints.BOTH;
 
 		JLabel msgLabel = new JLabel("<HtMl>" + msg);
+		// Centralizing the text on the JLabel
+		msgLabel.setHorizontalAlignment(JLabel.CENTER);
 		frame.add(msgLabel, constraints);
 		// close window after clicking on cross
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -161,13 +162,19 @@ public abstract class Notification extends Popup implements ActionListener {
 				// get the prev item in myownlist
 				if (count == 0) {
 					count = Popup.myownlist.getSize() - 1;
-					textLabel.setText(Popup.myownlist.getListItem(count)
-							.toString());
+					// allow text to be within the JLabel border
+					String text = String.format(
+							"<html><div WIDTH=%d>%s</div><html>", width,
+							Popup.myownlist.getListItem(count).toString());
+					textLabel.setText(text);
 
 				} else {
 					count--;
-					textLabel.setText(Popup.myownlist.getListItem(count)
-							.toString());
+					// allow text to be within the JLabel border
+					String text = String.format(
+							"<html><div WIDTH=%d>%s</div><html>", width,
+							Popup.myownlist.getListItem(count).toString());
+					textLabel.setText(text);
 				}
 			}
 		};
@@ -177,12 +184,18 @@ public abstract class Notification extends Popup implements ActionListener {
 			public void actionPerformed(ActionEvent actionEvent) {
 				// get the next item in myownlist
 				if (count == (Popup.myownlist.getSize())) {
-					textLabel.setText(Popup.myownlist.getListItem(count - 1)
-							.toString());
+					// allow text to be within the JLabel border
+					String text = String.format(
+							"<html><div WIDTH=%d>%s</div><html>", width,
+							Popup.myownlist.getListItem(count - 1).toString());
+					textLabel.setText(text);
 					count = 0;
 				}
-				textLabel
-						.setText(Popup.myownlist.getListItem(count).toString());
+				// allow text to be within the JLabel border
+				String text = String.format(
+						"<html><div WIDTH=%d>%s</div><html>", width,
+						Popup.myownlist.getListItem(count).toString());
+				textLabel.setText(text);
 				count++;
 			}
 		};

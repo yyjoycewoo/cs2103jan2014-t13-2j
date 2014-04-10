@@ -1,3 +1,4 @@
+//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -14,7 +15,6 @@ import java.util.TimeZone;
 public class Processor {
 
 	protected static String fileLoc = "tasks.txt";
-	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskList list = fileHandler.readFile();
 	protected static TaskList displayList = new TaskList();
@@ -26,9 +26,23 @@ public class Processor {
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
 	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES = 3;
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES = 4;
+	protected static final int MAX_TIME_LENGTH = 5;
 	protected static final int POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR = 1;
 	protected static final int POS_OF_MINUTE = 2;
+	protected static final int ONE_DAY = 1;
+	protected static final int DAY_OFFSET = 1;
+	protected static final int DAYS_IN_A_WEEK = 7;
+	protected static final int SUNDAY_IN_DATETIME = 0;
+	protected static final int NOON = 12;
+	protected static final int PM_OFFSET = 12;
+	protected static final int POSITION_OFFSET = 1;
+	protected static final int ONE_DIGIT = 1;
 	
+	protected static final String SG_TIMEZONE = "GMT+8:00";
+	protected static final String DEFAULT_MINUTE_FORMAT = "00";
+	protected static final String DATETIME_PADDING = "0";
+	protected static final String DATE_FORMAT_SYMBOL = "-";
+	protected static final String TIME_FORMAT_SYMBOL = ":";
 	protected static final String INVALID_DATE = "Invalid Date";
 	protected static final String INVALID_TIME = "Invalid Time";
 	
@@ -63,7 +77,7 @@ public class Processor {
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"
 	 * 
-	 * @author Daryl Ho
+	 *    
 	 * @param String
 	 *            month, String day
 	 * 
@@ -72,23 +86,22 @@ public class Processor {
 	 */
 	protected static String convertDateToStandardForm(String month, String day) {
 		String year = Integer.toString(DateTime.now(
-				TimeZone.getTimeZone("GMT+8:00")).getYear());
-		if (month.length() == 1) {
-			month = "0" + month;
+				TimeZone.getTimeZone(SG_TIMEZONE)).getYear());
+		if (month.length() == ONE_DIGIT) {
+			month = DATETIME_PADDING + month;
 		}
-		if (day.length() == 1) {
-			day = "0" + day;
+		if (day.length() == ONE_DIGIT) {
+			day = DATETIME_PADDING + day;
 		}
-		return year + "-" + day + "-" + month;
+		return year + DATE_FORMAT_SYMBOL + day + DATE_FORMAT_SYMBOL + month;
 	}
 
 	/**
 	 * Checks whether "am" or "pm" is in the string
 	 * 
-	 * @author Daryl Ho
+	 *    
 	 * @param input
-	 * @return integer indicating which meridiem is present -1 if there is not
-	 *         one
+	 * @return 0 for am, 1 for pm, -1 for not found
 	 */
 
 	protected static int checkMeridiem(String input) {
@@ -97,12 +110,21 @@ public class Processor {
 				return i;
 			}
 		}
-		return -1;
+		return NOT_FOUND;
 	}
+	
+	/**
+	 * Function to determine if a string can be parsed into a date
+	 * @param input
+	 * @return true or false
+	 */
 	
 	protected static Boolean isParseableByDate (String input) {
 		try {
 			if(isParseableByInt(input)) {
+				return false;
+			}
+			if (isParseableByTime(input)) {
 				return false;
 			}
 			input = parseDateString(input);
@@ -114,6 +136,12 @@ public class Processor {
 		}
 		return true;
 	}
+	
+	/**
+	 * Function determines if a string can be parsed into an integer
+	 * @param input
+	 * @return true or false
+	 */
 	
 	protected static Boolean isParseableByTime (String input) {
 		try {
@@ -129,8 +157,7 @@ public class Processor {
 	 * include days of the week "Monday", "Tuesday", etc You can also put next
 	 * before the days of the week This will set the string the DateTime format
 	 * of the specified day
-	 * 
-	 * @author Daryl Ho
+	 *    
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -168,10 +195,10 @@ public class Processor {
 			if (parts.length > 1) {
 				if (parts[0].contains(months[i])) {
 					standardFormDate = convertDateToStandardForm(parts[1],
-							String.valueOf(i + 1));
+							String.valueOf(i + POSITION_OFFSET));
 				} else if (parts[1].contains(months[i])) {
 					standardFormDate = convertDateToStandardForm(parts[0],
-							String.valueOf(i + 1));
+							String.valueOf(i + POSITION_OFFSET));
 				}
 			}
 		}
@@ -213,7 +240,7 @@ public class Processor {
 					return userDate;
 				case 1:
 				case 2:
-					userDate = currentDate.plusDays(1).toString();
+					userDate = currentDate.plusDays(ONE_DAY).toString();
 					return userDate;
 				}
 			}
@@ -232,36 +259,41 @@ public class Processor {
 	protected static int daysFromCurrentDay(String input) {
 		int currentDay = currentDate.getWeekDay();
 		int userDay = checkForDay(input);
-		/*
-		 * 1 is used as Sunday is the first day in DateTime, while Monday is
-		 * first day in this program, the next 3 lines is to readjust
-		 */
-		currentDay -= 1;
-		if (currentDay == 0) {
-			currentDay = 7;
+		
+		//1 is used as Sunday is the first day in DateTime, while Monday is
+		// first day in this program, the next 3 lines is to readjust
+		 
+		currentDay -= DAY_OFFSET;
+		if (currentDay == SUNDAY_IN_DATETIME) {
+			currentDay = DAYS_IN_A_WEEK;
 		}
 		int daysFromCurrent = userDay - currentDay;
 		if (input.contains("next")) {
-			daysFromCurrent += 7;
+			daysFromCurrent += DAYS_IN_A_WEEK;
 		}
 		return daysFromCurrent;
 	}
+	/**
+	 * Checks whether input contains "monday" or "tuesday"
+	 * Returns an integer depending on which day it is
+	 * @param input
+	 * @return integer (1 - 7)
+	 */
 
 	protected static int checkForDay(String input) {
 		int dayValue = 0;
 		for (int i = 0; i < days.length; i++) {
 			if (input.contains(days[i])) {
-				dayValue = i + 1;
+				dayValue = i + POSITION_OFFSET;
 				return dayValue;
 			}
 		}
-		return -1;
+		return NOT_FOUND;
 	}
 
 	/**
 	 * Converts "930pm" to HH:MM (DateTime Format)
 	 * 
-	 * @author Daryl Ho
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -273,25 +305,41 @@ public class Processor {
 		if (input == null) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
+		if (input.length() > MAX_TIME_LENGTH) {
+			throw new InvalidInputException(INVALID_TIME);
+		}
+		if ((input.length() == MAX_TIME_LENGTH) && input.contains(TIME_FORMAT_SYMBOL)) {
+			if (DateTime.isParseable(input)) {
+				return input;		
+			}
+		}
+		
 		timeString = convertStringToStdTimeString(input);
 		return timeString;
 	}
 	
+	/**
+	 * converts a String to HH:MM(DateTime format)
+	 * Supported String inputs are:
+	 * 930pm
+	 * 930
+	 * 9
+	 * 2130
+	 * @param input
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	
 	protected static String convertStringToStdTimeString (String input) throws InvalidInputException {
 		String userHour = null;
-		String userMinute = "00";
+		String userMinute = DEFAULT_MINUTE_FORMAT;
 		String timeString = null;
 		int meridiemIndex = checkMeridiem(input);
+		
+		//if am or pm is present, removes them from the string
 		if (meridiemIndex != NOT_FOUND) {
 			input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
 		}
-		if (input.length() > 5) {
-			throw new InvalidInputException(INVALID_TIME);
-		}
-		if ((input.length() == 5) && input.contains(":")) {
-			return input;
-		} 
-		
 		if (!isParseableByInt(input)) {
 			throw new InvalidInputException(INVALID_TIME);
 		} else {
@@ -307,16 +355,16 @@ public class Processor {
 			}
 		}
 		if (meridiemIndex == PM) { 	
-			if (Integer.parseInt(userHour) != 12) {
+			if (Integer.parseInt(userHour) != NOON) {
 				// Adds 12 hours to the hour if there is PM
-				userHour = Integer.toString(Integer.parseInt(userHour) + 12);
+				userHour = Integer.toString(Integer.parseInt(userHour) + PM_OFFSET);
 			}
 		}
 		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
 			// pads a single digit hour to fit the DateTime format
-			userHour = "0" + userHour;
+			userHour = DATETIME_PADDING + userHour;
 		}
-		timeString = userHour + ":" + userMinute;
+		timeString = userHour + TIME_FORMAT_SYMBOL + userMinute;
 		return timeString;
 	}
 	/**
@@ -338,7 +386,6 @@ public class Processor {
 	/**
 	 * Converts strings of form YYYY-MM-DD or HH:MM to DateTime format
 	 * 
-	 * @author Daryl Ho
 	 * @param input
 	 * @return DateTime
 	 */
@@ -378,6 +425,16 @@ public class Processor {
 		return parsePriorityFromWords(input);
 	}
 	
+	/**
+	 * Parses priority from a number
+	 * default = low
+	 * 1 = low
+	 * 2 = med
+	 * 3 = high
+	 * @param input
+	 * @return
+	 */
+	
 	protected static String parsePriorityFromNumber (String input) {
 		int noPriority = Integer.parseInt(input);
 		switch (noPriority) {
@@ -390,6 +447,13 @@ public class Processor {
 		}
 		return PRIORITY_LOW;
 	}
+	
+	/**
+	 * Parses priority from a string
+	 * an invalid input will default to low
+	 * @param input
+	 * @return
+	 */
 	
 	protected static String parsePriorityFromWords (String input) {
 		String priorityLevels[] = new String[] { "low", "med", "high" };
@@ -409,6 +473,15 @@ public class Processor {
 		return PRIORITY_LOW;
 		
 	}
+	
+	/**
+	 * Checks if the String contains "daily" or "weekly" and
+	 * returns an integer
+	 * Daily = 1
+	 * Weekly = 7
+	 * @param input
+	 * @return
+	 */
 		
 	protected static int parseRecurrencePeriodFromString(String input) {
 		if (isParseableByInt(input)) {
@@ -420,9 +493,9 @@ public class Processor {
 			if (input.contains(recurPeriodKeywords[i])) {
 				switch (i) {
 				case 0:
-					return 1;
+					return ONE_DAY;
 				case 1:
-					return 7;
+					return DAYS_IN_A_WEEK;
 				}
 				
 			}
