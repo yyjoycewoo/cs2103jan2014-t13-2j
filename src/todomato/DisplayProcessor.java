@@ -18,7 +18,7 @@ public class DisplayProcessor extends Processor {
 	//private static final String INVALID_ARGUMENT_MESSAGE = "Invalid argument";
 	
 	/**
-	 * @author linxuan
+	 * @author A0101578H
 	 * @param argument 
 	 * @return Status message along with a String of the list 
 	 */
