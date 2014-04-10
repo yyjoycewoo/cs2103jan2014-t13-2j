@@ -101,8 +101,7 @@ public class Processor {
 	 * 
 	 *    
 	 * @param input
-	 * @return integer indicating which meridiem is present -1 if there is not
-	 *         one
+	 * @return 0 for am, 1 for pm, -1 for not found
 	 */
 
 	protected static int checkMeridiem(String input) {
