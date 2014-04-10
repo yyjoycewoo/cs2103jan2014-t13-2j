@@ -383,7 +383,7 @@ public class UpdateProcessor extends Processor {
 	private static int getTaskIndex(String argument)
 			throws NumberFormatException, InvalidInputException {
 		int spaceAfterIndex = argument.indexOf(" ");
-		if (spaceAfterIndex == -1) {
+		if (spaceAfterIndex == NOT_FOUND) {
 			throw new InvalidInputException(INVALID_INDEX);
 		}
 		if (!isParseableByInt(argument.substring(0,spaceAfterIndex))) {

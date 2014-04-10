@@ -11,10 +11,10 @@ import java.util.TimeZone;
  * contains methods to parse a command's arguments.
  * 
  */
+//@author A0096620E
 public class Processor {
 
 	protected static String fileLoc = "tasks.txt";
-	//protected static String fileLoc = "C:\\Users\\Hao Eng\\Desktop\\tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskList list = fileHandler.readFile();
 	protected static TaskList displayList = new TaskList();
@@ -26,9 +26,16 @@ public class Processor {
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
 	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES = 3;
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES = 4;
+	protected static final int MAX_TIME_LENGTH = 5;
 	protected static final int POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR = 1;
 	protected static final int POS_OF_MINUTE = 2;
+	protected static final int ONE_DAY = 1;
+	protected static final int DAY_OFFSET = 1;
+	protected static final int DAYS_IN_A_WEEK = 7;
+	protected static final int SUNDAY_IN_DATETIME = 0;
 	
+	
+	protected static final String DEFAULT_MINUTE_FORMAT = "00";
 	protected static final String INVALID_DATE = "Invalid Date";
 	protected static final String INVALID_TIME = "Invalid Time";
 	
@@ -63,7 +70,7 @@ public class Processor {
 	/**
 	 * Converts "2" "1" to "YYYY-MM-DD"
 	 * 
-	 * @author Daryl Ho
+	 *    
 	 * @param String
 	 *            month, String day
 	 * 
@@ -85,7 +92,7 @@ public class Processor {
 	/**
 	 * Checks whether "am" or "pm" is in the string
 	 * 
-	 * @author Daryl Ho
+	 *    
 	 * @param input
 	 * @return integer indicating which meridiem is present -1 if there is not
 	 *         one
@@ -97,8 +104,14 @@ public class Processor {
 				return i;
 			}
 		}
-		return -1;
+		return NOT_FOUND;
 	}
+	
+	/**
+	 * Function to determine if a string can be parsed into a date
+	 * @param input
+	 * @return true or false
+	 */
 	
 	protected static Boolean isParseableByDate (String input) {
 		try {
@@ -115,6 +128,12 @@ public class Processor {
 		return true;
 	}
 	
+	/**
+	 * Function determines if a string can be parsed into an integer
+	 * @param input
+	 * @return true or false
+	 */
+	
 	protected static Boolean isParseableByTime (String input) {
 		try {
 			parseTimeString(input);
@@ -129,8 +148,7 @@ public class Processor {
 	 * include days of the week "Monday", "Tuesday", etc You can also put next
 	 * before the days of the week This will set the string the DateTime format
 	 * of the specified day
-	 * 
-	 * @author Daryl Ho
+	 *    
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -236,16 +254,22 @@ public class Processor {
 		 * 1 is used as Sunday is the first day in DateTime, while Monday is
 		 * first day in this program, the next 3 lines is to readjust
 		 */
-		currentDay -= 1;
-		if (currentDay == 0) {
-			currentDay = 7;
+		currentDay -= DAY_OFFSET;
+		if (currentDay == SUNDAY_IN_DATETIME) {
+			currentDay = DAYS_IN_A_WEEK;
 		}
 		int daysFromCurrent = userDay - currentDay;
 		if (input.contains("next")) {
-			daysFromCurrent += 7;
+			daysFromCurrent += DAYS_IN_A_WEEK;
 		}
 		return daysFromCurrent;
 	}
+	/**
+	 * Checks whether input contains "monday" or "tuesday"
+	 * Returns an integer depending on which day it is
+	 * @param input
+	 * @return integer (1 - 7)
+	 */
 
 	protected static int checkForDay(String input) {
 		int dayValue = 0;
@@ -255,13 +279,12 @@ public class Processor {
 				return dayValue;
 			}
 		}
-		return -1;
+		return NOT_FOUND;
 	}
 
 	/**
 	 * Converts "930pm" to HH:MM (DateTime Format)
 	 * 
-	 * @author Daryl Ho
 	 * @param input
 	 * @return standardFormDate
 	 * @throws InvalidInputException
@@ -277,18 +300,31 @@ public class Processor {
 		return timeString;
 	}
 	
+	/**
+	 * converts a String to HH:MM(DateTime format)
+	 * Supported String inputs are:
+	 * 930pm
+	 * 930
+	 * 9
+	 * 2130
+	 * @param input
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	
 	protected static String convertStringToStdTimeString (String input) throws InvalidInputException {
 		String userHour = null;
-		String userMinute = "00";
+		String userMinute = DEFAULT_MINUTE_FORMAT;
 		String timeString = null;
 		int meridiemIndex = checkMeridiem(input);
 		if (meridiemIndex != NOT_FOUND) {
+			//truncates 930pm to 930
 			input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
 		}
-		if (input.length() > 5) {
+		if (input.length() > MAX_TIME_LENGTH) {
 			throw new InvalidInputException(INVALID_TIME);
 		}
-		if ((input.length() == 5) && input.contains(":")) {
+		if ((input.length() == MAX_TIME_LENGTH) && input.contains(":")) {
 			return input;
 		} 
 		
@@ -338,7 +374,6 @@ public class Processor {
 	/**
 	 * Converts strings of form YYYY-MM-DD or HH:MM to DateTime format
 	 * 
-	 * @author Daryl Ho
 	 * @param input
 	 * @return DateTime
 	 */
@@ -378,6 +413,16 @@ public class Processor {
 		return parsePriorityFromWords(input);
 	}
 	
+	/**
+	 * Parses priority from a number
+	 * default = low
+	 * 1 = low
+	 * 2 = med
+	 * 3 = high
+	 * @param input
+	 * @return
+	 */
+	
 	protected static String parsePriorityFromNumber (String input) {
 		int noPriority = Integer.parseInt(input);
 		switch (noPriority) {
@@ -390,6 +435,13 @@ public class Processor {
 		}
 		return PRIORITY_LOW;
 	}
+	
+	/**
+	 * Parses priority from a string
+	 * an invalid input will default to low
+	 * @param input
+	 * @return
+	 */
 	
 	protected static String parsePriorityFromWords (String input) {
 		String priorityLevels[] = new String[] { "low", "med", "high" };
@@ -409,6 +461,12 @@ public class Processor {
 		return PRIORITY_LOW;
 		
 	}
+	
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
 		
 	protected static int parseRecurrencePeriodFromString(String input) {
 		if (isParseableByInt(input)) {
@@ -420,9 +478,9 @@ public class Processor {
 			if (input.contains(recurPeriodKeywords[i])) {
 				switch (i) {
 				case 0:
-					return 1;
+					return ONE_DAY;
 				case 1:
-					return 7;
+					return DAYS_IN_A_WEEK;
 				}
 				
 			}
