@@ -1,3 +1,4 @@
+//@author A0101578H
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -25,10 +26,13 @@ import java.util.logging.Logger;
  * <ul> <li> "delete completed" </ul>
  * </ul>
  *
+ *
  */
+
 public class DeleteProcessor extends Processor {
 	private static final String argDelimiter = "\\s*(,| )\\s*";
-	private static final String ARGUMENT_DATE = "date";
+	private static final String ARGUMENT_START_DATE = "startdate";
+	private static final String ARGUMENT_END_DATE = "enddate";
 	private static final String ARGUMENT_ALL = "all";
 	private static final String ARGUMENT_COMPLETED = "completed";
 	private static final String TASKS = " task(s)";
@@ -38,22 +42,21 @@ public class DeleteProcessor extends Processor {
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	
-	private static final Logger logger = Logger.getLogger(DeleteProcessor.class.getName());
+	//private static final Logger logger = Logger.getLogger(DeleteProcessor.class.getName());
 	
 	
 	/**
-	 * @author linxuan
 	 * @param argument
 	 * @return String of success/error message accordingly 
 	 */
 	public static String processDelete(String argument) throws InvalidInputException {
-		logger.log(Level.INFO, "processing delete");
+		//logger.log(Level.INFO, "processing delete");
 		if (list.getSize() == 0) {
-			logger.log(Level.INFO, "exited due to empty list");
+			//logger.log(Level.INFO, "exited due to empty list");
 			throw new InvalidInputException(INVALID_INPUT_EMPTY_LIST);
 		}
 		if (argument.isEmpty()) {
-			logger.log(Level.WARNING, "exited due to missing argument");
+			//logger.log(Level.WARNING, "exited due to missing argument");
 			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
 		}
 		
@@ -69,8 +72,11 @@ public class DeleteProcessor extends Processor {
 			else if (argStr.equalsIgnoreCase(ARGUMENT_COMPLETED)) {
 				statusMessage = SUCCESSFUL_DELETE + deleteCompleted() + TASKS;
 			}
-			else if (argStr.equalsIgnoreCase(ARGUMENT_DATE)) {
-				statusMessage = SUCCESSFUL_DELETE + deleteDate(argArr) + TASKS;
+			else if (argStr.equalsIgnoreCase(ARGUMENT_START_DATE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteStartDate(argArr) + TASKS;
+			}
+			else if (argStr.equalsIgnoreCase(ARGUMENT_END_DATE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteEndDate(argArr) + TASKS;
 			}
 			else if (argArr.length > 1) {
 				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
@@ -81,15 +87,15 @@ public class DeleteProcessor extends Processor {
 			displayList.deepCopy(list);
 			fileHandler.updateFile(list);
 			
-			logger.log(Level.INFO, "end of processing");
+			//logger.log(Level.INFO, "end of processing");
 			return statusMessage;
 		} catch(NumberFormatException e) {
 			UndoProcessor.processUndo();
-			logger.log(Level.WARNING, "exited due to non-number");
+			//logger.log(Level.WARNING, "exited due to non-number");
 			return ERROR_MESSAGE_NUMBER_FORMAT;
 		} catch(IndexOutOfBoundsException e) {
 			UndoProcessor.processUndo();
-			logger.log(Level.WARNING, "exited due to index out of bound");
+			//logger.log(Level.WARNING, "exited due to index out of bound");
 			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;
 		}		
 	}
@@ -109,7 +115,7 @@ public class DeleteProcessor extends Processor {
 		return Integer.toString(numberOfTasksDeleted);
 	}
 
-	private static String deleteDate(String[] arg) {
+	private static String deleteStartDate(String[] arg) {
 		int numberOfTasksDeleted = 0;
 		String date = arg[1] + " " + arg[2];
 		try {
@@ -119,7 +125,39 @@ public class DeleteProcessor extends Processor {
 		}
 		DateTime dateDT = convertStringToDateTime(date);
 		for (int i = displayList.getSize() - 1; i >= 0; i--) {
-			if(isSameDate(i,dateDT)) {
+			if(isSameStartDate(i,dateDT)) {
+				int listIndex = list.getItem(displayList.getListItem(i).getId());
+				
+				displayList.deleteListItem(i);
+				list.deleteListItem(listIndex);
+				
+				numberOfTasksDeleted++;
+			}
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+	
+	private static boolean isSameStartDate(int i, DateTime dateDT) {
+		if (list.getListItem(i).getStartDate() == null) {
+			return false;
+		}
+		if (list.getListItem(i).getStartDate().isSameDayAs(dateDT)) {
+			return true;
+		}
+		return false;
+	}
+	
+	private static String deleteEndDate(String[] arg) {
+		int numberOfTasksDeleted = 0;
+		String date = arg[1] + " " + arg[2];
+		try {
+			date = parseDateString(date);
+		} catch (InvalidInputException e) {
+			return INVALID_DATE;
+		}
+		DateTime dateDT = convertStringToDateTime(date);
+		for (int i = displayList.getSize() - 1; i >= 0; i--) {
+			if(isSameEndDate(i,dateDT)) {
 				int listIndex = list.getItem(displayList.getListItem(i).getId());
 				
 				displayList.deleteListItem(i);
@@ -131,8 +169,7 @@ public class DeleteProcessor extends Processor {
 		return Integer.toString(numberOfTasksDeleted);
 	}
 
-	private static boolean isSameDate(int i, DateTime dateDT) {
-		// TODO Auto-generated method stub
+	private static boolean isSameEndDate(int i, DateTime dateDT) {
 		if (list.getListItem(i).getEndDate() == null) {
 			return false;
 		}

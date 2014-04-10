@@ -1,3 +1,4 @@
+//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -46,7 +47,6 @@ import java.util.regex.Pattern;
  * <li>january 1
  * </ul>
  * 
- * @author Daryl
  * 
  */
 public class AddProcessor extends Processor {
@@ -83,7 +83,6 @@ public class AddProcessor extends Processor {
 
 
 	/**
-	 * @author Daryl
 	 * Adds Task to the list and writes to file the updated list
 	 * @param input
 	 * @return Task
@@ -127,8 +126,6 @@ public class AddProcessor extends Processor {
 			return statusString;
 		}
 	}
-	
-	
 	
 	/**
 	 * Parses Task from a String
@@ -561,7 +558,7 @@ public class AddProcessor extends Processor {
 	private static Boolean checkForInvertedCommas (String input) {
 		if (input.contains("\"")) {
 			if (input.substring(input.indexOf("\"")+1).contains("\"")) {
-			return true;
+				return true;
 			}
 		} 
 		return false;

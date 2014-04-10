@@ -77,7 +77,6 @@ public class FileHandler {
 			return taskList;
 			
 		} catch (IOException e) {
-			//TODO
 			return null;
 			
 		}
