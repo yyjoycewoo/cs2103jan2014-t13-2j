@@ -33,10 +33,9 @@ public class DataSyncer extends Processor {
 	
 	TaskList localList;
 	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	// static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+
 	
-	/**
-	 * @param fileLoc
-	 */
 	public DataSyncer (TaskList localList) {
 		this.localList = localList;
 	}
@@ -119,14 +118,16 @@ public class DataSyncer extends Processor {
 			task.setStartDate(startDate);
 			task.setEndDate(endDate);		
 			task.setLocation(location);
+			
 			if(id != null){
 				task.setId(id);
 			}
+			
 			task.setTimeCreated(timeCreated);
 			System.out.println(eventId);
 			task.setEventId(eventId);
 			task.setUpdateTime(updateTime);
-			// task.setPriorityLevel(prioritylevel);
+			// task.setPriorityLevel(priorityLevel);
 			// task.setCompleted(isCompleted);
 			// task.setNoticeTime(noticeTime);
 			output.addToList(task);
@@ -136,8 +137,10 @@ public class DataSyncer extends Processor {
 	}
 
 	private String formatTime(DateTime d, DateTime t) {
-		if (d == null || t == null || d.toString().equals("null") || t.toString().equals("null")) {
+		if (d == null || d.toString().equals("null")) {
 			return "";
+		} else if (t == null || t.toString().equals("null")) {
+			return d.format("YYYY-MM-DD");
 		} else {
 			return d.format("YYYY-MM-DD") + "T" + t.format("hh:mm:") + "00.000+08:00";
 		}
@@ -147,7 +150,7 @@ public class DataSyncer extends Processor {
 		if (dt == null || dt.toString().equals("null")  ) {
 			return "";
 		} else {
-			return dt.format("YYYY-MM-DD") + "T" + dt.format("hh:mm:") + "00.000+08:00";
+			return dt.format("YYYY-MM-DD") + "T" + dt.format("hh:mm:ss") + ".000+08:00";
 		}
 	}
 	
@@ -158,9 +161,14 @@ public class DataSyncer extends Processor {
 	
 	private ArrayList<DateTime> stringToDateAndTime(String s) {
 		ArrayList<DateTime> datetimeList = new ArrayList<DateTime>();
-		DateTime dt = new DateTime(s.substring(0,19));
-		DateTime d = DateTime.forDateOnly(dt.getYear(), dt.getMonth(), dt.getDay()); 
-		DateTime t = DateTime.forTimeOnly(dt.getHour(), dt.getMinute(), dt.getSecond(), dt.getNanoseconds());
+		DateTime t = null;
+		DateTime d = null;
+		if(s.length() >= 19){
+			d = new DateTime(s.substring(0,10));
+			t = new DateTime(s.substring(11,19));
+		} else {
+			d = new DateTime(s.substring(0,10));
+		}
 		datetimeList.add(d);
 		datetimeList.add(t);
 		return datetimeList;
@@ -221,6 +229,8 @@ public class DataSyncer extends Processor {
 			
 			if (notNullString(location)){
 				tJson.addProperty("location", location);
+			} else {
+				tJson.addProperty("location", "");
 			}
 			
 			if (notNullString(eid)){
