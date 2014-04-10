@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  * <ul> <li> "delete completed" </ul>
  * </ul>
  *
+ * @author A0101578H
  */
 public class DeleteProcessor extends Processor {
 	private static final String argDelimiter = "\\s*(,| )\\s*";
