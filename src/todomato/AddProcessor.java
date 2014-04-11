@@ -186,25 +186,28 @@ public class AddProcessor extends Processor {
 		DateTime startDate = convertStringToDateTime(taskDetails[INDEX_OF_START_DATE]);
 		DateTime endDate = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
 		if (startDate != null && endDate == null) {
-			endDate = startDate;
+			if (endTime != null && startTime != null) {
+				if (endTime.lt(startTime)) {
+					endDate = startDate.plusDays(1);
+				}
+			} else {
+				endDate = startDate;
+			}
 		}
 		if (startDate != null && endDate != null) {
 			if (startDate.gt(endDate)) {
 				endDate = startDate;
 			}
-			if (endTime != null && startTime != null) {
-				if (endTime.lt(startTime)) {
-					endDate = startDate.plusDays(1);
-				}
-				if (startDate.equals(endDate)) {
+			if (startDate.equals(endDate)) {
+				if (startTime!= null && endTime != null) {
 					if (startTime.gt(endTime)) {
 						errorsInInput[INDEX_OF_START_TIME] = true;
 						startTime = null;
 					}
 				}
 			}
-			
 		}
+			
 		int recurPeriod = 0;
 		try {
 			if (endDate == null && taskDetails[INDEX_OF_RECUR] != null) {
@@ -253,6 +256,7 @@ public class AddProcessor extends Processor {
 			case 3:
 				try {
 					taskDetails[INDEX_OF_END_TIME] = retrieveEndTime(input);
+					System.out.print(taskDetails[INDEX_OF_END_DATE] + "\n");
 				} catch (InvalidInputException invalidEndTime) {
 					errorsInInput[INDEX_OF_END_TIME] = true;
 				}
