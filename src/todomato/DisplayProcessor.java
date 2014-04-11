@@ -1,6 +1,9 @@
 //@author A0101578H
 package todomato;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 import hirondelle.date4j.DateTime;
 
 /**
@@ -16,14 +19,37 @@ import hirondelle.date4j.DateTime;
  */
 public class DisplayProcessor extends Processor {
 	private static final String SUCCESS_DISPLAY = "All tasks have been displayed: ";
-	//private static final String INVALID_ARGUMENT_MESSAGE = "Invalid argument";
+	private static final String INVALID_ARGUMENT_MESSAGE = "Invalid argument";
+	private static final int INDEX_OFFSET = 1;
+
+	private static int currWeekday;
+	private static DateTime startDate;
+	private static DateTime endDate;
+	private static String currDaysViewed;
+	private static DateTime viewDate;
+	private static DateTime currDate = DateTime.now(TimeZone.getDefault());
 	
 	/**
-	 * @param argument 
+	 * @param argument  
 	 * @return Status message along with a String of the list 
 	 */
-	public static String processDisplay() {
-		displayList.deepCopy(list);
+	public static String processDisplay(String argument) throws InvalidInputException {
+
+		if (argument.equals("all")) {
+			getViewAll();
+		} else if (argument.equals("week")) {
+			viewDate = currDate;
+			getViewWeek(viewDate);
+		} else if (argument.equals("next")) {
+			viewDate = viewDate.plusDays(DAYS_IN_A_WEEK);
+			getViewWeek(viewDate);
+		} else if (argument.equals("prev")) {
+			viewDate = viewDate.minusDays(DAYS_IN_A_WEEK);
+			getViewWeek(viewDate);
+		} else {
+			throw new InvalidInputException(argument);
+		}
+		
 		return SUCCESS_DISPLAY + displayList.toString();
 	}
 
@@ -42,5 +68,23 @@ public class DisplayProcessor extends Processor {
 			}
 			displayList.deepCopy(currTasks);
 		}
+	}
+	
+	private static void getViewAll() {
+		displayBetweenDates(null, null);
+	}
+
+	private static void getViewWeek(DateTime viewDate) {
+		currWeekday = viewDate.getWeekDay();
+		startDate = viewDate.minusDays(DAYS_IN_A_WEEK - currWeekday);
+		endDate = viewDate.plusDays(currWeekday - INDEX_OFFSET);
+		currDaysViewed = startDate.format("MMM DD, YYYY", new Locale("US"));
+		currDaysViewed += " - ";
+		currDaysViewed += endDate.format("MMM DD, YYYY", new Locale("US"));
+		
+		System.out.println(currDaysViewed);
+
+		displayBetweenDates(startDate, endDate);
+
 	}
 }
