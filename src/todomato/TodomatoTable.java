@@ -246,7 +246,6 @@ public class TodomatoTable extends JTable {
         }
 
         public void update() {
-    			//Processor.displayList.deepCopy(list);
                 data = loadData(Processor.getDisplayList());
                 table.setModel(new CustModel(data));
         }

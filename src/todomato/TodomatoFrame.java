@@ -34,7 +34,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_DATE_ASC_COMMAND = "sort date asc";
 
 	protected static final int INDEX_OFFSET = 1;
-	private static final int DAYS_IN_A_WEEK = 7;
 
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
 	private static final String SORT_PRIORITY = "Sort by priority";
@@ -97,13 +96,17 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 
 		initWeeklyView();
 
+		initBtnRightAction();
+		initBtnLeftAction();
+		initBtnAllAction();
+		
 		initTxtCommandAction(); 
 		initBtnDateAction();
 		initBtnPriorityAction();   
 		initBtnCompletedAction();
 		initViewPeriodAction();
 
-		updateData("");
+		updateData("display all");
 	}
 
 	private void initViewPeriodAction() {
@@ -117,11 +120,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	}
 
 	private void initWeeklyView() {
-		lblDate.setText(getViewWeek());
-
-		initBtnRightAction();
-		initBtnLeftAction();
-		initBtnAllAction();
+		//lblDate.setText(getViewWeek());
 	}
 
 	private void initBtnAllAction() {
