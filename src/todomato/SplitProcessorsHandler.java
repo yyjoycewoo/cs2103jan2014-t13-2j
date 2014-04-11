@@ -20,6 +20,7 @@ public class SplitProcessorsHandler {
 	private static final String RECUR_COMMAND = "recur";
 	private static final String NOTIFY_COMMAND = "notify";
 	private static final String SYNC_COMMAND = "sync";
+	private static final String SET_SYNC_INFO_COMMAND = "setsync";
 	private static final String HELP_COMMAND = "help";
 
 	private static Command command;
@@ -68,6 +69,9 @@ public class SplitProcessorsHandler {
 		}
 		if (command.getAction().equals(SYNC_COMMAND)) {
 			return SyncProcessor.processSync();
+		}
+		if (command.getAction().equals(SET_SYNC_INFO_COMMAND)) {
+			return SetSyncProcessor.processSetSync(command.getArgument());
 		}
 		if (command.getAction().equals(HELP_COMMAND)) {
 			HelpProcessor.processHelp();

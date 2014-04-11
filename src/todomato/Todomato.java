@@ -2,7 +2,9 @@ package todomato;
 
 import java.util.Scanner;
 
-//@author A0120766H
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+
 /**
  * This class is the driver for the Todomato application. It creates the GUI,
  * and repeatedly obtains user input until the user in the main method, until
@@ -20,20 +22,32 @@ public class Todomato {
 	 * Take in and execute user commands until the user wants to exit.
 	 * 
 	 * @param args
+	 * @throws SchedulerException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SchedulerException {
 		TodomatoFrame f = new TodomatoFrame();
 
 		System.out.println(WELCOME_MSG);
 
+		// show tasks for the next 3 days
 		Popup.show();
+		// show tasks that are due today according to the time of the day
+		Scheduler scheduler = Scheduling.schedulingTasks();
 
 		// type "exit" to exit the program
 		while (true) {
 			try {
 				System.out.print(PROMPT_USER_INPUT);
 				String command = scan.nextLine();
-
+				// stop the scheduler from running
+				if (command == "exit") {
+					try {
+						scheduler.shutdown();
+					} catch (SchedulerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				String status = SplitProcessorsHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {
