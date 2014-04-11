@@ -32,8 +32,8 @@ import org.apache.http.util.EntityUtils;
 public class DataSyncer extends Processor {
 	
 	TaskList localList;
-	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
-	//static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+	//static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 
 	
 	public DataSyncer (TaskList localList) {
@@ -129,9 +129,9 @@ public class DataSyncer extends Processor {
 //			System.out.println(isCompleted);
 			task.setEventId(eventId);
 			task.setUpdateTime(updateTime);
-			// task.setPriorityLevel(priorityLevel);
+// 			task.setPriorityLevel(priorityLevel);
 //			task.setCompleted(isCompleted);
-			// task.setNoticeTime(noticeTime);
+// 			task.setNoticeTime(noticeTime);
 			output.addToList(task);
 		}
 		
@@ -139,9 +139,15 @@ public class DataSyncer extends Processor {
 	}
 
 	private String formatTime(DateTime d, DateTime t) {
-		if (d == null || d.toString().equals("null")) {
+		
+		boolean emptyDate = (d == null || d.toString().equals("null"));
+		boolean emptyTime = (t == null || t.toString().equals("null"));
+				
+		if (emptyDate && emptyTime) {
 			return "";
-		} else if (t == null || t.toString().equals("null")) {
+		} else if (emptyDate && !emptyTime) {
+			return t.format("hh:mm:") + "00.000+08:00";
+		} else if (!emptyDate && emptyTime) {
 			return d.format("YYYY-MM-DD");
 		} else {
 			return d.format("YYYY-MM-DD") + "T" + t.format("hh:mm:") + "00.000+08:00";
@@ -166,16 +172,24 @@ public class DataSyncer extends Processor {
 		DateTime t = null;
 		DateTime d = null;
 		DateTime ts = null;
-		if(s.length() >= 19){
+		if(s.contains("T")){
 			d = new DateTime(s.substring(0,10));
 			t = new DateTime(s.substring(11,19));
 			ts = new DateTime(s.substring(11,16));
-		} else if (s.length() >= 11 ){
+		}
+		if (s.contains("-")){
 			d = new DateTime(s.substring(0,10));
+		}
+		if (s.contains(":")) {
+			t = new DateTime(s.substring(0,8));
+			ts = new DateTime(s.substring(0,5));
 		}
 		datetimeList.add(d);
 		datetimeList.add(t);
 		datetimeList.add(ts);
+		System.out.println(d);
+		System.out.println(t);
+		System.out.println(ts);
 		return datetimeList;
 	}
 	
