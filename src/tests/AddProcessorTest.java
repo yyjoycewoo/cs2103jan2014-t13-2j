@@ -85,9 +85,9 @@ public class AddProcessorTest {
 	@Test
 	public void testAddDateDec31() throws InvalidInputException {
 		Task testTask= null;
-		String test = "dinner with parents at 1900 Dec 31 recur weekly priority med @starbucks";
+		String test = "dinner with parents at 1900 Dec 31 recur weekly priority 2 @food court";
 		testTask = AddProcessor.parseTask(test);
-		assertEquals("", testTask.getLocation(), "starbucks");
+		assertEquals("", testTask.getLocation(), "food court");
 		assertEquals("", testTask.getPriorityLevel(), "MEDIUM");
 		assertEquals("", testTask.getRecurrencePeriod(), 7);
 		assertEquals("", testTask.getDescription(), "dinner with parents");
