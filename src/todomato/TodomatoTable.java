@@ -140,20 +140,20 @@ public class TodomatoTable extends JTable {
                                         int modelRow = convertRowIndexToModel(row);
                                         
                                         int index = Integer.parseInt( (String) getModel().getValueAt(modelRow, INDEX_COLUNM_INDEX));
-                                        if (index != 0) {
-                                                Task item = list.getListItem(index - 1);
-                                                String priority = item.getPriorityLevel();
-                                                if (PRIORITY_HIGH.equals(priority)) {
-                                                        c.setBackground(Color.RED);
-                                                }
-                                                if (PRIORITY_MEDIUM.equals(priority)) {
-                                                        c.setBackground(Color.YELLOW);
-                                                }
+                                        if (index != 0 && index < list.getSize()) {
+                                        	Task item = list.getListItem(index - 1);
+                                        	String priority = item.getPriorityLevel();
+                                        	if (PRIORITY_HIGH.equals(priority)) {
+                                        		c.setBackground(Color.RED);
+                                        	}
+                                        	if (PRIORITY_MEDIUM.equals(priority)) {
+                                        		c.setBackground(Color.YELLOW);
+                                        	}
 
-                                                Boolean completed = item.getCompleted();
-                                                if (completed) {
-                                                        c.setBackground(Color.GRAY);
-                                                }
+                                        	Boolean completed = item.getCompleted();
+                                        	if (completed) {
+                                        		c.setBackground(Color.GRAY);                                                
+                                        	}
                                         }
                                 }
                                 return c;
