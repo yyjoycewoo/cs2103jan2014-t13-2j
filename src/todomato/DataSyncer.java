@@ -32,8 +32,8 @@ import org.apache.http.util.EntityUtils;
 public class DataSyncer extends Processor {
 	
 	TaskList localList;
-	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
-	// static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+	//static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 
 	
 	public DataSyncer (TaskList localList) {
@@ -106,9 +106,11 @@ public class DataSyncer extends Processor {
 			ArrayList<DateTime> endDTList = stringToDateAndTime(tJson.get("endtime").getAsString());
 			
 			DateTime startDate = startDTList.get(0);
-			DateTime startTime = startDTList.get(1);
+			DateTime startTime = startDTList.get(2);
 			DateTime endDate = endDTList.get(0);
-			DateTime endTime = endDTList.get(1);
+			DateTime endTime = endDTList.get(2);
+			
+//			boolean isCompleted = tJson.get("completed").getAsBoolean();
 			
 			DateTime updateTime = stringToDateTime(tJson.get("edit").getAsString());
 			DateTime timeCreated = stringToDateTime(tJson.get("created").getAsString());
@@ -124,11 +126,11 @@ public class DataSyncer extends Processor {
 			}
 			
 			task.setTimeCreated(timeCreated);
-			System.out.println(eventId);
+//			System.out.println(isCompleted);
 			task.setEventId(eventId);
 			task.setUpdateTime(updateTime);
 			// task.setPriorityLevel(priorityLevel);
-			// task.setCompleted(isCompleted);
+//			task.setCompleted(isCompleted);
 			// task.setNoticeTime(noticeTime);
 			output.addToList(task);
 		}
@@ -163,16 +165,20 @@ public class DataSyncer extends Processor {
 		ArrayList<DateTime> datetimeList = new ArrayList<DateTime>();
 		DateTime t = null;
 		DateTime d = null;
+		DateTime ts = null;
 		if(s.length() >= 19){
 			d = new DateTime(s.substring(0,10));
 			t = new DateTime(s.substring(11,19));
+			ts = new DateTime(s.substring(11,16));
 		} else {
 			d = new DateTime(s.substring(0,10));
 		}
 		datetimeList.add(d);
 		datetimeList.add(t);
+		datetimeList.add(ts);
 		return datetimeList;
 	}
+	
 	
 	private boolean notNullString(String s) {
 		boolean isNullString = (s == null || s.equals("null"));
@@ -208,8 +214,11 @@ public class DataSyncer extends Processor {
 			String edit = formatTime(t.getUpdateTime());
 			String location = t.getLocation();
 			String eid = t.getEventId();
+			String completed  = t.getCompleted().toString();
 			
 			tJson.addProperty("id", id);
+			System.out.println(completed);
+			tJson.addProperty("completed", completed);
 
 			if (notNullString(description)){
 				tJson.addProperty("description", description);
