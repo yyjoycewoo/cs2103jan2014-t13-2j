@@ -101,7 +101,9 @@ public class AddProcessor extends Processor {
 		userTask = parseTask(input);
 		list.addToList(userTask);
 		fileHandler.updateFile(list);
-		displayList.deepCopy(list);
+		
+		displayList = list;
+		
 		String statusString = "";
 		Boolean errorPresent = false;
 		for (int i = 0; i < errorsInInput.length; i++) {

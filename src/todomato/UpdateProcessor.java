@@ -99,7 +99,7 @@ public class UpdateProcessor extends Processor {
 			printInvalidIndexMsg(index);
 			whichToEdit = findDetailToEdit(argument);
 			updater(argument, whichToEdit, index);
-			displayList.deepCopy(list);
+			displayList = list;
 		}
 		return UPDATED;
 	}

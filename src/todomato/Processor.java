@@ -17,7 +17,7 @@ public class Processor {
 	protected static String fileLoc = "tasks.txt";
 	protected static FileHandler fileHandler = new FileHandler(fileLoc);
 	protected static TaskList list = fileHandler.readFile();
-	protected static TaskList displayList = new TaskList();
+	protected static TaskList displayList = list;
 	protected static Stack<TaskList> undoList = new Stack<TaskList>();
 	protected static Stack<TaskList> redoList = new Stack<TaskList>();
 	
