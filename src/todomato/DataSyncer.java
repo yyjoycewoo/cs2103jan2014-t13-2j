@@ -32,8 +32,8 @@ import org.apache.http.util.EntityUtils;
 public class DataSyncer extends Processor {
 	
 	TaskList localList;
-	//static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
-	static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	//static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 
 	
 	public DataSyncer (TaskList localList) {
@@ -170,7 +170,7 @@ public class DataSyncer extends Processor {
 			d = new DateTime(s.substring(0,10));
 			t = new DateTime(s.substring(11,19));
 			ts = new DateTime(s.substring(11,16));
-		} else {
+		} else if (s.length() >= 11 ){
 			d = new DateTime(s.substring(0,10));
 		}
 		datetimeList.add(d);
