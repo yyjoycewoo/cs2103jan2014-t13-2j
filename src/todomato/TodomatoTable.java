@@ -10,6 +10,13 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+//@author A0120766H
+/**
+ * This class consists of a table that is designed to display a user's
+ * TaskList. It color codes based on priority and completion status,
+ * and sets the width of each column.
+ *
+ */
 public class TodomatoTable extends JTable {     
         //constants for column names
         private static final String INDEX_HEADER = "Index";
@@ -65,6 +72,9 @@ public class TodomatoTable extends JTable {
         int rowSelected;
         TaskList list = Processor.getDisplayList();
         
+        /**
+         * Create a new TodomatoTable.
+         */
         public TodomatoTable() {
             String[] columnNames = {INDEX_HEADER, DESC_HEADER,
                     STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,

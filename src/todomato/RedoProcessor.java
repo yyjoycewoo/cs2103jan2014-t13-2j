@@ -1,10 +1,10 @@
 package todomato;
 
 
+//@author A0120766H
 /** 
  * This class contains methods to process undo commands by the user.
  * It updates the user's lists of tasks, and saves it to disk.
- * @author Joyce
  *
  */
 public class RedoProcessor extends Processor {

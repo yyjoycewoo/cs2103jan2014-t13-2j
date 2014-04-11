@@ -4,9 +4,9 @@ import hirondelle.date4j.DateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
+//@author A0120766H
 /**
- * Class to store a list of all TaskDTs that the user wants to keep track of
- * @author Joyce
+ * Class to store a list of all Tasks that the user wants to keep track of
  *
  */
 public class TaskList {
@@ -17,16 +17,16 @@ public class TaskList {
 	private String password=null;
 	
 	/**
-	 * Create a new empty TaskDTList
+	 * Create a new empty TaskList
 	 */
 	public TaskList() {
 		this.list = new ArrayList<Task>();
 	}
 	
 	/**
-	 * Add t to the TaskDTList
-	 * @param t TaskDT to be added
-	 * @return TaskDT that was added
+	 * Add t to the TaskList
+	 * @param t Task to be added
+	 * @return Task that was added
 	 */
 	public Task addToList(Task t) {
 		list.add(t);
@@ -34,8 +34,8 @@ public class TaskList {
 	}
 	
 	/**
-	 * Delete Task i from the TaskDTList
-	 * @param i index of TaskDT to be deleted
+	 * Delete Task i from the TaskList
+	 * @param i index of Task to be deleted
 	 * @return Task deleted
 	 */
 	public Task deleteListItem(int i){
@@ -45,16 +45,16 @@ public class TaskList {
 	}
 	
 	/**
-	 * Clears all the TaskDTs in the TaskDTList
+	 * Clears all the Tasks in the TaskList
 	 */
 	public void clearList() {
 		list = new ArrayList<Task>();
 	}
 	
 	/**
-	 * Get the TaskDT at index i
-	 * @param i Index of TaskDT to get
-	 * @return TaskDT at index i
+	 * Get the Task at index i
+	 * @param i Index of Task to get
+	 * @return Task at index i
 	 */
 	public Task getListItem(int i) {
 		return list.get(i);
@@ -86,9 +86,9 @@ public class TaskList {
 	}
 	
 	/**
-	 * Modifies TaskDTList to be a deep copy of copyList
-	 * @param copyList TaskDTList to be copied
-	 * @return modified TaskDTList
+	 * Modifies TaskList to be a deep copy of copyList
+	 * @param copyList TaskList to be copied
+	 * @return modified TaskList
 	 */
 	public ArrayList<Task> deepCopy(TaskList copyList) {
 		list = new ArrayList<Task>();

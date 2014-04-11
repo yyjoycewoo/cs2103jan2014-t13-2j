@@ -7,7 +7,11 @@ import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
-
+//@author A0120766H
+/**
+ * This class generates a dialogue box to ask the
+ * user for his/her username and password.
+ */
 public class UsernamePasswordDialogueBox extends JFrame{
 	private JPanel panel = new JPanel();
 	private JLabel lblUsername = new JLabel("Username: ");
@@ -18,6 +22,9 @@ public class UsernamePasswordDialogueBox extends JFrame{
 	private String username;
 	private String password;
 	
+	/**
+	 * Create a new UsernamePasswordDialogueBox
+	 */
 	public UsernamePasswordDialogueBox() {
 		super("Log in");
 		setSize(680,500);

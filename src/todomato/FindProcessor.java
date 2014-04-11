@@ -1,10 +1,26 @@
 package todomato;
 
+//@author A0120766H
+/**
+ * This class processes find commands by the user.
+ * 
+ * The user should enter the keyword "find" followed
+ * a String of word(s) that they would like to search
+ * for.
+ *  
+ *
+ */
 public class FindProcessor extends Processor {
 
 	private static final String NO_TASKS_FOUND_MESSAGE = "No tasks found";
 	private static final String SUCCESS_MSG = "Search completed";
 
+	/**
+	 * Finds and modifies the displayList to display all tasks that contain
+	 * the String argument. 
+	 * @param argument String to be found
+	 * @return a status message stating whether or not tasks have been found
+	 */
 	public static String processFind(String argument) {
 		//Make search case insensitive by converting everything to uppercase
 		argument = argument.toUpperCase();

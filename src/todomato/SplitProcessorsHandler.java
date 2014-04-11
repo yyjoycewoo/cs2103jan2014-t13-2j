@@ -1,10 +1,9 @@
 package todomato;
 
+//@author A0120766H
 /**
  * This class handles user commands by calling the processing method depending
  * on the action specified.
- * 
- * @author Joyce
  * 
  */
 public class SplitProcessorsHandler {
@@ -38,7 +37,7 @@ public class SplitProcessorsHandler {
 			System.exit(0);
 		}
 		if (command.getAction().equalsIgnoreCase(DISPLAY_COMMAND)) {
-			return DisplayProcessor.processDisplay();
+			return DisplayProcessor.processDisplay(command.getArgument());
 		}
 		if (command.getAction().equalsIgnoreCase(UPDATE_COMMAND)) {
 			return UpdateProcessor.processUpdate(command.getArgument());

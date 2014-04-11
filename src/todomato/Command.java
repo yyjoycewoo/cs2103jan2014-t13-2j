@@ -1,9 +1,9 @@
 package todomato;
+//@author A0120766H
 /**
  * This class stores the different components of a user's command: the action, and the argument.
  * The action is the keyword specified in the first word of a command (eg. add, delete, update,
  * etc), and the argument is the rest of the command.
- * @author Joyce
  *
  */
 public class Command {
