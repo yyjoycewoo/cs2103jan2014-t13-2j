@@ -72,19 +72,28 @@ public class DisplayProcessor extends Processor {
 	
 	private static void getViewAll() {
 		displayBetweenDates(null, null);
+		currDaysViewed = "Displaying all tasks";
 	}
 
 	private static void getViewWeek(DateTime viewDate) {
 		currWeekday = viewDate.getWeekDay();
 		startDate = viewDate.minusDays(DAYS_IN_A_WEEK - currWeekday);
 		endDate = viewDate.plusDays(currWeekday - INDEX_OFFSET);
-		currDaysViewed = startDate.format("MMM DD, YYYY", new Locale("US"));
-		currDaysViewed += " - ";
-		currDaysViewed += endDate.format("MMM DD, YYYY", new Locale("US"));
+		setCurrDaysViewed(startDate.format("MMM DD, YYYY", new Locale("US")));
+		setCurrDaysViewed(getCurrDaysViewed() + " - ");
+		setCurrDaysViewed(getCurrDaysViewed() + endDate.format("MMM DD, YYYY", new Locale("US")));
 		
-		System.out.println(currDaysViewed);
+		//System.out.println(currDaysViewed);
 
 		displayBetweenDates(startDate, endDate);
 
+	}
+
+	public static String getCurrDaysViewed() {
+		return currDaysViewed;
+	}
+
+	public static void setCurrDaysViewed(String currDaysViewed) {
+		DisplayProcessor.currDaysViewed = currDaysViewed;
 	}
 }
