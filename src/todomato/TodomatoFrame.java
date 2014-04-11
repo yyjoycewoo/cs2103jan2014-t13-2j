@@ -34,7 +34,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_DATE_ASC_COMMAND = "sort date asc";
 
 	protected static final int INDEX_OFFSET = 1;
-	private static final int numDaysInAWeek = 7;
+	private static final int DAYS_IN_A_WEEK = 7;
 
 	private static final String INVALID_INPUT_MSG = "Invalid input: ";
 	private static final String SORT_PRIORITY = "Sort by priority";
@@ -59,12 +59,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private JButton btnViewPeriod = new JButton("By week");
 	JLabel lblDate = new JLabel();
 
-	private DateTime currDate = DateTime.now(TimeZone.getDefault());
-	private DateTime viewDate;
-	private DateTime startDate;
-	private DateTime endDate;
-	private String currDaysViewed;
-	private int currWeekday;
+//	private String currDaysViewed;
 
 	/**
 	 * Create a new TodomatoFrame for the GUI.
@@ -82,7 +77,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		//pack();
 		setVisible(true);
 	}
-
 
 	private void initDisplay() {
 		panel.setLayout(new MigLayout("nocache"));
@@ -112,7 +106,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		updateData("");
 	}
 
-
 	private void initViewPeriodAction() {
 		btnViewPeriod.addActionListener(new ActionListener() {			 
 			public void actionPerformed(ActionEvent e) {
@@ -124,7 +117,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	}
 
 	private void initWeeklyView() {
-		viewDate = currDate;
 		lblDate.setText(getViewWeek());
 
 		initBtnRightAction();
@@ -132,13 +124,11 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 		initBtnAllAction();
 	}
 
-
 	private void initBtnAllAction() {
 		btnToday.addActionListener(new ActionListener() {			 
 			public void actionPerformed(ActionEvent e) {
 				lblDate.setText(getViewAll());
-				btnLeft.setVisible(false);
-				btnRight.setVisible(false);
+				hideLeftRightButtons();
 			}
 		});
 	}
@@ -156,7 +146,6 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	}
 
 	private String getViewWeek() {		
-
 		try {
 			SplitProcessorsHandler.processCommand("display week");
 		} catch (InvalidInputException e) {
@@ -164,16 +153,10 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			e.printStackTrace();
 		}
 		
-		currWeekday = viewDate.getWeekDay();
-		startDate = viewDate.minusDays(numDaysInAWeek - currWeekday);
-		endDate = viewDate.plusDays(currWeekday - INDEX_OFFSET);
-		currDaysViewed = startDate.format("MMM DD, YYYY", new Locale("US"));
-		currDaysViewed += " - ";
-		currDaysViewed += endDate.format("MMM DD, YYYY", new Locale("US"));
-
 		table.update();
-
-		return currDaysViewed;
+		lblDate.setText(DisplayProcessor.getCurrDaysViewed());
+		
+		return DisplayProcessor.getCurrDaysViewed();
 	}
 
 	private void initBtnRightAction() {
@@ -186,7 +169,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					e1.printStackTrace();
 				}
 				table.update();
-				lblDate.setText("next");
+				lblDate.setText(DisplayProcessor.getCurrDaysViewed());
 			}
 		});
 	}
@@ -200,9 +183,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-
 				table.update();
-				lblDate.setText("prev");
+				lblDate.setText(DisplayProcessor.getCurrDaysViewed());
 			}
 		});
 	}
@@ -293,10 +275,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			if (command.getAction().equals("find")) {
 				table.update();
 				lblDate.setText("Search results");  				
-				btnLeft.setVisible(false);
-				btnRight.setVisible(false);
+				hideLeftRightButtons();
 			} else if (command.getAction().equals("display")) {
-				//TODO update label..
+				lblDate.setText(DisplayProcessor.getCurrDaysViewed());
+				if (DisplayProcessor.getCurrDaysViewed().equals("Displaying all tasks")) {
+					hideLeftRightButtons();
+				}
 			}
 
 			table.update();
@@ -308,6 +292,11 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 			txtCommand.setText("");
 			lblStatus.setText(INVALID_INPUT_MSG + e.getMessage());
 		}
+	}
+
+	private void hideLeftRightButtons() {
+		btnLeft.setVisible(false);
+		btnRight.setVisible(false);
 	}
 
 	private void initShortcuts() {		
