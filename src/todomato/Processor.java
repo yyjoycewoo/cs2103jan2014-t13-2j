@@ -37,6 +37,8 @@ public class Processor {
 	protected static final int PM_OFFSET = 12;
 	protected static final int POSITION_OFFSET = 1;
 	protected static final int ONE_DIGIT = 1;
+	protected static final int FIRST_WORD = 0;
+	protected static final int SECOND_WORD= 1;
 	
 	protected static final String SG_TIMEZONE = "GMT+8:00";
 	protected static final String DEFAULT_MINUTE_FORMAT = "00";
@@ -105,9 +107,9 @@ public class Processor {
 	 */
 
 	protected static int checkMeridiem(String input) {
-		for (int i = 0; i < meridiems.length; i++) {
-			if (input.contains(meridiems[i])) {
-				return i;
+		for (int meridiemPos = 0; meridiemPos < meridiems.length; meridiemPos++) {
+			if (input.contains(meridiems[meridiemPos])) {
+				return meridiemPos;
 			}
 		}
 		return NOT_FOUND;
@@ -191,14 +193,14 @@ public class Processor {
 		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
 				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
-		for (int i = 0; i < months.length; i++) {
+		for (int monthPos = 0; monthPos < months.length; monthPos++) {
 			if (parts.length > 1) {
-				if (parts[0].contains(months[i])) {
-					standardFormDate = convertDateToStandardForm(parts[1],
-							String.valueOf(i + POSITION_OFFSET));
-				} else if (parts[1].contains(months[i])) {
-					standardFormDate = convertDateToStandardForm(parts[0],
-							String.valueOf(i + POSITION_OFFSET));
+				if (parts[FIRST_WORD].contains(months[monthPos])) {
+					standardFormDate = convertDateToStandardForm(parts[SECOND_WORD],
+							String.valueOf(monthPos + POSITION_OFFSET));
+				} else if (parts[SECOND_WORD].contains(months[monthPos])) {
+					standardFormDate = convertDateToStandardForm(parts[FIRST_WORD],
+							String.valueOf(monthPos + POSITION_OFFSET));
 				}
 			}
 		}
@@ -216,8 +218,8 @@ public class Processor {
 	 */
 	
 	protected static Boolean hasTodayOrTmr (String input) {
-		for (int i = 0; i < dateKeywords.length; i++) {
-			if (input.contains(dateKeywords[i])) {
+		for (int keywordPos = 0; keywordPos < dateKeywords.length; keywordPos++) {
+			if (input.contains(dateKeywords[keywordPos])) {
 				return true;
 			}
 		}
@@ -232,9 +234,9 @@ public class Processor {
 	
 	protected static String getDateIfTdyOrTmrInString (String input) {
 		String userDate;
-		for (int i = 0; i < dateKeywords.length; i++) {
-			if (input.contains(dateKeywords[i])) {
-				switch (i) {
+		for (int keywordPos = 0; keywordPos < dateKeywords.length; keywordPos++) {
+			if (input.contains(dateKeywords[keywordPos])) {
+				switch (keywordPos) {
 				case 0:
 					userDate = currentDate.toString();
 					return userDate;
@@ -282,9 +284,9 @@ public class Processor {
 
 	protected static int checkForDay(String input) {
 		int dayValue = 0;
-		for (int i = 0; i < days.length; i++) {
-			if (input.contains(days[i])) {
-				dayValue = i + POSITION_OFFSET;
+		for (int dayPos = 0; dayPos < days.length; dayPos++) {
+			if (input.contains(days[dayPos])) {
+				dayValue = dayPos + POSITION_OFFSET;
 				return dayValue;
 			}
 		}

@@ -34,7 +34,7 @@ public class DeleteProcessor extends Processor {
 	private static final String ARGUMENT_START_DATE = "startdate";
 	private static final String ARGUMENT_END_DATE = "enddate";
 	private static final String ARGUMENT_ALL = "all";
-	private static final String ARGUMENT_COMPLETED = "completed";
+	private static final String ARGUMENT_COMPLETE = "complete";
 	private static final String TASKS = " task(s)";
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
@@ -64,12 +64,13 @@ public class DeleteProcessor extends Processor {
 		
 		String[] argArr = argument.split(argDelimiter);
 		String argStr = argArr[0];
+		argStr.toLowerCase();
 		String statusMessage;
 		try {
 			if (argStr.equalsIgnoreCase(ARGUMENT_ALL)) {
 				statusMessage = SUCCESSFUL_DELETE + deleteAll() + TASKS; 
 			}
-			else if (argStr.equalsIgnoreCase(ARGUMENT_COMPLETED)) {
+			else if (argStr.contains(ARGUMENT_COMPLETE)) {
 				statusMessage = SUCCESSFUL_DELETE + deleteCompleted() + TASKS;
 			}
 			else if (argStr.equalsIgnoreCase(ARGUMENT_START_DATE)) {
