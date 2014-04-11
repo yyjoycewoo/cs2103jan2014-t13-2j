@@ -72,6 +72,10 @@ public class AddProcessor extends Processor {
 	private static int INDEX_OF_RECUR = 6;
 	private static int INDEX_OF_PRIORITY = 7;
 	private static int NO_OF_TASK_DETAILS = 8;
+	private static int THREE_WORDS = 3;
+	private static int TWO_WORDS = 2;
+	private static int ONE_WORD = 1;
+	private static int DEFAULT_RECUR_PERIOD = 0;
 	private static String TODAY = " today";
 	private static String TOMORROW1 = " tmr";
 	private static String TOMORROW2 = " tomorrow";
@@ -186,26 +190,29 @@ public class AddProcessor extends Processor {
 		DateTime startDate = convertStringToDateTime(taskDetails[INDEX_OF_START_DATE]);
 		DateTime endDate = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
 		if (startDate != null && endDate == null) {
-			endDate = startDate;
+			if (endTime != null && startTime != null) {
+				if (endTime.lt(startTime)) {
+					endDate = startDate.plusDays(1);
+				}
+			} else {
+				endDate = startDate;
+			}
 		}
 		if (startDate != null && endDate != null) {
 			if (startDate.gt(endDate)) {
 				endDate = startDate;
 			}
-			if (endTime != null && startTime != null) {
-				if (endTime.lt(startTime)) {
-					endDate = startDate.plusDays(1);
-				}
-				if (startDate.equals(endDate)) {
+			if (startDate.equals(endDate)) {
+				if (startTime!= null && endTime != null) {
 					if (startTime.gt(endTime)) {
 						errorsInInput[INDEX_OF_START_TIME] = true;
 						startTime = null;
 					}
 				}
 			}
-			
 		}
-		int recurPeriod = 0;
+			
+		int recurPeriod = DEFAULT_RECUR_PERIOD;
 		try {
 			if (endDate == null && taskDetails[INDEX_OF_RECUR] != null) {
 				errorsInInput[INDEX_OF_RECUR] = true;
@@ -307,41 +314,46 @@ public class AddProcessor extends Processor {
 		} else {
 			startTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
 		}
-		startTimeString = retrieveStartDateFromStartTime(startTimeString);
+		startTimeString = retrieveDateFromTimeString(startTimeString, INDEX_OF_START_DATE);
 		if (startTimeString != null) {
 			startTimeString = parseTimeString(startTimeString);
 		}
 		return startTimeString;
 	}
 	
-	private static String retrieveStartDateFromStartTime (String startTimeString) throws InvalidInputException {
-		String parts[] = startTimeString.split(" ");
-		if (parts.length == 3) {
-			if (isParseableByDate(parts[0] + " " + parts[1])) {
-				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0] + " " + parts[1]);
-				startTimeString = parseTimeString(parts[2]);
-			} else if (isParseableByDate (parts[1] + " " + parts[2])) {
-				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[1] + " " + parts[2]);
-				startTimeString = parseTimeString(parts[0]);
+	private static String retrieveDateFromTimeString (String timeString, int startOrEndTimeIndex) throws InvalidInputException {
+		String parts[] = timeString.split(" ");
+		String dateString = null;
+		if (parts.length == THREE_WORDS) {
+			String firstWordPlusSecondWord = parts[0] + " " + parts[1];
+			String secondWordPlusThirdWord = parts[1] + " " + parts[2];
+			if (isParseableByDate(firstWordPlusSecondWord)) {
+				dateString = parseDateString(firstWordPlusSecondWord);
+				timeString = parseTimeString(parts[2]);
+			} else if (isParseableByDate (secondWordPlusThirdWord)) {
+				dateString = parseDateString(secondWordPlusThirdWord);
+				timeString = parseTimeString(parts[0]);
 			}
-		} else if (parts.length == 2) {
+		} else if (parts.length == TWO_WORDS) {
+			String firstWordPlusSecondWord = parts[0] + " " + parts[1];
 			if (isParseableByDate(parts[0])) {
-				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0]);
-				startTimeString = parts[1];
+				dateString = parseDateString(parts[0]);
+				timeString = parts[1];
 			} else if (isParseableByDate(parts[1])) {
-				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[1]);
-				startTimeString = parts[0];
-			} else if (isParseableByDate (parts[0] + " " + parts[1])) {
-				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0] + " " + parts[1]);
-				startTimeString = null;
+				dateString = parseDateString(parts[1]);
+				timeString = parts[0];
+			} else if (isParseableByDate (firstWordPlusSecondWord)) {
+				dateString = parseDateString(firstWordPlusSecondWord);
+				timeString = null;
 			}
-		} else if (parts.length == 1) {
+		} else if (parts.length == ONE_WORD) {
 			if (isParseableByDate(parts[0])) {
-				taskDetails[INDEX_OF_START_DATE] = parseDateString(parts[0]);
-				return null;
+				dateString = parseDateString(parts[0]);
+				timeString = null;
 			}
 		}
-		return startTimeString;
+		taskDetails[startOrEndTimeIndex] = dateString;
+		return timeString;
 	}
 	
 	/**
@@ -359,39 +371,9 @@ public class AddProcessor extends Processor {
 		} else {
 			endTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
 		}
-		endTimeString = retrieveEndDateFromEndTime(endTimeString);
+		endTimeString = retrieveDateFromTimeString(endTimeString, INDEX_OF_END_DATE);
 		if (endTimeString != null) {
 			endTimeString = parseTimeString(endTimeString);
-		}
-		return endTimeString;
-	}
-	
-	private static String retrieveEndDateFromEndTime (String endTimeString) throws InvalidInputException {
-		String parts[] = endTimeString.split(" ");
-		if (parts.length == 3) {
-			if (isParseableByDate(parts[0] + " " + parts[1])) {
-				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0] + " " + parts[1]);
-				endTimeString = parseTimeString(parts[2]);
-			} else if (isParseableByDate (parts[1] + " " + parts[2])) {
-				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[1] + " " + parts[2]);
-				endTimeString = parseTimeString(parts[0]);
-			}
-		} else if (parts.length == 2) {
-			if (isParseableByDate(parts[0])) {
-				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0]);
-				endTimeString = parts[1];
-			} else if (isParseableByDate(parts[1])) {
-				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[1]);
-				endTimeString = parts[0];
-			} else if (isParseableByDate (parts[0] + " " + parts[1])) {
-				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0] + " " + parts[1]);
-				endTimeString = null;
-			}
-		} else if (parts.length == 1) {
-			if (isParseableByDate(parts[0])) {
-				taskDetails[INDEX_OF_END_DATE] = parseDateString(parts[0]);
-				return null;
-			}
 		}
 		return endTimeString;
 	}

@@ -3,6 +3,8 @@
  */
 package todomato;
 
+import java.util.TimeZone;
+
 import hirondelle.date4j.DateTime;
 
 //@author A0101324A
@@ -111,6 +113,7 @@ public class UpdateProcessor extends Processor {
 	private static void updater(String argument, int[] whichToEdit, int index)
 			throws InvalidInputException {
 		for (int i = 0; i < whichToEdit.length; i++) {
+			updateUpdateTime(index);
 			if (whichToEdit[i] != -1) {
 				switch (i) {
 				case 0:
@@ -151,6 +154,16 @@ public class UpdateProcessor extends Processor {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @param index
+	 * 
+	 */
+
+	private static void updateUpdateTime(int index) {
+		DateTime currentTime = DateTime.now(TimeZone.getDefault());
+		list.getListItem(index).setUpdateTime(currentTime);
 	}
 
 	/**
