@@ -34,66 +34,6 @@ public class DisplayProcessor extends Processor {
 	 * @return Status message along with a String of the list 
 	 */
 	public static String processDisplay(String argument) throws InvalidInputException {
-
-		if (argument.equals("all")) {
-			getViewAll();
-		} else if (argument.equals("week")) {
-			viewDate = currDate;
-			getViewWeek(viewDate);
-		} else if (argument.equals("next")) {
-			viewDate = viewDate.plusDays(DAYS_IN_A_WEEK);
-			getViewWeek(viewDate);
-		} else if (argument.equals("prev")) {
-			viewDate = viewDate.minusDays(DAYS_IN_A_WEEK);
-			getViewWeek(viewDate);
-		} else {
-			throw new InvalidInputException(argument);
-		}
-		
-		return SUCCESS_DISPLAY + displayList.toString();
-	}
-
-	public static void displayBetweenDates(DateTime startDate, DateTime endDate) {
-		if (startDate == null && endDate == null) {
-			displayList.deepCopy(list);
-		} else {
-			TaskList currTasks = new TaskList();
-			for (Task i : list.getList()) {
-				DateTime date = i.getEndDate();
-				if (date == null)
-					currTasks.addToList(i);
-				else if (date.numDaysFrom(startDate) <= 0 && date.numDaysFrom(endDate) >= 0) {
-					currTasks.addToList(i);
-				}
-			}
-			displayList.deepCopy(currTasks);
-		}
-	}
-	
-	private static void getViewAll() {
-		displayBetweenDates(null, null);
-		currDaysViewed = "Displaying all tasks";
-	}
-
-	private static void getViewWeek(DateTime viewDate) {
-		currWeekday = viewDate.getWeekDay();
-		startDate = viewDate.minusDays(DAYS_IN_A_WEEK - currWeekday);
-		endDate = viewDate.plusDays(currWeekday - INDEX_OFFSET);
-		setCurrDaysViewed(startDate.format("MMM DD, YYYY", new Locale("US")));
-		setCurrDaysViewed(getCurrDaysViewed() + " - ");
-		setCurrDaysViewed(getCurrDaysViewed() + endDate.format("MMM DD, YYYY", new Locale("US")));
-		
-		//System.out.println(currDaysViewed);
-
-		displayBetweenDates(startDate, endDate);
-
-	}
-
-	public static String getCurrDaysViewed() {
-		return currDaysViewed;
-	}
-
-	public static void setCurrDaysViewed(String currDaysViewed) {
-		DisplayProcessor.currDaysViewed = currDaysViewed;
+		return SUCCESS_DISPLAY + list.toString();
 	}
 }

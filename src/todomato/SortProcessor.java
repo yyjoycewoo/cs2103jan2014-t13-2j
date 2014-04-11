@@ -93,7 +93,7 @@ public class SortProcessor extends Processor{
 		
 		bubbleSort(ARGUMENT_SORT_BY_COMPLETION);
 		if (isDescending(order)) {
-			displayList.reverse();
+			list.reverse();
 		}
 		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_COMPLETION;
@@ -109,7 +109,7 @@ public class SortProcessor extends Processor{
 		
 		bubbleSort(ARGUMENT_SORT_BY_PRIORITY);
 		if (isAscending(order)) {
-			displayList.reverse();
+			list.reverse();
 		}
 		//fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_PRIORITY;
@@ -125,7 +125,7 @@ public class SortProcessor extends Processor{
 		
 		bubbleSort(ARGUMENT_SORT_BY_START_DATE);
 		if (isDescending(order)) {
-			displayList.reverse();
+			list.reverse();
 		}
 		//fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
@@ -141,17 +141,17 @@ public class SortProcessor extends Processor{
 		
 		bubbleSort(ARGUMENT_SORT_BY_DATE);
 		if (isDescending(order)) {
-			displayList.reverse();
+			list.reverse();
 		}
 		//fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
 	}
 	
 	private static void bubbleSort(String type) {
-		for (int i = 0; i < (displayList.getSize() - 1); i++) {
-			for (int j = 0; j < (displayList.getSize() - i - 1); j++) {
+		for (int i = 0; i < (list.getSize() - 1); i++) {
+			for (int j = 0; j < (list.getSize() - i - 1); j++) {
 				if (needSwap(type, j)) {
-					displayList.swap(j, j + 1);
+					list.swap(j, j + 1);
 				}
 			}
 		}
@@ -184,8 +184,8 @@ public class SortProcessor extends Processor{
 //	Returns true if..
 //	list[i] is completed but list[j] is not
 	private static boolean compareCompletion(int i, int j) {
-		if (displayList.getListItem(i).getCompleted()) {
-			if (!displayList.getListItem(j).getCompleted()) {
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
 				return true;
 			}
 		}
@@ -196,15 +196,15 @@ public class SortProcessor extends Processor{
 //  list[i] later than list[j]
 //	Tasks without date is considered latest
 	private static boolean compareStartDate(int i, int j) {
-		if(displayList.getListItem(i).getStartDate() == null) {
-			if(displayList.getListItem(j).getStartDate() == null) {
+		if(list.getListItem(i).getStartDate() == null) {
+			if(list.getListItem(j).getStartDate() == null) {
 				return false;
 			}
 			return true;
-		} if(displayList.getListItem(j).getStartDate() == null) {
+		} if(list.getListItem(j).getStartDate() == null) {
 			return false;
-		} if(displayList.getListItem(i).getStartDate()
-				.compareTo(displayList.getListItem(j).getStartDate()) > 0) {
+		} if(list.getListItem(i).getStartDate()
+				.compareTo(list.getListItem(j).getStartDate()) > 0) {
 			return true;
 		} 
 		return false;
@@ -215,15 +215,15 @@ public class SortProcessor extends Processor{
 //  list[i] later than list[j]
 //	Tasks without date is considered latest
 	private static boolean compareDate(int i, int j) {
-		if(displayList.getListItem(i).getEndDate() == null) {
-			if(displayList.getListItem(j).getEndDate() == null) {
+		if(list.getListItem(i).getEndDate() == null) {
+			if(list.getListItem(j).getEndDate() == null) {
 				return false;
 			}
 			return true;
-		} if(displayList.getListItem(j).getEndDate() == null) {
+		} if(list.getListItem(j).getEndDate() == null) {
 			return false;
-		} if(displayList.getListItem(i).getEndDate()
-				.compareTo(displayList.getListItem(j).getEndDate()) > 0) {
+		} if(list.getListItem(i).getEndDate()
+				.compareTo(list.getListItem(j).getEndDate()) > 0) {
 			return true;
 		} 
 		return false;
@@ -232,20 +232,20 @@ public class SortProcessor extends Processor{
 //	Returns true if..
 //	list[i] has lower priority than list[j]
 	private static boolean comparePriority(int i, int j) {
-		if (displayList.getListItem(i).getCompleted()) {
-			if (displayList.getListItem(j).getCompleted()) {
+		if (list.getListItem(i).getCompleted()) {
+			if (list.getListItem(j).getCompleted()) {
 				return false;
 			}
 			return true;
 		}
-		if (displayList.getListItem(i).getPriorityLevel().equals(PRIORITY_LOW)) {
-			if (displayList.getListItem(j).getPriorityLevel().equals(PRIORITY_LOW)) {
+		if (list.getListItem(i).getPriorityLevel().equals(PRIORITY_LOW)) {
+			if (list.getListItem(j).getPriorityLevel().equals(PRIORITY_LOW)) {
 				return false;
 			}
 			return true;
 		}
-		if (displayList.getListItem(i).getPriorityLevel().equals(PRIORITY_MED)) {
-			if(displayList.getListItem(j).getPriorityLevel().equals(PRIORITY_HIGH)) {
+		if (list.getListItem(i).getPriorityLevel().equals(PRIORITY_MED)) {
+			if(list.getListItem(j).getPriorityLevel().equals(PRIORITY_HIGH)) {
 				return true;
 			}
 			return false;

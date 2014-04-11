@@ -18,9 +18,12 @@ public class RedoProcessor extends Processor {
 		 */
 		public static String processRedo() {
 			if (!redoList.isEmpty()) {
+				undoList.push(list);
+				
 				list = redoList.pop();	
 				fileHandler.updateFile(list);
-				displayList.deepCopy(list);
+
+				displayList = list;
 				return SUCCESS_MSG;
 			} else {
 				return NO_CHANGES_TO_REDO_MSG;

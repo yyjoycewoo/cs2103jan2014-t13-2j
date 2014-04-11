@@ -85,7 +85,9 @@ public class DeleteProcessor extends Processor {
 			else {
 				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argStr);
 			}
-			displayList.deepCopy(list);
+			
+			displayList = list;
+			
 			fileHandler.updateFile(list);
 			
 			//logger.log(Level.INFO, "end of processing");
@@ -100,18 +102,14 @@ public class DeleteProcessor extends Processor {
 			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;
 		}		
 	}
-	
+
 	private static String deleteCompleted() {
 		int numberOfTasksDeleted = 0;
-		for (int i = displayList.getSize() - 1; i >= 0 ; i--) { 
-			if (displayList.getListItem(i).getCompleted()) {
-				int listIndex = list.getItem(displayList.getListItem(i).getId());
-				
-				displayList.deleteListItem(i);
-				list.deleteListItem(listIndex);
-				
+		for (int i = list.getSize() - 1; i >= 0 ; i--) { 
+			if (list.getListItem(i).getCompleted()) {
+				list.deleteListItem(i);
 				numberOfTasksDeleted++;
-			}
+			}		
 		}
 		return Integer.toString(numberOfTasksDeleted);
 	}
@@ -125,12 +123,9 @@ public class DeleteProcessor extends Processor {
 			return INVALID_DATE;
 		}
 		DateTime dateDT = convertStringToDateTime(date);
-		for (int i = displayList.getSize() - 1; i >= 0; i--) {
+		for (int i = list.getSize() - 1; i >= 0; i--) {
 			if(isSameStartDate(i,dateDT)) {
-				int listIndex = list.getItem(displayList.getListItem(i).getId());
-				
-				displayList.deleteListItem(i);
-				list.deleteListItem(listIndex);
+				list.deleteListItem(i);
 				
 				numberOfTasksDeleted++;
 			}
@@ -157,13 +152,9 @@ public class DeleteProcessor extends Processor {
 			return INVALID_DATE;
 		}
 		DateTime dateDT = convertStringToDateTime(date);
-		for (int i = displayList.getSize() - 1; i >= 0; i--) {
+		for (int i = list.getSize() - 1; i >= 0; i--) {
 			if(isSameEndDate(i,dateDT)) {
-				int listIndex = list.getItem(displayList.getListItem(i).getId());
-				
-				displayList.deleteListItem(i);
-				list.deleteListItem(listIndex);
-				
+				list.deleteListItem(i);
 				numberOfTasksDeleted++;
 			}
 		}
@@ -182,11 +173,8 @@ public class DeleteProcessor extends Processor {
 
 	private static String deleteAll() {
 		int numberOfTasksDeleted = 0;
-		while(displayList.getSize() != 0) {
-			int listIndex = list.getItem(displayList.getListItem(0).getId());
-			
-			displayList.deleteListItem(0);
-			list.deleteListItem(listIndex);
+		while(list.getSize() != 0) {
+			list.deleteListItem(0);
 			
 			numberOfTasksDeleted++;
 		}
@@ -195,12 +183,8 @@ public class DeleteProcessor extends Processor {
 	
 	private static String deleteSingle(String indexString) {
 		int index = Integer.parseInt(indexString) - 1;
-		Task deletedTask = displayList.getListItem(index);
-
-		int listIndex = list.getItem(displayList.getListItem(index).getId());
-		
-		displayList.deleteListItem(index);
-		list.deleteListItem(listIndex);
+		Task deletedTask = list.getListItem(index);
+		list.deleteListItem(index);
 		
 		return deletedTask.toString();
 	}
