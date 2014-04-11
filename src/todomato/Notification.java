@@ -30,13 +30,14 @@ import javax.swing.plaf.basic.BasicArrowButton;
  * 
  */
 
-public abstract class Notification extends Popup implements ActionListener {
+public abstract class Notification implements ActionListener {
 	private static int count = 0, width = 200;
 
 	/**
+	 * @param myownlist
 	 * @param taskToDo
 	 */
-	protected static void popUpNotice() {
+	protected static void popUpNotice(TaskList list) {
 		String msg = "~~~Reminder! Do now or never!~~~";
 		// pop up disappeared after 2sec
 		final int waitfor = 2000;
@@ -66,7 +67,7 @@ public abstract class Notification extends Popup implements ActionListener {
 		constraints.fill = GridBagConstraints.BOTH;
 
 		final JLabel textLabel = new JLabel();
-		buttonsAction(textLabel);
+		buttonsAction(textLabel, list);
 
 		textLabel.setPreferredSize(new Dimension(300, 100));
 		textLabel.setOpaque(false);
@@ -159,7 +160,8 @@ public abstract class Notification extends Popup implements ActionListener {
 	 * @param textLabel
 	 * @return
 	 */
-	protected static void buttonsAction(final JLabel textLabel) {
+	protected static void buttonsAction(final JLabel textLabel,
+			final TaskList list) {
 		// allow the next task to be shown after clicking the button
 		ActionListener actionListener_prev = new ActionListener() {
 			private String text;
@@ -170,13 +172,11 @@ public abstract class Notification extends Popup implements ActionListener {
 					count = 0;
 					// allow text to be within the JLabel border
 					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, Popup.myownlist.getListItem(count)
-									.toString());
+							width, list.getListItem(count).toString());
 				} else {
 					count--;
 					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, Popup.myownlist.getListItem(count)
-									.toString());
+							width, list.getListItem(count).toString());
 				}
 				textLabel.setText(text);
 			}
@@ -190,23 +190,22 @@ public abstract class Notification extends Popup implements ActionListener {
 			public void actionPerformed(ActionEvent actionEvent) {
 
 				// get the next item in myownlist
-				if (count >= (Popup.myownlist.getSize() - 1)) {
-					count = Popup.myownlist.getSize() - 1;
+				if (count >= (list.getSize() - 1)) {
+					count = list.getSize() - 1;
 					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, Popup.myownlist.getListItem(count)
-									.toString());
+							width, list.getListItem(count).toString());
 
 				} else {
 					count++;
 					// allow text to be within the JLabel border
 					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, Popup.myownlist.getListItem(count)
-									.toString());
+							width, list.getListItem(count).toString());
 				}
 				textLabel.setText(text);
 			}
 		};
-		putButtonsOnLabel(textLabel, actionListener_prev, actionListener_next);
+		putButtonsOnLabel(textLabel, actionListener_prev, actionListener_next,
+				list);
 	}
 
 	/**
@@ -216,7 +215,7 @@ public abstract class Notification extends Popup implements ActionListener {
 	 */
 	protected static void putButtonsOnLabel(final JLabel textLabel,
 			ActionListener actionListener_prev,
-			ActionListener actionListener_next) {
+			ActionListener actionListener_next, TaskList list) {
 
 		// implementing buttons on the label
 		textLabel.setLayout(new BorderLayout());
@@ -227,7 +226,7 @@ public abstract class Notification extends Popup implements ActionListener {
 		textLabel.add(prev, BorderLayout.WEST);
 		textLabel.add(next, BorderLayout.EAST);
 		String text = String.format("<html><div WIDTH=%d>%s</div><html>",
-				width, Popup.myownlist.getListItem(0).toString());
+				width, list.getListItem(0).toString());
 		textLabel.setText(text);
 		// Centralizing the text on the JLabel
 		textLabel.setHorizontalAlignment(JLabel.CENTER);

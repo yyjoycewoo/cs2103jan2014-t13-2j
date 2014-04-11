@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 //@author A0101324A
+
+// showing the tasks that are due in 3 days
 public class Popup extends Processor {
 	// list of tasks that are near deadline
 	protected static TaskList myownlist = new TaskList();
@@ -29,30 +31,14 @@ public class Popup extends Processor {
 			tasksNearingDeadline(now, item);
 		}
 		if (myownlist.getSize() != 0) {
-			Notification.popUpNotice();
+			Notification.popUpNotice(myownlist);
 		}
-	}
-
-	public static void keepCheckingNoticeTime() {
-		for (int i = 0; i < Processor.getList().getSize(); i++) {
-			String timeStamp = new SimpleDateFormat("HH:mm").format(Calendar
-					.getInstance().getTime());
-			if (Processor.getList().getListItem(i).getNoticeTime() != null) {
-				if (Processor.getList().getListItem(i).getNoticeTime()
-						.equals(timeStamp)) {
-					System.out.println("yeah");
-					// pop up the relevant task at that time
-					myownlist.clearList();
-					myownlist.addToList(Processor.getList().getListItem(i));
-				}
-			}
-		}
-		Notification.popUpNotice();
 	}
 
 	/**
 	 * @param now
 	 * @param item
+	 *            Checking tasks that fall within the 3 days from now
 	 */
 	protected static void tasksNearingDeadline(Calendar now, Task item) {
 		if ((item.getEndDate() != null) && !item.getCompleted()) {
