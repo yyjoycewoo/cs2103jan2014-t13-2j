@@ -36,8 +36,8 @@ public class Todomato {
 		while (true) {
 			try {
 				System.out.print(PROMPT_USER_INPUT);
+				Popup.keepCheckingNoticeTime();
 				String command = scan.nextLine();
-
 				String status = SplitProcessorsHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {
@@ -45,5 +45,4 @@ public class Todomato {
 			}
 		}
 	}
-
 }

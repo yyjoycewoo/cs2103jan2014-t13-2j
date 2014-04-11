@@ -17,7 +17,6 @@ public class Popup extends Processor {
 	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-dd-MM");
 
 	public static void show() {
-
 		// create calendar instance
 		Calendar now = Calendar.getInstance();
 		now.add(Calendar.DATE, daysB4deadline);
@@ -32,6 +31,23 @@ public class Popup extends Processor {
 		if (myownlist.getSize() != 0) {
 			Notification.popUpNotice();
 		}
+	}
+
+	public static void keepCheckingNoticeTime() {
+		for (int i = 0; i < Processor.getList().getSize(); i++) {
+			String timeStamp = new SimpleDateFormat("HH:mm").format(Calendar
+					.getInstance().getTime());
+			if (Processor.getList().getListItem(i).getNoticeTime() != null) {
+				if (Processor.getList().getListItem(i).getNoticeTime()
+						.equals(timeStamp)) {
+					System.out.println("yeah");
+					// pop up the relevant task at that time
+					myownlist.clearList();
+					myownlist.addToList(Processor.getList().getListItem(i));
+				}
+			}
+		}
+		Notification.popUpNotice();
 	}
 
 	/**
