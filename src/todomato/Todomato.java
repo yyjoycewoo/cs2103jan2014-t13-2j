@@ -25,7 +25,7 @@ public class Todomato {
 	 * @throws SchedulerException
 	 */
 	public static void main(String[] args) throws SchedulerException {
-		TodomatoFrame f = new TodomatoFrame();
+		new TodomatoFrame();
 
 		System.out.println(WELCOME_MSG);
 
@@ -34,20 +34,22 @@ public class Todomato {
 		// show tasks that are due today according to the time of the day
 		Scheduler scheduler = Scheduling.schedulingTasks();
 
-		// type "exit" to exit the program
+		// loops forever until user types "exit"
 		while (true) {
 			try {
 				System.out.print(PROMPT_USER_INPUT);
 				String command = scan.nextLine();
+				assert command != null;
+				
 				// stop the scheduler from running
 				if (command == "exit") {
 					try {
 						scheduler.shutdown();
 					} catch (SchedulerException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.err.println(e.getMessage());
 					}
 				}
+				
 				String status = SplitProcessorsHandler.processCommand(command);
 				System.out.println(status);
 			} catch (InvalidInputException e) {

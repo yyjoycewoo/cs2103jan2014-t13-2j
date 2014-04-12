@@ -27,6 +27,27 @@ public class FindProcessor extends Processor {
 		TaskList tasksFound = new TaskList();
 		TaskList tasksNotFound = new TaskList();
 		
+		createTasksFoundList(argument, tasksFound, tasksNotFound);
+		reorderList(tasksFound, tasksNotFound);
+		
+		fileHandler.updateFile(list);		
+		displayList = tasksFound;
+		
+		if (tasksFound.isEmpty())
+			return NO_TASKS_FOUND_MESSAGE;
+		
+		return SUCCESS_MSG;
+	}
+
+	private static void reorderList(TaskList tasksFound, TaskList tasksNotFound) {
+		list.deepCopy(tasksFound);
+		for (Task i : tasksNotFound.getList()) {
+			list.addToList(i);
+		}
+	}
+
+	private static void createTasksFoundList(String argument,
+			TaskList tasksFound, TaskList tasksNotFound) {
 		for (Task i : list.getList()) {
 			String task = i.toString().toUpperCase();
 			if (task.contains(argument) && task != "") {
@@ -36,19 +57,6 @@ public class FindProcessor extends Processor {
 				tasksNotFound.addToList(i);
 			}
 		}
-		
-		list.deepCopy(tasksFound);
-		for (Task i : tasksNotFound.getList()) {
-			list.addToList(i);
-		}
-		fileHandler.updateFile(list);
-		
-		displayList = tasksFound;
-		
-		if (tasksFound.isEmpty())
-			return NO_TASKS_FOUND_MESSAGE;
-		
-		return SUCCESS_MSG;
 	}
 
 }

@@ -13,12 +13,27 @@ import net.miginfocom.swing.MigLayout;
  * user for his/her username and password.
  */
 public class UsernamePasswordDialogueBox extends JFrame{
+	//constants for MigLayout formatting
+	private static final String SUBMIT_BUTTON_LAYOUT = "span, align center";
+	private static final String PASSWORD_TEXTBOX_LAYOUT = "wrap, growx";
+	private static final String USERNAME_TEXTBOX_LAYOUT = "wrap, pushx, growx";
+	private static final String MIG_LAYOUT = "nocache";
+	
+	private static final int GUI_HEIGHT = 500;
+	private static final int GUI_WIDTH = 680;
+	
+	private static final String SUBMIT_BUTTON_TEXT = "Submit";
+	private static final int PASSWORD_TEXTBOX_SIZE = 20;
+	private static final int USERNAME_TEXTBOX_SIZE = 20;
+	private static final String PASSWORD_LABEL = "Pasword: ";
+	private static final String USERNAME_LABEL = "Username: ";
+	
 	private JPanel panel = new JPanel();
-	private JLabel lblUsername = new JLabel("Username: ");
-	private JLabel lblPassword = new JLabel("Pasword: ");
-	private JTextField txtUsername = new JTextField(20);
-	private JTextField txtPassword = new JTextField(20);
-	private JButton button = new JButton("Submit");
+	private JLabel lblUsername = new JLabel(USERNAME_LABEL);
+	private JLabel lblPassword = new JLabel(PASSWORD_LABEL);
+	private JTextField txtUsername = new JTextField(USERNAME_TEXTBOX_SIZE);
+	private JTextField txtPassword = new JTextField(PASSWORD_TEXTBOX_SIZE);
+	private JButton button = new JButton(SUBMIT_BUTTON_TEXT);
 	private String username;
 	private String password;
 	
@@ -27,15 +42,15 @@ public class UsernamePasswordDialogueBox extends JFrame{
 	 */
 	public UsernamePasswordDialogueBox() {
 		super("Log in");
-		setSize(680,500);
+		setSize(GUI_WIDTH, GUI_HEIGHT);
 		setLocationRelativeTo(null);
 
-		panel.setLayout(new MigLayout("nocache"));
+		panel.setLayout(new MigLayout(MIG_LAYOUT));
 		panel.add(lblUsername);
-		panel.add(txtUsername, "wrap, pushx, growx");
+		panel.add(txtUsername, USERNAME_TEXTBOX_LAYOUT);
 		panel.add(lblPassword);
-		panel.add(txtPassword, "wrap, growx");
-		panel.add(button, "span, align center");
+		panel.add(txtPassword, PASSWORD_TEXTBOX_LAYOUT);
+		panel.add(button, SUBMIT_BUTTON_LAYOUT);
 		
 		initButtonAction();
 		
