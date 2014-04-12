@@ -58,9 +58,9 @@ public class SortProcessor extends Processor{
 	private static final String ascending[] = {"ascending", "a", "asc"};
 	private static final int INVALID_PARAMETERS = -1;
 	
-	public static String processSort(String argument) {
+	public static String processSort(String argument) throws InvalidInputException {
 		if (argument.isEmpty()) {
-			return INVALID_INPUT_MISSING_ARGUMENT;
+			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
 		}
 		
 		String argArr[] = argument.split(" ", 2);
@@ -83,15 +83,15 @@ public class SortProcessor extends Processor{
 			return sortByCompletion(order);
 		}
 		
-		return INVALID_INPUT_TYPE;
+		throw new InvalidInputException(INVALID_INPUT_TYPE);
 	}
 	
 	// Sort in order of..
 	// Default/Ascending: unfinished -> completed tasks
 	// Descending: completed -> unfinished tasks
-	private static String sortByCompletion(String order) {
+	private static String sortByCompletion(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
-			return INVALID_INPUT_ORDER;
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
 		}
 		
 		bubbleSort(ARGUMENT_COMPLETION);
@@ -105,9 +105,9 @@ public class SortProcessor extends Processor{
 	// Sort in order of..
 	// Default/Descending: High -> Medium -> Low priority
 	// Ascending: Low -> Medium -> High priority
-	private static String sortByPriority(String order) {
+	private static String sortByPriority(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
-			return INVALID_INPUT_ORDER;
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
 		}
 		
 		bubbleSort(ARGUMENT_PRIORITY);
@@ -121,9 +121,9 @@ public class SortProcessor extends Processor{
 	// Sort in order of..
 	// Default/Ascending: Most recent -> Least recent -> No date
 	// Descending: No date -> Least recent -> Most recent
-	private static String sortByStartDate(String order) {
+	private static String sortByStartDate(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
-			return INVALID_INPUT_ORDER;
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
 		}
 		
 		bubbleSort(ARGUMENT_START_DATE);
@@ -137,9 +137,9 @@ public class SortProcessor extends Processor{
 	// Sort in order of..
 	// Default/Ascending: Most recent -> Least recent -> No date
 	// Descending: No date -> Least recent -> Most recent
-	private static String sortByEndDate(String order) {
+	private static String sortByEndDate(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
-			return INVALID_INPUT_ORDER;
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
 		}
 		
 		bubbleSort(ARGUMENT_END_DATE);
