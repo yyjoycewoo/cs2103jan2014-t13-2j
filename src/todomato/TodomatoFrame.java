@@ -31,8 +31,8 @@ public class TodomatoFrame extends JFrame implements ActionListener {
 	private static final String SORT_PRIORITY_ASC_COMMAND = "sort priority asc";
 	private static final String SORT_COMPLETE_DESC_COMMAND = "sort complete desc";
 	private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
-	private static final String SORT_DATE_DESC_COMMAND = "sort date desc";
-	private static final String SORT_DATE_ASC_COMMAND = "sort date asc";
+	private static final String SORT_DATE_DESC_COMMAND = "sort enddate desc";
+	private static final String SORT_DATE_ASC_COMMAND = "sort enddate asc";
 
 	private final String UNDO = "undo action key";
 	private final String REDO = "redo action key";
