@@ -38,8 +38,8 @@ import org.apache.http.util.EntityUtils;
 public class DataSyncer extends Processor {
 	
 	TaskList localList;
-	static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
-	//static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+	// static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 
 	
 	public DataSyncer (TaskList localList) {
@@ -132,12 +132,15 @@ public class DataSyncer extends Processor {
 		String eventId = tJson.get("eid").getAsString();
 		String description = tJson.get("description").getAsString();
 		String location = tJson.get("location").getAsString();
-		ArrayList<DateTime> startDTList = stringToDateAndTime(tJson.get("starttime").getAsString());
-		ArrayList<DateTime> endDTList = stringToDateAndTime(tJson.get("endtime").getAsString());
+		
+		DateTime startTime = stringToTime(tJson.get("starttime").getAsString());
+		DateTime endTime = stringToTime(tJson.get("endtime").getAsString());
+		DateTime startDate = stringToDate(tJson.get("startdate").getAsString());
+		DateTime endDate = stringToDate(tJson.get("enddate").getAsString());
 		DateTime updateTime = stringToDateTime(tJson.get("edit").getAsString());
 		DateTime timeCreated = stringToDateTime(tJson.get("created").getAsString());
 		
-		ArrayList<DateTime> taskTime = createDateTimeForATask(timeCode, startDTList, endDTList);
+		ArrayList<DateTime> taskTime = createDateTimeForATask(timeCode, startDate, startTime, endDate, endTime);
 		Integer id = null;
 		
 		if (!idJson.isJsonNull()){
@@ -198,11 +201,15 @@ public class DataSyncer extends Processor {
 	}
 
 	private ArrayList<DateTime> createDateTimeForATask(String timeCode,
-			ArrayList<DateTime> startDTList, ArrayList<DateTime> endDTList) {
+			DateTime startDate, DateTime startTime, DateTime endDate, DateTime endTime) {
 		// TODO Auto-generated method stub
 		
-		ArrayList<DateTime> timeArray = prepareTimeArray(startDTList, endDTList);
-		
+		ArrayList<DateTime> timeArray = new ArrayList<DateTime>();
+		timeArray.add(startDate);
+		timeArray.add(startTime);
+		timeArray.add(endDate);
+		timeArray.add(endTime);
+
 		for(int i = 0; i < timeCode.length(); i++){
 			boolean isValidData = timeCode.charAt(i) != '0';
 			if(!isValidData){
@@ -213,29 +220,8 @@ public class DataSyncer extends Processor {
 		return timeArray;
 	}
 
-	/**
-	 * @param startDTList
-	 * @param endDTList
-	 * @return 
-	 */
-	private ArrayList<DateTime> prepareTimeArray(ArrayList<DateTime> startDTList,
-			ArrayList<DateTime> endDTList) {
-		DateTime startDate = startDTList.get(0);
-		DateTime startTime = startDTList.get(2);
-		DateTime endDate = endDTList.get(0);
-		DateTime endTime = endDTList.get(2);
-		
-		ArrayList<DateTime> time = new ArrayList<DateTime>();
-		time.add(startDate);
-		time.add(startTime);
-		time.add(endDate);
-		time.add(endTime);
-		
-		return time;
-	}
 
 	private String formatTime(DateTime dt) {
-		
 		
 		
 		if (dt == null || dt.toString().equals("null")  ) {
@@ -265,29 +251,26 @@ public class DataSyncer extends Processor {
 		return dt;
 	}
 	
-	private ArrayList<DateTime> stringToDateAndTime(String s) {
-		ArrayList<DateTime> datetimeList = new ArrayList<DateTime>();
-		DateTime t = null;
+
+	
+	
+	private DateTime stringToDate(String s) {
 		DateTime d = null;
-		DateTime ts = null;
-		if(s.contains("T")){
-			d = new DateTime(s.substring(0,10));
-			t = new DateTime(s.substring(11,19));
-			ts = new DateTime(s.substring(11,16));
+		if (!s.isEmpty()){
+			d = new DateTime(s);
 		}
-		if (s.contains("-")){
-			d = new DateTime(s.substring(0,10));
-		}
-		if (s.contains(":")) {
-			t = new DateTime(s.substring(0,8));
-			ts = new DateTime(s.substring(0,5));
-		}
-		datetimeList.add(d);
-		datetimeList.add(t);
-		datetimeList.add(ts);
-		return datetimeList;
+		
+		return d;
 	}
 	
+	private DateTime stringToTime(String s) {
+		DateTime t = null;
+		if (!s.isEmpty()){
+			t = new DateTime(s.substring(0, 5));
+		}
+		
+		return t;
+	}
 	
 	private boolean notNullString(String s) {
 		boolean isNullString = (s == null || s.equals("null"));
