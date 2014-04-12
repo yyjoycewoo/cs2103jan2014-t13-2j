@@ -31,9 +31,12 @@ public class DeleteProcessorTest {
 		System.setProperty("user.dir", folder.getRoot().toString());
 		tasks = folder.newFile("tasks.txt");
 		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
-        out.write("es1531 assignment 3#null#null#null#null#0#404344556#2014-04-01 23:11:04.575000000#LOW#false#null#null#null\r\n");
-        out.write("cs post-lecture quiz#null#null#2014-03-28#null#7#-1997137046#2014-04-01 22:57:15.488000000#LOW#true#null#null#null\r\n");
-        out.write("ie2150 project#null#null#null#null#0#-195311185#2014-04-02 22:49:07.307000000#HIGH#false#null#null#null\r\n");
+		out.write("null\r\n");
+        out.write("null\r\n");
+        out.write("null\r\n");
+        out.write("Lunch#null#null#null#null#null#0#1046042885#2014-04-09 16:19:17.842000000#HIGH#true#null#null#null\r\n");
+        out.write("Dinner#null#18:00#2014-04-09#2014-04-10#null#0#-1351579072#2014-04-09 16:18:25.784000000#LOW#false#null#null#null\r\n");
+        out.write("Project meeting#null#14:00#2014-04-01#2014-04-10#null#0#570051783#2014-04-09 16:18:48.669000000#MEDIUM#true#null#null#null\r\n");
         out.close();
         
         FileHandler fileHandler = new FileHandler("tasks.txt");
@@ -49,19 +52,16 @@ public class DeleteProcessorTest {
         }
 	}
 
-	
 	@Test
 	public void testDeleteAll() throws InvalidInputException, IOException {
 		String message = DeleteProcessor.processDelete("all");
 		assertEquals("Deleted: 3 task(s)", message);
-		//UndoProcessor.processUndo();
 	}
 	
 	@Test
 	public void testDeleteSingle() throws InvalidInputException, IOException {
 		String message = DeleteProcessor.processDelete("1");
-		assertEquals("Deleted: es1531 assignment 3", message);
-		//UndoProcessor.processUndo();
+		assertEquals("Deleted: Lunch", message);
 	}
 	
 	// This is a boundary case for the valid indices partition
@@ -69,7 +69,18 @@ public class DeleteProcessorTest {
 	public void testDeleteMultiple() throws InvalidInputException, IOException {
 		String message = DeleteProcessor.processDelete("3,1");
 		assertEquals("Deleted: 2 task(s)", message);
-		//UndoProcessor.processUndo();
+	}
+	
+	@Test
+	public void testDeleteStartDate() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("startdate 1 apr");
+		assertEquals("Deleted: 1 task(s)", message);
+	}
+	
+	@Test
+	public void testDeleteEndDate() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("enddate 10 apr");
+		assertEquals("Deleted: 2 task(s)", message);
 	}
 	
 	// This is a boundary case for the invalid indices partition
@@ -97,8 +108,5 @@ public class DeleteProcessorTest {
 		} catch (InvalidInputException e){
 			assertEquals(e.getMessage(), "empty list");
 		}
-		//UndoProcessor.processUndo();
 	}
-	
-	
 }
