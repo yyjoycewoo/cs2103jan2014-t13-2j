@@ -20,8 +20,10 @@ import java.util.logging.Logger;
  * <ul> <li> "delete 1,2,3" </ul>
  * <li> delete all tasks
  * <ul> <li> "delete all" </ul>
- * <li> delete tasks that fall on a date
- * <ul> <li> "delete date 1 jan" </ul>
+ * <li> delete tasks that starts on a date
+ * <ul> <li> "delete startdate 1 jan" </ul>
+ * <li> delete tasks that ends on a date
+ * <ul> <li> "delete enddate 20 jan" </ul>
  * <li> delete tasks that are completed
  * <ul> <li> "delete completed" </ul>
  * </ul>
