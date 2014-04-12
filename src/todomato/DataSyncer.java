@@ -11,10 +11,16 @@ import java.util.TimeZone;
 
 
 
+
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+
 
 
 
@@ -38,7 +44,9 @@ import org.apache.http.util.EntityUtils;
 public class DataSyncer extends Processor {
 	
 	TaskList localList;
-	// static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+	
+	
+	//static String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
 	static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 
 	
@@ -47,13 +55,35 @@ public class DataSyncer extends Processor {
 	}
 			
 	public TaskList sync(String username, String password, DateTime lastsync) {
+
+		System.out.println("");
+		System.out.println("START SYNCING");
+		System.out.println("==================================");
+		System.out.println("Server:\n" + SERVER_URL + "\n");
+		
 		JsonObject localJson = prepareData(this.localList, username, password, lastsync);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		
+		System.out.println("Send data\n----------------------");
+		System.out.println(gson.toJson(localJson));
+		System.out.println("\n");
+		
+		System.out.println("Receive data\n----------------------");
 		JsonObject responseJson = sendRequest(localJson);
+		System.out.println(gson.toJson(responseJson));
+		System.out.println("\n");
+		
+		System.out.println("PROCESS RESPONSE");
+		System.out.println("==================================");
 		
 		localList = processResponse(responseJson);
 		localList.setLastSyncTime(DateTime.now(TimeZone.getDefault()));
 		localList.setUserName(username);
 		localList.setPassword(password);
+		
+		System.out.println("==================================");
+		System.out.println("SYNC COMPLETE");
+		
 		return localList;
 	}
 	
@@ -73,7 +103,6 @@ public class DataSyncer extends Processor {
 				HttpResponse response = client.execute(post);
 				String json = EntityUtils.toString(response.getEntity());
 				JsonParser jsonParser = new JsonParser();
-				System.out.println(json);
 				JsonObject tJson = (JsonObject)jsonParser.parse(json);
 				
 				return tJson;
@@ -150,10 +179,9 @@ public class DataSyncer extends Processor {
 		
 		Task task = createATask(isCompleted, priorityLevel, eventId, description,
 				location, updateTime, timeCreated, taskTime, id);
-		System.out.println("==========");
-		System.out.println("timecode:" + timeCode);
-		System.out.println(task);
 		
+		System.out.println("Task\n----------------------");
+		System.out.println("description: " + description + "\ntimecode: " + timeCode + "\npriority:" + priorityLevel + "\ncompletion: " + isCompleted + "\n");
 		
 		return task;
 	}
@@ -291,9 +319,6 @@ public class DataSyncer extends Processor {
 		// add tasklist in response Json
 		data.add("tasklist", tasklist);
 		localJson.add("data", data);
-		
-		System.out.println(auth);
-		
 		return localJson;
 	}
 
@@ -308,7 +333,6 @@ public class DataSyncer extends Processor {
 		for (Task t: list) {
 			JsonObject tJson = convertTaskToJson(t);
 			tasklist.add(tJson);
-			System.out.println(tJson);
 		}
 		
 		
@@ -328,6 +352,7 @@ public class DataSyncer extends Processor {
 		auth.addProperty("username", username);
 		auth.addProperty("password", password);
 		auth.addProperty("last_sync", formatTime(lastsync));
+		auth.addProperty("current_time", formatTime(DateTime.now(TimeZone.getDefault())));
 		localJson.add("auth", auth);
 	}
 
