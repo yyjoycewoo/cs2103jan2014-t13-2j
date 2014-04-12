@@ -72,9 +72,6 @@ public class AddProcessor extends Processor {
 	private static int INDEX_OF_RECUR = 6;
 	private static int INDEX_OF_PRIORITY = 7;
 	private static int NO_OF_TASK_DETAILS = 8;
-	private static int THREE_WORDS = 3;
-	private static int TWO_WORDS = 2;
-	private static int ONE_WORD = 1;
 	private static int DEFAULT_RECUR_PERIOD = 0;
 	private static String INVERTED_COMMA = "\"";
 	private static String TODAY = " today";

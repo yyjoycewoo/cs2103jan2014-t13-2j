@@ -8,6 +8,7 @@ package todomato;
  */
 public class Command {
 	private static final String EMPTY_STRING = "";
+	private static final int ONE_WORD = 1;
 	private String action;
 	private String argument;
 	
@@ -38,7 +39,7 @@ public class Command {
 		this.setAction(input[0]);
 		
 		//argument is everything except the first word that the user enters
-		if (input.length > 1) {
+		if (input.length > ONE_WORD) {
 			this.setArgument(input[1]);
 		} else {
 			this.setArgument(EMPTY_STRING);

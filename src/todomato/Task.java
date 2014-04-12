@@ -123,9 +123,13 @@ public class Task {
 		}
 		if (startDate == null && endDate != null) {
 			task += DATE_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
-		} else if (endDate != null && endTime == null) {
-			if (!endDate.equals(startDate)) {
-				task += END_TIME_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+		} else if (endDate != null) {
+			if (endTime == null) {
+				if (!endDate.equals(startDate)) {
+					task += END_TIME_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+				}
+			} else {
+				task += DATE_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
 			}
 		}
 		if (location != null) {

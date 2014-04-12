@@ -3,6 +3,7 @@
  */
 package todomato;
 
+import java.util.Arrays;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
@@ -71,6 +72,8 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_RECUR = 7;
 	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
 	private static final int NO_OF_CHAR_IN_PRIORITY_SYMBOL = 4;
+	private static final int NO_EDIT = -1;
+	private static final int NO_OF_DETAILS_TO_EDIT = 11;
 	private static final String START_TIME_GT_END_TIME = "Start time cannot be greater than end time";
 	private static final String INVALID_INDEX = "Invalid Index";
 	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
@@ -93,7 +96,8 @@ public class UpdateProcessor extends Processor {
 			throws InvalidInputException {
 		storeCurrentList();
 		printInvalidKeywords(argument);
-		int[] whichToEdit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		int[] whichToEdit = new int[NO_OF_DETAILS_TO_EDIT];
+		Arrays.fill(whichToEdit, NO_EDIT);
 		int[] indices = getTaskIndex(argument);
 		for (int indice : indices) {
 			int index = indice - 1;
@@ -423,7 +427,7 @@ public class UpdateProcessor extends Processor {
 		int[] indices = new int[index.length];
 
 		// only single index
-		if (index.length == 1) {
+		if (index.length == ONE_WORD) {
 			if (!isParseableByInt(index[0])) {
 				throw new InvalidInputException(INVALID_INDEX);
 			} else {

@@ -40,6 +40,10 @@ public class Processor {
 	protected static final int FIRST_WORD = 0;
 	protected static final int SECOND_WORD = 1;
 	protected static final int THIRD_WORD = 2;
+	protected static int THREE_WORDS = 3;
+	protected static int TWO_WORDS = 2;
+	protected static int ONE_WORD = 1;
+	protected static int NO_RECURRENCE = 0;
 	
 	protected static final String SG_TIMEZONE = "GMT+8:00";
 	protected static final String DEFAULT_MINUTE_FORMAT = "00";
@@ -72,10 +76,6 @@ public class Processor {
 		TaskList lastList = new TaskList();
 		lastList.deepCopy(list);
 		undoList.push(lastList);
-	}
-	
-	protected static void setUserNameAndPassword(String username, String password) {
-		list.setUserNameAndPassword(username, password);
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class Processor {
 				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
 		for (int monthPos = 0; monthPos < months.length; monthPos++) {
-			if (parts.length > 1) {
+			if (parts.length > ONE_WORD) {
 				if (parts[FIRST_WORD].contains(months[monthPos])) {
 					standardFormDate = convertDateToStandardForm(parts[SECOND_WORD],
 							String.valueOf(monthPos + POSITION_OFFSET));
@@ -504,7 +504,7 @@ public class Processor {
 				
 			}
 		}
-		return 0;
+		return NO_RECURRENCE;
 	}
 
 	public static TaskList getList() {
