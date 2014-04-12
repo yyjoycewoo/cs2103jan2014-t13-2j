@@ -82,6 +82,12 @@ public class DeleteProcessorTest {
 		assertEquals("Deleted: 2 task(s)", message);
 	}
 	
+	@Test
+	public void testDeleteRange() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("1-3");
+		assertEquals("Deleted: 3 task(s)", message);
+	}
+	
 	// This is a boundary case for the invalid indices partition
 	@Test
 	public void testExceedMaxIndex() throws InvalidInputException {
@@ -93,7 +99,7 @@ public class DeleteProcessorTest {
 	@Test
 	public void testNegativeIndex() throws InvalidInputException {
 		String message = DeleteProcessor.processDelete("-1");
-		assertEquals("Delete failed: Index out of bound", message);
+		assertEquals("Delete failed: Index not in number format", message);
 	}
 		
 	// This is a test for the empty list partition
@@ -106,6 +112,16 @@ public class DeleteProcessorTest {
 			fail("Should have thrown InvalidInputException");
 		} catch (InvalidInputException e){
 			assertEquals(e.getMessage(), "empty list");
+		}
+	}
+	
+	@Test
+	public void testInvalidNumberOfLimits() throws InvalidInputException {
+		try {
+			DeleteProcessor.processDelete("-");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Upper and lower limits required");
 		}
 	}
 }

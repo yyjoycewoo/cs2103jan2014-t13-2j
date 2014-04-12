@@ -32,7 +32,9 @@ import java.util.logging.Logger;
  */
 
 public class DeleteProcessor extends Processor {
-	private static final String argDelimiter = "\\s*(,| )\\s*";
+	private static final String DELIMITER_FOR_ARGUMENT = "\\s*(,| )\\s*";
+	private static final String DELIMITER_FOR_RANGE = "\\s*-\\s*";
+	private static final String IDENTIFIER_RANGE = "-";
 	private static final String ARGUMENT_START_DATE = "startdate";
 	private static final String ARGUMENT_END_DATE = "enddate";
 	private static final String ARGUMENT_ALL = "all";
@@ -41,6 +43,7 @@ public class DeleteProcessor extends Processor {
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
 	private static final String INVALID_INPUT_MISSING_ARGUMENT = "Missing argument";
+	private static final String INVALID_NUMBER_OF_LIMITS = "Upper and lower limits required";
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	
@@ -64,7 +67,7 @@ public class DeleteProcessor extends Processor {
 		
 		storeCurrentList();
 		
-		String[] argArr = argument.split(argDelimiter);
+		String[] argArr = argument.split(DELIMITER_FOR_ARGUMENT);
 		String argStr = argArr[0];
 		argStr.toLowerCase();
 		String statusMessage;
@@ -80,6 +83,9 @@ public class DeleteProcessor extends Processor {
 			}
 			else if (argStr.equalsIgnoreCase(ARGUMENT_END_DATE)) {
 				statusMessage = SUCCESSFUL_DELETE + deleteEndDate(argArr) + TASKS;
+			}
+			else if (argument.contains(IDENTIFIER_RANGE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteRange(argument) + TASKS;
 			}
 			else if (argArr.length > 1) {
 				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
@@ -103,6 +109,23 @@ public class DeleteProcessor extends Processor {
 			//logger.log(Level.WARNING, "exited due to index out of bound");
 			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;
 		}		
+	}
+
+	private static String deleteRange(String argument) throws InvalidInputException {
+		//logger.log(Level.INFO, "processing delete range");
+		String[] rangeLimits = argument.split(DELIMITER_FOR_RANGE);
+		if (!(rangeLimits.length == 2)) {
+			throw new InvalidInputException(INVALID_NUMBER_OF_LIMITS);
+		}
+		//logger.log(Level.INFO, "number of limits valid");
+		int lowerLimitIndex = Integer.parseInt(rangeLimits[0]) - 1;
+		int upperLimitIndex = Integer.parseInt(rangeLimits[1]) - 1;
+		int numberOfTasksDeleted = 0;
+		for (int i = upperLimitIndex; i >= lowerLimitIndex; i--) {
+			list.deleteListItem(i);
+			numberOfTasksDeleted++;
+		}
+		return Integer.toString(numberOfTasksDeleted);
 	}
 
 	private static String deleteCompleted() {
