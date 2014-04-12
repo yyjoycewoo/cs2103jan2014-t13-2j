@@ -13,7 +13,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import todomato.DeleteProcessor;
 import todomato.FileHandler;
+import todomato.InvalidInputException;
 import todomato.Processor;
 import todomato.SortProcessor;
 import todomato.TaskList;
@@ -69,7 +71,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortStartDate() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortStartDate() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList =  
 				"1: " + ITEM_THREE +
 				"2: " + ITEM_TWO +
@@ -83,7 +85,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortStartDateAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortStartDateAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList =  
 				"1: " + ITEM_THREE +
 				"2: " + ITEM_TWO +
@@ -97,7 +99,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortStartDateDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortStartDateDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_FOUR +
 				"2: " + ITEM_ONE + 
@@ -110,7 +112,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortEndDate() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortEndDate() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_THREE + 
 				"2: " + ITEM_TWO + 
@@ -123,7 +125,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortEndDateAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortEndDateAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_THREE + 
 				"2: " + ITEM_TWO + 
@@ -136,7 +138,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortEndDateDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortEndDateDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_FOUR + 
 				"2: " + ITEM_ONE + 
@@ -149,7 +151,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortComplete() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortComplete() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_ONE + 
 				"2: " + ITEM_TWO +
@@ -162,7 +164,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortCompleteAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortCompleteAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_ONE + 
 				"2: " + ITEM_TWO +
@@ -175,7 +177,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortCompleteDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortCompleteDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_FOUR + 
 				"2: " + ITEM_FIVE +
@@ -188,7 +190,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortPriority() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortPriority() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_THREE + 
 				"2: " + ITEM_FIVE +
@@ -201,7 +203,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortPriorityAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortPriorityAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_FOUR + 
 				"2: " + ITEM_TWO +
@@ -214,7 +216,7 @@ private  File tasks;
 	}
 	
 	@Test
-	public void testSortPriorityDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void testSortPriorityDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
 		String expectedList = 
 				"1: " + ITEM_THREE + 
 				"2: " + ITEM_FIVE +
@@ -224,5 +226,35 @@ private  File tasks;
 		SortProcessor.processSort("priority d");
 		String resultList = getList().toString();
 		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testMissingArgument() throws InvalidInputException {
+		try {
+			SortProcessor.processSort("");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Missing argument");
+		}
+	}
+	
+	@Test
+	public void testInvalidSortType() throws InvalidInputException {
+		try {
+			SortProcessor.processSort("starryday");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Sorting type could not be determined");
+		}
+	}
+	
+	@Test
+	public void testInvalidSortOrder() throws InvalidInputException {
+		try {
+			SortProcessor.processSort("priority ass");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Sorting order could not be determined");
+		}
 	}
 }
