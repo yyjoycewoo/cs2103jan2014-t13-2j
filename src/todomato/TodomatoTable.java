@@ -140,7 +140,7 @@ public class TodomatoTable extends JTable {
                                         int modelRow = convertRowIndexToModel(row);
                                         
                                         int index = Integer.parseInt( (String) getModel().getValueAt(modelRow, INDEX_COLUNM_INDEX));
-                                        if (index != 0 && index < list.getSize()) {
+                                        if (index != 0 && index <= list.getSize()) {
                                         	Task item = list.getListItem(index - 1);
                                         	String priority = item.getPriorityLevel();
                                         	if (PRIORITY_HIGH.equals(priority)) {
