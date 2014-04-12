@@ -30,9 +30,10 @@ public class IntegrationTest {
 		System.setProperty("user.dir", folder.getRoot().toString());
 		tasks = folder.newFile("tasks.txt");
 		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
-        out.write("cs post-lecture quiz#null#null#2014-03-28#null#7#-1997137046#2014-04-01 22:57:15.488000000#LOW#true#null#null#null\r\n");
-        out.write("study#12:00#16:00#2014-03-31#utown#7#950768200#2014-04-02 23:17:24.118000000#LOW#true#null#null#null\r\n");
-        out.write("es1531 assignment 2#null#null#2014-04-01#null#0#636174328#2014-03-30 16:24:17.877000000#HIGH#true#null#null#null\r\n");
+		out.write("null\r\nnull\r\nnull\r\n");
+        out.write("CS2103 Tutorial#13:00#null#2014-04-10#2014-04-10#Home#0#395871680#2014-04-09 20:27:24.669000000#LOW#false#null#null#null\r\n");
+        out.write("ES1531 Exam Prep#null#null#null#2014-04-23#Home#0#-1379251807#2014-04-09 20:27:29.951000000#HIGH#false#null#null#null\r\n");
+        out.write("CS2103 Presentation#13:00#null#2014-04-17#2014-04-17#null#0#1463178207#2014-04-09 20:27:54.869000000#LOW#false#null#null#null\r\n");
         out.close();
         
         // To reset list to the tasks written ^ before each test case
@@ -55,7 +56,7 @@ public class IntegrationTest {
 		FileHandler fileHandler = new FileHandler(fileLoc);
 		TaskList list = fileHandler.readFile();
 		
-		assertEquals("cs post-lecture quiz", list.getListItem(0).getDescription());
+		assertEquals("CS2103 Tutorial", list.getListItem(0).getDescription());
 		String messageAdd1 = SplitProcessorsHandler.processCommand("add something");
 		assertEquals("Added something", messageAdd1);
 		
@@ -93,7 +94,7 @@ public class IntegrationTest {
 		assertEquals("Search completed", messageFind3);
 		
 		String messageUpdate1 = SplitProcessorsHandler.processCommand("update 4 desc Dinner with Parents\\ location home\\");
-		assertEquals("Dinner with Parents in home", messageUpdate1);
+		assertEquals("Updated the task(s)", messageUpdate1);
 		
 		String messageDelete1 = SplitProcessorsHandler.processCommand("delete all");
 		assertEquals("Deleted: 5 task(s)", messageDelete1);
