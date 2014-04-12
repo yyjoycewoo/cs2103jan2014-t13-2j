@@ -21,12 +21,24 @@ import net.miginfocom.swing.MigLayout;
  */
 @SuppressWarnings("serial")
 public class TodomatoFrame extends JFrame implements ActionListener {
-        private static final String SORT_PRIORITY_DESC_COMMAND = "sort priority desc";
+        private static final String EMPTY_TEXT = "";
+		private static final String REDO_COMMAND = "redo";
+		private static final String FIND_COMMAND = "find ";
+		private static final String DELETE_COMMAND = "delete ";
+		private static final String HELP_COMMAND = "help";
+		private static final String UNDO_COMMAND = "undo";
+		private static final String SORT_PRIORITY_DESC_COMMAND = "sort priority desc";
         private static final String SORT_PRIORITY_ASC_COMMAND = "sort priority asc";
         private static final String SORT_COMPLETE_DESC_COMMAND = "sort complete desc";
         private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
-        protected static final String SORT_DATE_DESC_COMMAND = "sort date desc";
-        protected static final String SORT_DATE_ASC_COMMAND = "sort date asc";
+        private static final String SORT_DATE_DESC_COMMAND = "sort date desc";
+        private static final String SORT_DATE_ASC_COMMAND = "sort date asc";
+
+        private final String UNDO = "undo action key";
+        private final String REDO = "redo action key";
+        private final String FIND = "search action key";
+        private final String DELETE = "delete action key";
+        private final String HELP = "help action key";
         
         protected static final int INDEX_OFFSET = 1;
         
@@ -44,7 +56,7 @@ public class TodomatoFrame extends JFrame implements ActionListener {
         private JLabel lblStatus = new JLabel(" ");
         private JButton btnPriority = new JButton(SORT_PRIORITY, upArrow);
         private JButton btnCompleted = new JButton(SORT_COMPLETED, upArrow);
-        private JButton btnDate = new JButton(SORT_DATE, upArrow);
+        private JButton btnStartDate = new JButton(SORT_DATE, upArrow);
 
 
         public TodomatoFrame() {
@@ -65,34 +77,33 @@ public class TodomatoFrame extends JFrame implements ActionListener {
         private void initDisplay() {
                 panel.setLayout(new MigLayout("nocache"));
                 panel.add(table.getTableDisplay(), "wrap, push, grow");
-                panel.add(btnDate, "split");
+                panel.add(btnStartDate, "split");
                 panel.add(btnPriority);
-                //panel.add(btnPriority, "split");
                 panel.add(btnCompleted, "wrap");
                 panel.add(txtCommand, "wrap, pushx, growx");
                 panel.add(lblStatus);
 
-                updateData("");
+                updateData(EMPTY_TEXT);
 
                 initTxtCommandAction(); 
-                initBtnDateAction();
+                initBtnStartDateAction();
                 initBtnPriorityAction();   
                 initBtnCompletedAction();  
         }
 
 
-        private void initBtnDateAction() {
-                btnDate.addActionListener(new ActionListener() {                         
+        private void initBtnStartDateAction() {
+                btnStartDate.addActionListener(new ActionListener() {                         
             public void actionPerformed(ActionEvent e)
             {
                                 String status;
                                 try {
-                                        if (btnDate.getIcon() == upArrow) {
+                                        if (btnStartDate.getIcon() == upArrow) {
                                                 status = SplitProcessorsHandler.processCommand(SORT_DATE_ASC_COMMAND);
-                                                btnDate.setIcon(downArrow);
+                                                btnStartDate.setIcon(downArrow);
                                         } else {
                                                 status = SplitProcessorsHandler.processCommand(SORT_DATE_DESC_COMMAND);
-                                                btnDate.setIcon(upArrow);
+                                                btnStartDate.setIcon(upArrow);
                                         }
                                         assert status != null;
                                         table.update();
@@ -170,42 +181,45 @@ public class TodomatoFrame extends JFrame implements ActionListener {
                         
                         table.update();
                         
-                        txtCommand.setText("");
+                        txtCommand.setText(EMPTY_TEXT);
                         lblStatus.setText(status);
                 } catch (InvalidInputException e) {
-                        txtCommand.setText("");
+                        txtCommand.setText(EMPTY_TEXT);
                         lblStatus.setText(INVALID_INPUT_MSG + e.getMessage());
                 }
         }
 
         private void initShortcuts() {          
-                String UNDO = "undo action key";
-                String REDO = "redo action key";
-                String FIND = "search action key";
-                String DELETE = "delete action key";
+                
 
                 Action undoAction = new AbstractAction() {
                         public void actionPerformed(ActionEvent e) {
-                                updateData("undo");
+                                updateData(UNDO_COMMAND);
                         }
                 };
 
                 Action redoAction = new AbstractAction() {
                         public void actionPerformed(ActionEvent e) {
-                                updateData("redo");
+                                updateData(REDO_COMMAND);
                         }
                 };
                 
                 Action searchAction = new AbstractAction() {
                         public void actionPerformed(ActionEvent e) {
-                                updateData("find " + txtCommand.getText());
+                                updateData(FIND_COMMAND + txtCommand.getText());
                         }
                 };
                 
                 Action deleteAction = new AbstractAction() {
                         public void actionPerformed(ActionEvent e) {
                                 int rowIndex = table.rowSelected + INDEX_OFFSET;
-                                updateData("delete " + rowIndex);
+                                updateData(DELETE_COMMAND + rowIndex);
+                        }
+                };
+
+                Action helpAction = new AbstractAction() {
+                        public void actionPerformed(ActionEvent e) {
+                                updateData(HELP_COMMAND);
                         }
                 };
 
@@ -213,10 +227,12 @@ public class TodomatoFrame extends JFrame implements ActionListener {
                 panel.getActionMap().put(REDO, redoAction);
                 panel.getActionMap().put(FIND, searchAction);
                 panel.getActionMap().put(DELETE, deleteAction);
+                panel.getActionMap().put(HELP, helpAction);
 
                 panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), UNDO);
                 panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), REDO);
                 panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F2"), FIND);
+                panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F1"), HELP);
                 panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), DELETE);
         }
 
