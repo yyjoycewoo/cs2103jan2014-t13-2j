@@ -10,11 +10,14 @@ import java.util.Collections;
  *
  */
 public class TaskList {
+	private static final int TASK_NOT_FOUND_VALUE = -1;
+	private static final int OFFSET_INDEX = 1;
+	private static final String INDEX_SEPARATOR = ": ";
 	private static final String LINE_BREAK = "\r\n";
 	private ArrayList<Task> list;
-	private DateTime lastSyncTime=null;
-	private String userName=null;
-	private String password=null;
+	private DateTime lastSyncTime = null;
+	private String userName = null;
+	private String password = null;
 	
 	/**
 	 * Create a new empty TaskList
@@ -71,7 +74,7 @@ public class TaskList {
 				return i;
 			}
 		}
-		return -1;
+		return TASK_NOT_FOUND_VALUE;
 	}
 
 	@Override
@@ -79,7 +82,8 @@ public class TaskList {
 		String s = "";
 		int i = 0;
 		for (Task t : list){
-			s += Integer.toString(i+1) + ": " + t.toString() + LINE_BREAK;
+			s += Integer.toString(i + OFFSET_INDEX) + INDEX_SEPARATOR
+					+ t.toString() + LINE_BREAK;
 			i++;
 		}
 		return s;

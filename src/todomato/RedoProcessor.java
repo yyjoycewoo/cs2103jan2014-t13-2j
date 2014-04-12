@@ -1,6 +1,5 @@
 package todomato;
 
-
 //@author A0120766H
 /** 
  * This class contains methods to process undo commands by the user.
@@ -13,7 +12,6 @@ public class RedoProcessor extends Processor {
 
 		/**
 		 * Undo last action, if possible
-		 * @author Joyce
 		 * @return Status message telling user if there were changes to redo
 		 */
 		public static String processRedo() {

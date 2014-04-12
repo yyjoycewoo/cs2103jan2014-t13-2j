@@ -22,6 +22,7 @@ public class SplitProcessorsHandler {
 	private static final String SYNC_COMMAND = "sync";
 	private static final String SET_SYNC_INFO_COMMAND = "setsync";
 	private static final String HELP_COMMAND = "help";
+	private static final String FILLER_STRING = " ";
 
 	private static Command command;
 
@@ -75,11 +76,11 @@ public class SplitProcessorsHandler {
 		}
 		if (command.getAction().equals(HELP_COMMAND)) {
 			HelpProcessor.processHelp();
-			return " ";
+			return FILLER_STRING;
 		}
 		// Do nothing if empty string is entered
 		if (command.getAction().equals("")) {
-			return " ";
+			return FILLER_STRING;
 		}
 		// Otherwise, treat as an add command
 		return AddProcessor.processAdd(userInput);
