@@ -70,6 +70,7 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_EDATE = 9;
 	private static final int NO_OF_CHAR_IN_RECUR = 7;
 	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
+	private static final int NO_OF_CHAR_IN_PRIORITY_SYMBOL = 4;
 	private static final String START_TIME_GT_END_TIME = "Start time cannot be greater than end time";
 	private static final String INVALID_INDEX = "Invalid Index";
 	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
@@ -342,9 +343,11 @@ public class UpdateProcessor extends Processor {
 		int stopIndex = argument.length();
 		String priority = null;
 		if (argument.contains(" !")) {
+			System.out.print(argument.substring(priorityDesc + NO_OF_CHAR_IN_PRIORITY_SYMBOL));
 			priority = parsePriorityFromString(argument.substring(
-					priorityDesc + 2, stopIndex));
+					priorityDesc + NO_OF_CHAR_IN_PRIORITY_SYMBOL, stopIndex));
 		} else {
+			System.out.print(argument.substring(priorityDesc));
 			priority = parsePriorityFromString(argument.substring(priorityDesc
 					+ NO_OF_CHAR_IN_PRIORITY, stopIndex));
 		}
