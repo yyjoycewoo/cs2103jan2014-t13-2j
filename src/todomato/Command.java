@@ -7,6 +7,8 @@ package todomato;
  *
  */
 public class Command {
+	private static final int ARGUMENT_POSITION = 1;
+	private static final int ACTION_POSITION = 0;
 	private static final String EMPTY_STRING = "";
 	private static final int ONE_WORD = 1;
 	private String action;
@@ -36,11 +38,11 @@ public class Command {
 	 */
 	public Command(String[] input) {
 		//command is the first word that the user enters
-		this.setAction(input[0]);
+		this.setAction(input[ACTION_POSITION]);
 		
 		//argument is everything except the first word that the user enters
 		if (input.length > ONE_WORD) {
-			this.setArgument(input[1]);
+			this.setArgument(input[ARGUMENT_POSITION]);
 		} else {
 			this.setArgument(EMPTY_STRING);
 		}
