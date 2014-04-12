@@ -76,6 +76,7 @@ public class AddProcessor extends Processor {
 	private static int TWO_WORDS = 2;
 	private static int ONE_WORD = 1;
 	private static int DEFAULT_RECUR_PERIOD = 0;
+	private static String INVERTED_COMMA = "\"";
 	private static String TODAY = " today";
 	private static String TOMORROW1 = " tmr";
 	private static String TOMORROW2 = " tomorrow";
@@ -191,15 +192,6 @@ public class AddProcessor extends Processor {
 		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME]);
 		DateTime startDate = convertStringToDateTime(taskDetails[INDEX_OF_START_DATE]);
 		DateTime endDate = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
-		if (startDate != null && endDate == null) {
-			if (endTime != null && startTime != null) {
-				if (endTime.lt(startTime)) {
-					endDate = startDate.plusDays(1);
-				}
-			} else {
-				endDate = startDate;
-			}
-		}
 		if (startDate != null && endDate != null) {
 			if (startDate.gt(endDate)) {
 				endDate = startDate;
@@ -212,7 +204,18 @@ public class AddProcessor extends Processor {
 					}
 				}
 			}
+		} else if (startDate != null && endDate == null) {
+			if (endTime != null && startTime != null) {
+				if (endTime.lt(startTime)) {
+					endDate = startDate.plusDays(ONE_DAY);
+				} else {
+					endDate = startDate;
+				}
+			} else {
+				endDate = startDate;
+			}
 		}
+		
 			
 		int recurPeriod = DEFAULT_RECUR_PERIOD;
 		try {
@@ -327,30 +330,30 @@ public class AddProcessor extends Processor {
 		String parts[] = timeString.split(" ");
 		String dateString = null;
 		if (parts.length == THREE_WORDS) {
-			String firstWordPlusSecondWord = parts[0] + " " + parts[1];
-			String secondWordPlusThirdWord = parts[1] + " " + parts[2];
+			String firstWordPlusSecondWord = parts[FIRST_WORD] + SPACE + parts[SECOND_WORD];
+			String secondWordPlusThirdWord = parts[SECOND_WORD] + SPACE + parts[THIRD_WORD];
 			if (isParseableByDate(firstWordPlusSecondWord)) {
 				dateString = parseDateString(firstWordPlusSecondWord);
-				timeString = parseTimeString(parts[2]);
+				timeString = parseTimeString(parts[THIRD_WORD]);
 			} else if (isParseableByDate (secondWordPlusThirdWord)) {
 				dateString = parseDateString(secondWordPlusThirdWord);
-				timeString = parseTimeString(parts[0]);
+				timeString = parseTimeString(parts[FIRST_WORD]);
 			}
 		} else if (parts.length == TWO_WORDS) {
-			String firstWordPlusSecondWord = parts[0] + " " + parts[1];
-			if (isParseableByDate(parts[0])) {
-				dateString = parseDateString(parts[0]);
-				timeString = parts[1];
-			} else if (isParseableByDate(parts[1])) {
-				dateString = parseDateString(parts[1]);
-				timeString = parts[0];
+			String firstWordPlusSecondWord = parts[FIRST_WORD] + SPACE + parts[SECOND_WORD];
+			if (isParseableByDate(parts[FIRST_WORD])) {
+				dateString = parseDateString(parts[FIRST_WORD]);
+				timeString = parts[SECOND_WORD];
+			} else if (isParseableByDate(parts[SECOND_WORD])) {
+				dateString = parseDateString(parts[SECOND_WORD]);
+				timeString = parts[FIRST_WORD];
 			} else if (isParseableByDate (firstWordPlusSecondWord)) {
 				dateString = parseDateString(firstWordPlusSecondWord);
 				timeString = null;
 			}
 		} else if (parts.length == ONE_WORD) {
-			if (isParseableByDate(parts[0])) {
-				dateString = parseDateString(parts[0]);
+			if (isParseableByDate(parts[FIRST_WORD])) {
+				dateString = parseDateString(parts[FIRST_WORD]);
 				timeString = null;
 			}
 		}
@@ -414,8 +417,8 @@ public class AddProcessor extends Processor {
 	}
 	
 	private static Boolean isKeywordForTimePresentFound (String input) {
-		for (int i = 0; i < NO_OF_KEYWORDS_FOR_TIME; i++) {
-			if (input.contains(keywords[i])) {
+		for (int timeKeywordPos = 0; timeKeywordPos < NO_OF_KEYWORDS_FOR_TIME; timeKeywordPos++) {
+			if (input.contains(keywords[timeKeywordPos])) {
 				return true;
 			}
 		}
@@ -474,11 +477,11 @@ public class AddProcessor extends Processor {
 		int firstKeywordPos = input.length();
 		int firstKeyword = NOT_FOUND;
 
-		for (int i = 0; i < keywords.length; i++) {
-			if (input.contains(keywords[i])) {
-				if (input.indexOf(keywords[i]) < firstKeywordPos) {
-					firstKeywordPos = input.indexOf(keywords[i]);
-					firstKeyword = i;
+		for (int keywordPos = 0; keywordPos < keywords.length; keywordPos++) {
+			if (input.contains(keywords[keywordPos])) {
+				if (input.indexOf(keywords[keywordPos]) < firstKeywordPos) {
+					firstKeywordPos = input.indexOf(keywords[keywordPos]);
+					firstKeyword = keywordPos;
 				}
 			}
 		}
@@ -524,10 +527,10 @@ public class AddProcessor extends Processor {
 			taskDetails[INDEX_OF_END_DATE] = currentDate.toString();	
 			input = input.substring(0,input.indexOf(TODAY)) + input.substring(input.indexOf(TODAY) + TODAY.length());
 		} else if (input.contains(TOMORROW1)) {
-			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(1).toString();			
+			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(ONE_DAY).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW1)) + input.substring(input.indexOf(TOMORROW1) + TOMORROW1.length());
 		} else if (input.contains(TOMORROW2)) {
-			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(1).toString();			
+			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(ONE_DAY).toString();			
 			input = input.substring(0,input.indexOf(TOMORROW2)) + input.substring(input.indexOf(TOMORROW2) + TOMORROW2.length());
 		}
 		return input;
@@ -540,8 +543,8 @@ public class AddProcessor extends Processor {
 	 */
 	
 	private static Boolean checkForInvertedCommas (String input) {
-		if (input.contains("\"")) {
-			if (input.substring(input.indexOf("\"")+1).contains("\"")) {
+		if (input.contains(INVERTED_COMMA)) {
+			if (input.substring(input.indexOf(INVERTED_COMMA)+1).contains(INVERTED_COMMA)) {
 				return true;
 			}
 		} 
@@ -555,8 +558,8 @@ public class AddProcessor extends Processor {
 	 */
 	
 	private static String setDescWithWordsInsideInvertedCommas (String input) {
-		int firstIndex = input.indexOf("\"");
-		int secondIndex = input.lastIndexOf("\"");
+		int firstIndex = input.indexOf(INVERTED_COMMA);
+		int secondIndex = input.lastIndexOf(INVERTED_COMMA);
 		//Extracts the task Description from in between the two quotation marks
 		taskDetails[INDEX_OF_DESC] = input.substring(1, secondIndex - firstIndex);
 		input = input.substring(secondIndex);

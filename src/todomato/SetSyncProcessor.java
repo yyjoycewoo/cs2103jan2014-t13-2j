@@ -1,8 +1,13 @@
+/**
+ * Simple class to set username and password via CLI
+ * @author A0096620E
+ *
+ */
 package todomato;
 
 public class SetSyncProcessor extends Processor {
 	private static final String SET_SUCCESSFUL = "Username and password successful set";
-	private static final String INVALID_USERNAME = "Invalid username and passwrd: There must be only two words";
+	private static final String INVALID_USERNAME = "Invalid username and password. Format is <username> <password>";
 	public static String processSetSync(String input) {
 		String[] parts = input.split(" ");
 		if (parts.length != 2) {

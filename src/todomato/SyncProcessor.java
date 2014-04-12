@@ -2,12 +2,12 @@ package todomato;
 
 public class SyncProcessor extends Processor {
 
+	private static final String NO_USERNAME_PW = "Set username and password with \"setsync <username> <password>\"";
+	private static final String SYNC_COMPLETE = "Sync completed";
 	public static String processSync() {
 		if ((list.getUserName() == null && list.getPassword() == null) ||
 		(list.getUserName().equals("null") && list.getPassword().equals("null"))){
-			new UsernamePasswordDialogueBox();
-			fileHandler.updateFile(list);
-
+			return NO_USERNAME_PW;
 		}
 		
 		String username = list.getUserName();
@@ -19,7 +19,7 @@ public class SyncProcessor extends Processor {
 		fileHandler.updateFile(list);
 		displayList.deepCopy(list);
 		
-		return "sync completed";
+		return SYNC_COMPLETE;
 
 	}
 }
