@@ -160,7 +160,6 @@ public class TodomatoTable extends JTable {
                         }
                 };
 
-                //table.changeSelection(0, 0, false, false);
                 table.setAutoCreateRowSorter(true);
                 return table;
         }
@@ -170,12 +169,6 @@ public class TodomatoTable extends JTable {
                         new ListSelectionListener() {
                                 public void valueChanged(ListSelectionEvent event) {
                                         rowSelected = table.getSelectedRow();
-                                        /*int modelRow = table.convertRowIndexToModel(viewRow);
-                    System.out.println(
-                        String.format("Selected Row in view: %d. " +
-                            "Selected Row in model: %d.", 
-                            viewRow, modelRow));*/
-                                        //System.out.println(String.format("Selected Row in view: %d. ", viewRow));
                                 }
                         }               
                 );
