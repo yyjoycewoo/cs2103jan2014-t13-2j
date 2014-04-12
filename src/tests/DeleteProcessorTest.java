@@ -18,7 +18,6 @@ import todomato.FileHandler;
 import todomato.InvalidInputException;
 import todomato.Processor;
 import todomato.TaskList;
-import todomato.UndoProcessor;
 
 public class DeleteProcessorTest {
 	private  File tasks;

@@ -1,6 +1,8 @@
 //@author A0101578H
 package todomato;
 
+import hirondelle.date4j.DateTime;
+
 /**
  * This class contains methods to process sort commands by the user. 
  * It updates the user's list of tasks, and saves it to disk.
@@ -41,10 +43,10 @@ package todomato;
  */
 
 public class SortProcessor extends Processor{
-	private static final String ARGUMENT_SORT_BY_START_DATE = "startdate";
-	private static final String ARGUMENT_SORT_BY_END_DATE = "enddate";
-	private static final String ARGUMENT_SORT_BY_PRIORITY = "priority";
-	private static final String ARGUMENT_SORT_BY_COMPLETION = "complete";
+	private static final String ARGUMENT_START_DATE = "startdate";
+	private static final String ARGUMENT_END_DATE = "enddate";
+	private static final String ARGUMENT_PRIORITY = "priority";
+	private static final String ARGUMENT_COMPLETION = "complete";
 	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
 	private static final String SUCCESS_SORT_BY_PRIORITY = "Sorted by priority";
 	private static final String SUCCESS_SORT_BY_COMPLETION = "Sorted by completion status";
@@ -54,6 +56,7 @@ public class SortProcessor extends Processor{
 	
 	private static final String descending[] = {"descending", "d", "desc"};
 	private static final String ascending[] = {"ascending", "a", "asc"};
+	private static final int INVALID_PARAMETERS = -1;
 	
 	public static String processSort(String argument) {
 		if (argument.isEmpty()) {
@@ -67,16 +70,16 @@ public class SortProcessor extends Processor{
 			order = argArr[1];
 		}
 		
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_START_DATE)) {
+		if (type.equalsIgnoreCase(ARGUMENT_START_DATE)) {
 			return sortByStartDate(order);
 		}
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_END_DATE)) {
+		if (type.equalsIgnoreCase(ARGUMENT_END_DATE)) {
 			return sortByEndDate(order);
 		}
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_PRIORITY)) {
+		if (type.equalsIgnoreCase(ARGUMENT_PRIORITY)) {
 			return sortByPriority(order);
 		}
-		if (type.equalsIgnoreCase(ARGUMENT_SORT_BY_COMPLETION)) {
+		if (type.equalsIgnoreCase(ARGUMENT_COMPLETION)) {
 			return sortByCompletion(order);
 		}
 		
@@ -91,7 +94,7 @@ public class SortProcessor extends Processor{
 			return INVALID_INPUT_ORDER;
 		}
 		
-		bubbleSort(ARGUMENT_SORT_BY_COMPLETION);
+		bubbleSort(ARGUMENT_COMPLETION);
 		if (isDescending(order)) {
 			list.reverse();
 		}
@@ -107,7 +110,7 @@ public class SortProcessor extends Processor{
 			return INVALID_INPUT_ORDER;
 		}
 		
-		bubbleSort(ARGUMENT_SORT_BY_PRIORITY);
+		bubbleSort(ARGUMENT_PRIORITY);
 		if (isAscending(order)) {
 			list.reverse();
 		}
@@ -123,7 +126,7 @@ public class SortProcessor extends Processor{
 			return INVALID_INPUT_ORDER;
 		}
 		
-		bubbleSort(ARGUMENT_SORT_BY_START_DATE);
+		bubbleSort(ARGUMENT_START_DATE);
 		if (isDescending(order)) {
 			list.reverse();
 		}
@@ -139,7 +142,7 @@ public class SortProcessor extends Processor{
 			return INVALID_INPUT_ORDER;
 		}
 		
-		bubbleSort(ARGUMENT_SORT_BY_END_DATE);
+		bubbleSort(ARGUMENT_END_DATE);
 		if (isDescending(order)) {
 			list.reverse();
 		}
@@ -158,22 +161,22 @@ public class SortProcessor extends Processor{
 	}
 
 	private static boolean needSwap(String type, int j) {
-		if (type.equals(ARGUMENT_SORT_BY_START_DATE)) {
+		if (type.equals(ARGUMENT_START_DATE)) {
 			if (compareStartDate(j, j + 1)) {
 				return true;
 			}
 		}
-		if (type.equals(ARGUMENT_SORT_BY_END_DATE)) {
-			if (compareDate(j, j + 1)) {
+		if (type.equals(ARGUMENT_END_DATE)) {
+			if (compareEndDate(j, j + 1)) {
 				return true;
 			}
 		}
-		if (type.equals(ARGUMENT_SORT_BY_PRIORITY)) {
+		if (type.equals(ARGUMENT_PRIORITY)) {
 			if (comparePriority(j, j + 1)) {
 				return true;
 			}
 		} 
-		if (type.equals(ARGUMENT_SORT_BY_COMPLETION)) {
+		if (type.equals(ARGUMENT_COMPLETION)) {
 			if (compareCompletion(j, j + 1)) {
 				return true;
 			}
@@ -192,40 +195,53 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 
-//  Returns true if..
-//  list[i] later than list[j]
-//	Tasks without date is considered latest
+	// Returns true if..
+	// list[i] starts later than list[j]
+	// Tasks without date is considered latest
+	// Tasks that are completed will also be ranked as latest
 	private static boolean compareStartDate(int i, int j) {
-		if(list.getListItem(i).getStartDate() == null) {
-			if(list.getListItem(j).getStartDate() == null) {
-				return false;
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
+				return true;
 			}
-			return true;
-		} if(list.getListItem(j).getStartDate() == null) {
+		}
+		if (list.getListItem(j).getCompleted()) {
 			return false;
-		} if(list.getListItem(i).getStartDate()
-				.compareTo(list.getListItem(j).getStartDate()) > 0) {
+		}
+		if (hasSameDate(ARGUMENT_START_DATE, i, j)) {
+			if (getLaterTimeTask(ARGUMENT_START_DATE, i, j) == i) {
+				return true;
+			}
+			return false;
+		}
+		if (getLaterDateTask(ARGUMENT_START_DATE, i ,j) == i) {
 			return true;
-		} 
+		}
 		return false;
 	}
 	
-	
-//  Returns true if..
-//  list[i] later than list[j]
-//	Tasks without date is considered latest
-	private static boolean compareDate(int i, int j) {
-		if(list.getListItem(i).getEndDate() == null) {
-			if(list.getListItem(j).getEndDate() == null) {
-				return false;
+	// Returns true if..
+	// list[i] ends later than list[j]
+	// Tasks without date is considered latest
+	// Tasks that are completed will also be ranked as latest
+	private static boolean compareEndDate(int i, int j) {
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
+				return true;
 			}
-			return true;
-		} if(list.getListItem(j).getEndDate() == null) {
+		}
+		if (list.getListItem(j).getCompleted()) {
 			return false;
-		} if(list.getListItem(i).getEndDate()
-				.compareTo(list.getListItem(j).getEndDate()) > 0) {
+		}
+		if (hasSameDate(ARGUMENT_END_DATE, i, j)) {
+			if (getLaterTimeTask(ARGUMENT_END_DATE, i, j) == i) {
+				return true;
+			}
+			return false;
+		}
+		if (getLaterDateTask(ARGUMENT_END_DATE, i ,j) == i) {
 			return true;
-		} 
+		}
 		return false;
 	}
 	
@@ -251,6 +267,136 @@ public class SortProcessor extends Processor{
 			return false;
 		}
 		return false;
+	}
+	
+	private static boolean hasSameDate(String type, int i, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			DateTime iStartDate = list.getListItem(i).getStartDate();
+			DateTime jStartDate = list.getListItem(j).getStartDate();
+			if (iStartDate == null && jStartDate == null) {
+				return true;
+			}
+			if (iStartDate == null || jStartDate == null) {
+				return false;
+			}
+			if (iStartDate.isSameDayAs(jStartDate)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			DateTime iEndDate = list.getListItem(i).getEndDate();
+			DateTime jEndDate = list.getListItem(j).getEndDate();
+			if (iEndDate == null && jEndDate == null) {
+				return true;
+			}
+			if (iEndDate == null || jEndDate == null) {
+				return false;
+			}
+			if (iEndDate.isSameDayAs(jEndDate)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Compares two tasks by either start or end time
+	 * If the times are the same, j will be returned
+	 * 
+	 * @param type
+	 * @param i
+	 * @param j
+	 * @return later task of the i'th and j'th tasks
+	 *  
+	 */
+	private static int getLaterTimeTask(String type, int i, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			DateTime iStartTime = list.getListItem(i).getStartTime();
+			DateTime jStartTime = list.getListItem(j).getStartTime();
+			
+			if (iStartTime == null) {
+				if (jStartTime == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jStartTime == null) {
+				return j;
+			}
+			if (jStartTime.gteq(iStartTime)) {
+				return j;
+			}
+			return i;
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			DateTime iEndTime = list.getListItem(i).getEndTime();
+			DateTime jEndTime = list.getListItem(j).getEndTime();
+			
+			if (iEndTime == null) {
+				if (jEndTime == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jEndTime == null) {
+				return j;
+			}
+			if (jEndTime.gteq(iEndTime)) {
+				return j;
+			}
+			return i;
+		}
+		return INVALID_PARAMETERS;
+	}
+	
+	/**
+	 * Compares two tasks by either start or end date
+	 * If the dates are the same, j will be returned
+	 * 
+	 * @param type
+	 * @param i
+	 * @param j
+	 * @return later task of the i'th and j'th tasks
+	 *  
+	 */
+	private static int getLaterDateTask(String type, int i, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			DateTime iStartDate = list.getListItem(i).getStartDate();
+			DateTime jStartDate = list.getListItem(j).getStartDate();
+			
+			if (iStartDate == null) {
+				if (jStartDate == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jStartDate == null) {
+				return j;
+			}
+			if (jStartDate.gteq(iStartDate)) {
+				return j;
+			}
+			return i;
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			DateTime iEndDate = list.getListItem(i).getEndDate();
+			DateTime jEndDate = list.getListItem(j).getEndDate();
+			
+			if (iEndDate == null) {
+				if (jEndDate == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jEndDate == null) {
+				return j;
+			}
+			if (jEndDate.gteq(iEndDate)) {
+				return j;
+			}
+			return i;
+		}
+		return INVALID_PARAMETERS;
 	}
 	
 	private static boolean isAscending(String order) {
