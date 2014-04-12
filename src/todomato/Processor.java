@@ -38,13 +38,15 @@ public class Processor {
 	protected static final int POSITION_OFFSET = 1;
 	protected static final int ONE_DIGIT = 1;
 	protected static final int FIRST_WORD = 0;
-	protected static final int SECOND_WORD= 1;
+	protected static final int SECOND_WORD = 1;
+	protected static final int THIRD_WORD = 2;
 	
 	protected static final String SG_TIMEZONE = "GMT+8:00";
 	protected static final String DEFAULT_MINUTE_FORMAT = "00";
 	protected static final String DATETIME_PADDING = "0";
 	protected static final String DATE_FORMAT_SYMBOL = "-";
 	protected static final String TIME_FORMAT_SYMBOL = ":";
+	protected static final String SPACE = " ";
 	protected static final String INVALID_DATE = "Invalid Date";
 	protected static final String INVALID_TIME = "Invalid Time";
 	

@@ -205,8 +205,9 @@ public class UpdateProcessor extends Processor {
 		list.getListItem(index).setStartTime(time);
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		} else {
+			fileHandler.updateFile(list);
 		}
-		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
@@ -218,8 +219,9 @@ public class UpdateProcessor extends Processor {
 		list.getListItem(index).setEndTime(time);
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		} else {
+			fileHandler.updateFile(list);
 		}
-		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
@@ -234,8 +236,9 @@ public class UpdateProcessor extends Processor {
 		}
 		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		} else {
+			fileHandler.updateFile(list);
 		}
-		fileHandler.updateFile(list);
 		return list.getListItem(index);
 	}
 
