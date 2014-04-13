@@ -1,6 +1,3 @@
-/**
- * 
- */
 package todomato;
 
 import java.text.DateFormat;

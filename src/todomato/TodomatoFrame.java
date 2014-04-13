@@ -1,5 +1,5 @@
 package todomato;
-//@author A0120766H
+
 import java.awt.Dimension;
 import java.awt.event.*;
 
@@ -9,6 +9,7 @@ import org.jfree.ui.BevelArrowIcon;
 
 import net.miginfocom.swing.MigLayout;
 
+//@author A0120766H
 /**
  * This class is the JFrame for the GUI of the application.
  */

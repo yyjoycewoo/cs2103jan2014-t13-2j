@@ -1,4 +1,3 @@
-//@author A0101578H
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -7,6 +6,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//@author A0101578H
 /**
  * This class contains methods to process delete commands by the user.
  * It updates the user's lists of tasks, and saves it to disk.
@@ -32,7 +32,6 @@ import java.util.logging.Logger;
  *
  *
  */
-
 public class DeleteProcessor extends Processor {
 	private static final String DELIMITER_FOR_ARGUMENT = "\\s*(,| )\\s*";
 	private static final String DELIMITER_FOR_RANGE = "\\s*-\\s*";

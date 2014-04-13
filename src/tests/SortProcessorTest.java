@@ -1,4 +1,3 @@
-//@author A0101578H
 package tests;
 
 import static org.junit.Assert.*;
@@ -20,6 +19,7 @@ import todomato.Processor;
 import todomato.SortProcessor;
 import todomato.TaskList;
 
+//@author A0101578H
 public class SortProcessorTest {
 private  File tasks;
 	

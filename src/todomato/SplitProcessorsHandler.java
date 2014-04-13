@@ -1,6 +1,6 @@
-//@author A0120766H
 package todomato;
 
+//@author A0120766H
 /**
  * This class handles user commands by calling the processing method depending
  * on the action specified.

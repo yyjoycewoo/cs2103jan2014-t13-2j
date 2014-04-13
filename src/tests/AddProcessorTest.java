@@ -1,4 +1,3 @@
-//@author A0096620E
 package tests;
 
 import static org.junit.Assert.*;
@@ -13,6 +12,7 @@ import todomato.AddProcessor;
 import todomato.InvalidInputException;
 import todomato.Task;
 
+//@author A0096620E
 public class AddProcessorTest {
 
 	/*This is a test case to test for locations for more than one words*/

@@ -1,10 +1,10 @@
-//@author A0096620E
-/**
- * Simple class to set username and password via CLI
- *
- */
 package todomato;
 
+//@author A0096620E
+/**
+ * Class to set username and password via CLI
+ *
+ */
 public class SetSyncProcessor extends Processor {
 	private static final String SET_SUCCESSFUL = "Username and password successful set";
 	private static final String INVALID_USERNAME = "Invalid username and password. Format is <username> <password>";
