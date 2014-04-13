@@ -1,6 +1,6 @@
-//@author A0099332Y
 package todomato;
 
+//@author A0099332Y
 public class SyncProcessor extends Processor {
 
 	private static final String NO_USERNAME_PW = "Set username and password with \"setsync <username> <password>\"";

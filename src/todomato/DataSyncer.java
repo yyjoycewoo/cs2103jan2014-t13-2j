@@ -1,5 +1,5 @@
-//@author A0099332Y
 package todomato;
+
 import hirondelle.date4j.DateTime;
 
 import java.io.IOException;
@@ -36,6 +36,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+//@author A0099332Y
 /**
  * This class is the process for the Google Sync of the application.
  *
