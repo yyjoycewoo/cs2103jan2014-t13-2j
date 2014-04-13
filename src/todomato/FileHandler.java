@@ -35,8 +35,7 @@ public class FileHandler {
 			try {
 				FileWriter fw = new FileWriter(f.getAbsoluteFile());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return null;
 			}
 		}
 		return dataFile;
