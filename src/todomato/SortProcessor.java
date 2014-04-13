@@ -201,14 +201,14 @@ public class SortProcessor extends Processor{
 	 * 
 	 * @param i: index of first task
 	 * @param j: index of second task
-	 * @return true if task i has lower priority than task j
+	 * @return true if task i has lower priority than task j or has been completed
 	 */
 	private static boolean comparePriority(int i, int j) {
 		if (list.getListItem(i).getCompleted()) {
-			if (list.getListItem(j).getCompleted()) {
-				return false;
-			}
 			return true;
+		}
+		if (list.getListItem(j).getCompleted()) {
+			return false;
 		}
 		if (isSamePriority(i, j)) {
 			return false;

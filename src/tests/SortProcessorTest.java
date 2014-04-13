@@ -192,7 +192,7 @@ private  File tasks;
 				"3: " + ITEM_ONE +
 				"4: " + ITEM_TWO +
 				"5: " + ITEM_FOUR;
-		SortProcessor.processSort("priority d");
+		SortProcessor.processSort("priority");
 		String resultList = getList().toString();
 		assertEquals(expectedList, resultList);
 	}
@@ -218,6 +218,20 @@ private  File tasks;
 				"3: " + ITEM_ONE +
 				"4: " + ITEM_TWO +
 				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("priority d");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	public void testMultipleSortPriority() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_THREE + 
+				"2: " + ITEM_FIVE +
+				"3: " + ITEM_ONE +
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("priority");
+		SortProcessor.processSort("priority a");
 		SortProcessor.processSort("priority d");
 		String resultList = getList().toString();
 		assertEquals(expectedList, resultList);
