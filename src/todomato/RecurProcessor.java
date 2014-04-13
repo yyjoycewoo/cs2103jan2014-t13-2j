@@ -9,7 +9,6 @@ import todomato.Processor;
 
 public class RecurProcessor extends Processor {
 	
-
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
 	
 	public static String processRecur(String input) {
@@ -28,7 +27,12 @@ public class RecurProcessor extends Processor {
 	private static void addsRecurringTask(Task task) {
 		if (needsToBeRecurred(task)) {
 			Task newTask = new Task(task);
+			if (newTask.getStartDate() != null) {
+				newTask.setStartDate(task.getStartDate().plusDays(task.getRecurrencePeriod()));
+			}
 			newTask.setEndDate(task.getEndDate().plusDays(task.getRecurrencePeriod()));
+			newTask.setTimeCreated(DateTime.now(TimeZone.getTimeZone(SG_TIMEZONE)));
+			newTask.setCompleted(false);
 			list.addToList(newTask);
 		}
 	}
@@ -39,12 +43,12 @@ public class RecurProcessor extends Processor {
 	 */
 	private static Boolean checkIfDuplicateRecurTaskExist (Task task) {
 
-		DateTime recurDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
+		DateTime recurEndDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
 		for (int i = 0; i < list.getSize(); i++) {
 			if (list.getListItem(i).getEndDate() == null) {
 				return false;
 			}
-			if (list.getListItem(i).getEndDate().equals(recurDate)) {
+			if (list.getListItem(i).getEndDate().equals(recurEndDate)) {
 				if (list.getListItem(i).compareDescAndLocation(task)) {
 					return true;
 				}
@@ -67,9 +71,9 @@ public class RecurProcessor extends Processor {
 		if (task.getRecurrencePeriod() == 0) {
 			return false;
 		}
-		TimeZone SGT = TimeZone.getTimeZone("GMT+8");
-		DateTime recurDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
-		if (DateTime.today(SGT).numDaysFrom(recurDate) < task.getRecurrencePeriod()) {
+		TimeZone SGT = TimeZone.getTimeZone(SG_TIMEZONE);
+		DateTime recurEndDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
+		if (DateTime.today(SGT).numDaysFrom(recurEndDate) < task.getRecurrencePeriod()) {
 			if (!checkIfDuplicateRecurTaskExist(task)) {
 				return true;
 			}
