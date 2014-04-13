@@ -4,6 +4,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,15 +26,19 @@ import todomato.UpdateProcessor;
 public class UpdateProcessorTest {
 
 	private static final String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#2014-04-10 00:33:20.173000000#LOW#false#null#2014-04-13 16:29:01.763000000#null";
-	private static final String TASK2 = "cs2103 testcases#null#null#null#2014-04-11#haha#0#-695569587#2014-04-10 13:00:20.931000000#LOW#false#null#2014-04-13 16:27:42.395000000#null";
-	private static final String TASK3 = "do tutorial cs2103#null#null#null#null#null#0#-700020665#2014-04-10 00:33:30.367000000#LOW#true#null#null#null";
+	private static final String TASK2 = "Breakfast#07:00#null#2014-04-01#2014-04-01#null#0#1046042885#2014-04-09 16:19:17.842000000#LOW#true#null#null#null\r\n";
+	private static final String TASK3 = "Project meeting#null#14:00#2014-04-01#2014-04-10#null#0#570051783#2014-04-09 16:18:48.669000000#MEDIUM#true#null#null#null\r\n";
 	private static final String STATUS_MSG = "Updated the task(s)";
-	String taskString = "1 starttime 730pm endtime 930pm";
+	String startEndTime = "1 starttime 730pm endtime 930pm";
+	String descLoc = "2 desc CS2103\" location com1\\";
+	String startEndDate = "1 startdate 11 apr enddate 12 apr";
 	String invalidkey = "1 rubbish";
 	String invalidIndex = "100";
 	int index1 = 0;
 	String INDEX_OUT_OF_BOUND = "Index is out of the list.";
 	String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
+	String INVALID_DATE = "Start time cannot be greater than end time";
+	String invalidDate = "1 startdate 12 apr enddate 11 apr";
 	private static final String LIST = "list";
 	private static final String FILE_DIR = "user.dir";
 	private static final String FILE_NAME = "tasks.txt";
@@ -68,12 +73,6 @@ public class UpdateProcessorTest {
 		}
 	}
 
-	@Test
-	public void testUpdateIndexOne() throws InvalidInputException {
-		String task1 = UpdateProcessor.processUpdate(taskString);
-		assertEquals(STATUS_MSG, task1);
-	}
-
 	// testing the out of bound index
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidIndexOne() throws InvalidInputException {
@@ -98,6 +97,28 @@ public class UpdateProcessorTest {
 			UpdateProcessor.processUpdate(invalidkey);
 		} catch (InvalidInputException e) {
 			assertEquals(NO_KEYWORDS_FOUND, e.getMessage());
+		}
+	}
+
+	// testing start and end time, desc and location, start and end date
+	@Test
+	public void testUpdate1() throws InvalidInputException {
+		String task1 = UpdateProcessor.processUpdate(startEndTime);
+		String task2 = UpdateProcessor.processUpdate(descLoc);
+		String task3 = UpdateProcessor.processUpdate(startEndDate);
+		assertEquals(STATUS_MSG, task1);
+		assertEquals(STATUS_MSG, task2);
+		assertEquals(STATUS_MSG, task3);
+	}
+
+	// testing for invalid time or date
+	@Test
+	public void testInvalidDate() throws InvalidInputException {
+		try {
+			UpdateProcessor.processUpdate(invalidDate);
+			fail("Should have thrown invalid input");
+		} catch (InvalidInputException e) {
+			assertEquals(INVALID_DATE, e.getMessage());
 		}
 	}
 }
