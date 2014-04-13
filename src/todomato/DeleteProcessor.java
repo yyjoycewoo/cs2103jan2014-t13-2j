@@ -43,7 +43,8 @@ public class DeleteProcessor extends Processor {
 	private static final String SUCCESSFUL_DELETE = "Deleted: ";
 	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
 	private static final String INVALID_INPUT_MISSING_ARGUMENT = "Missing argument";
-	private static final String INVALID_NUMBER_OF_LIMITS = "Upper and lower limits required";
+	private static final String INVALID_NUMBER_OF_LIMITS = "Invalid range: Upper and lower limits required";
+	private static final String INVALID_RANGE_LIMITS = "Invalid range: Enter <lower index> - <higher index>";
 	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
 	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
 	
@@ -121,6 +122,9 @@ public class DeleteProcessor extends Processor {
 		int lowerLimitIndex = Integer.parseInt(rangeLimits[0]) - 1;
 		int upperLimitIndex = Integer.parseInt(rangeLimits[1]) - 1;
 		int numberOfTasksDeleted = 0;
+		if (lowerLimitIndex > upperLimitIndex) {
+			throw new InvalidInputException(INVALID_RANGE_LIMITS);
+		}
 		for (int i = upperLimitIndex; i >= lowerLimitIndex; i--) {
 			list.deleteListItem(i);
 			numberOfTasksDeleted++;
