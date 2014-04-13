@@ -1,10 +1,10 @@
 //@author A0101324A
 package todomato;
 
+import hirondelle.date4j.DateTime;
+
 import java.util.Arrays;
 import java.util.TimeZone;
-
-import hirondelle.date4j.DateTime;
 
 /**
  * This class contains methods to process update commands by the user. It
@@ -21,8 +21,8 @@ import hirondelle.date4j.DateTime;
  * <ul>
  * <li>"starttime" for the start time
  * <li>"endtime" for the end time
- * <li>"desc" for the description, followed by '\\' afterwards
- * <li>"location" for the location, followed by '\\' afterwards
+ * <li>"desc" for the description, followed by '\' afterwards
+ * <li>"location" for the location, followed by '\' afterwards
  * <li>"date" for the date
  * <li>"recur" for recurrence interval
  * <li>"priority" or "!" for priority level
@@ -63,6 +63,7 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_STIME = 11;
 	private static final int NO_OF_CHAR_IN_ETIME = 9;
 	private static final int NO_OF_CHAR_IN_LOC = 10;
+	private static final int NO_OF_CHAR_IN_AT_LOC = 2;
 	private static final int NO_OF_CHAR_IN_SDATE = 11;
 	private static final int NO_OF_CHAR_IN_DESC = 6;
 	private static final int NO_OF_CHAR_IN_EDATE = 9;
@@ -157,7 +158,7 @@ public class UpdateProcessor extends Processor {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param index
 	 * 
@@ -268,7 +269,8 @@ public class UpdateProcessor extends Processor {
 		}
 		if (argument.contains(" @")) {
 			list.getListItem(index).setLocation(
-					argument.substring(editLoc + 2, stopIndex));
+					argument.substring(editLoc + NO_OF_CHAR_IN_AT_LOC,
+							stopIndex));
 		} else {
 			list.getListItem(index).setLocation(
 					argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
@@ -344,11 +346,9 @@ public class UpdateProcessor extends Processor {
 		int stopIndex = argument.length();
 		String priority = null;
 		if (argument.contains(" !")) {
-			System.out.print(argument.substring(priorityDesc + NO_OF_CHAR_IN_PRIORITY_SYMBOL));
-			priority = parsePriorityFromString(argument.substring(
-					priorityDesc + NO_OF_CHAR_IN_PRIORITY_SYMBOL, stopIndex));
+			priority = parsePriorityFromString(argument.substring(priorityDesc
+					+ NO_OF_CHAR_IN_PRIORITY_SYMBOL, stopIndex));
 		} else {
-			System.out.print(argument.substring(priorityDesc));
 			priority = parsePriorityFromString(argument.substring(priorityDesc
 					+ NO_OF_CHAR_IN_PRIORITY, stopIndex));
 		}
