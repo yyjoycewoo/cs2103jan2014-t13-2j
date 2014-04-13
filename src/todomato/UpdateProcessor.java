@@ -242,7 +242,7 @@ public class UpdateProcessor extends Processor {
 		String[] parts = argument.split(" ");
 		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
 		list.getListItem(index).setStartTime(time);
-		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		} else {
 			fileHandler.updateFile(list);
@@ -256,7 +256,7 @@ public class UpdateProcessor extends Processor {
 		String[] parts = argument.split(" ");
 		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
 		list.getListItem(index).setEndTime(time);
-		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		} else {
 			fileHandler.updateFile(list);
@@ -273,7 +273,7 @@ public class UpdateProcessor extends Processor {
 		if (list.getListItem(index).getEndDate() == null) {
 			list.getListItem(index).setEndDate(date);
 		}
-		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		} else {
 			fileHandler.updateFile(list);
@@ -286,7 +286,7 @@ public class UpdateProcessor extends Processor {
 		DateTime date = convertStringToDateTime(parseDateString(argument
 				.substring(editDate + NO_OF_CHAR_IN_EDATE)));
 		list.getListItem(index).setEndDate(date);
-		if (isStartTimeLessThanEndTime(list.getListItem(index))) {
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
 			throw new InvalidInputException(START_TIME_GT_END_TIME);
 		}
 		fileHandler.updateFile(list);
@@ -423,8 +423,14 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
+	
+	/**
+	 * Checks whether start time/date is greater than end time/date
+	 * @param input
+	 * @return true if start time is greater than end time
+	 */
 
-	private static Boolean isStartTimeLessThanEndTime(Task input) {
+	private static Boolean isStartTimeGreaterThanEndTime(Task input) {
 		if ((input.getStartDate() != null) && (input.getEndDate() != null)) {
 			if (input.getStartDate().gt(input.getEndDate())) {
 				return true;
