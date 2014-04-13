@@ -2,7 +2,7 @@ package todomato;
 
 //@author A0099332Y
 /**
- * This class signals that the user has entered an unknown input.
+ * This class signals that there is an error occur in sync process.
  *
  */
 @SuppressWarnings("serial")
