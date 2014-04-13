@@ -1,8 +1,8 @@
-//@author A0101578H
 package todomato;
 
 import hirondelle.date4j.DateTime;
 
+//@author A0101578H
 /**
  * This class contains methods to process sort commands by the user. 
  * It updates the user's list of tasks, and saves it to disk.

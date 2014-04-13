@@ -1,4 +1,3 @@
-//@author A0101578H
 package tests;
 
 import static org.junit.Assert.*;
@@ -20,6 +19,7 @@ import todomato.InvalidInputException;
 import todomato.Processor;
 import todomato.TaskList;
 
+//@author A0101578H
 public class DeleteProcessorTest {
 	private  File tasks;
 	
@@ -41,14 +41,11 @@ public class DeleteProcessorTest {
         
         FileHandler fileHandler = new FileHandler("tasks.txt");
         TaskList newList = fileHandler.readFile();
-        //System.out.println(newList.toString());
         Field f = Processor.class.getDeclaredField("list");
         f.setAccessible(true);
         if ("list".equals(f.getName())) {
             f.setAccessible(true);
-            //System.out.println(f.get("list"));
             f.set("list", newList);
-            //System.out.println(f.get("list"));
         }
 	}
 

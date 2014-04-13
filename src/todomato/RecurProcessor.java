@@ -1,4 +1,3 @@
-//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -7,6 +6,7 @@ import java.util.TimeZone;
 
 import todomato.Processor;
 
+//@author A0096620E
 public class RecurProcessor extends Processor {
 	
 	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";

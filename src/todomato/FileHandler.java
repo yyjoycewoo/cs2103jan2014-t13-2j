@@ -8,10 +8,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+//@author A0099332Y
 /**
  * This class reads, writes, and updates a local data file stored
  * on the user's computer. It reads in tasks as Task objects.
- * @author A0099332Y
  *
  */
 
