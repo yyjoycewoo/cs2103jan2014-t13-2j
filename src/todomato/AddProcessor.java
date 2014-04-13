@@ -57,12 +57,14 @@ public class AddProcessor extends Processor {
 	
 	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
 	private static final int NO_OF_KEYWORDS_FOR_TIME = 5;
+
 	private static int NOT_FOUND = -1;
 	private static String INVALID_INPUT = "Invalid Input format ";
 	private static String INVALID_START_TIME = "Invalid Start Time ";
 	private static String INVALID_END_TIME = "Invalid End Time ";
 	private static String INVALID_END_DATE = "Invalid End Date format ";
 	private static String INVALID_RECUR = "Invalid Recur format : Need Date before adding recurrence period";
+	private static final String INVALID_INDEX = "Index must be 3 or 4";
 	private static int INDEX_OF_DESC = 0;
 	private static int INDEX_OF_START_TIME = 1;
 	private static int INDEX_OF_END_TIME = 2;
@@ -149,6 +151,7 @@ public class AddProcessor extends Processor {
 			taskDesExtracted = true;
 		}
 
+		//Only is called if "at", "on", "due" and "until" is not present in the String
 		if (!isKeywordForTimePresentFound(input)) {
 			if (isTodayOrTomorrowFound(input)) {
 				//Removes today and tomorrow from the string so that it does not appear in description
@@ -338,6 +341,10 @@ public class AddProcessor extends Processor {
 	 */
 	
 	private static String retrieveDateFromTimeString (String timeString, int startOrEndTimeIndex) throws InvalidInputException {
+		if (startOrEndTimeIndex != INDEX_OF_START_DATE && startOrEndTimeIndex != INDEX_OF_END_DATE) {
+			throw new InvalidInputException(INVALID_INDEX);
+		}
+		
 		String parts[] = timeString.split(" ");
 		String dateString = null;
 		if (parts.length == THREE_WORDS) {
