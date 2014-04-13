@@ -121,7 +121,17 @@ public class DeleteProcessorTest {
 			DeleteProcessor.processDelete("-");
 			fail("Should have thrown InvalidInputException");
 		} catch (InvalidInputException e){
-			assertEquals(e.getMessage(), "Upper and lower limits required");
+			assertEquals(e.getMessage(), "Invalid range: Upper and lower limits required");
+		}
+	}
+	
+	@Test
+	public void testInvalidRangeLimits() throws InvalidInputException {
+		try {
+			DeleteProcessor.processDelete("4-2");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Invalid range: Enter <lower index> - <higher index>");
 		}
 	}
 }
