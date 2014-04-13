@@ -98,9 +98,9 @@ public class DataSyncer extends Processor {
 		
 		JsonObject localJson = prepareData(this.localList, username, password, lastSyncTime);
 		
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 //		System.out.println("Send data\n----------------------");
-		System.out.println(gson.toJson(localJson));
+//		System.out.println(gson.toJson(localJson));
 //		System.out.println("\n");
 //		System.out.println("Receive data\n----------------------");
 		
