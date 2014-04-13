@@ -42,14 +42,6 @@ import hirondelle.date4j.DateTime;
  * <li>0730
  * <li>0730pm
  * </ul>
- * 
- * <p>
- * The following date formats are supported (case does not matter):
- * <ul>
- * <li>jan 1
- * <li>1 january
- * <li>january 1
- * </ul>
  */
 public class NotifyProcessor extends Processor {
 
