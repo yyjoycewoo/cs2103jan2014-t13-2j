@@ -1,4 +1,3 @@
-//@author A0101324A
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -6,6 +5,7 @@ import hirondelle.date4j.DateTime;
 import java.util.Arrays;
 import java.util.TimeZone;
 
+//@author A0101324A
 /**
  * This class contains methods to process update commands by the user. It
  * updates the user's lists of tasks, and saves it to disk.

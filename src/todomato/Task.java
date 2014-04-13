@@ -1,4 +1,3 @@
-//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -6,6 +5,7 @@ import hirondelle.date4j.DateTime;
 import java.util.Locale;
 import java.util.TimeZone;
 
+//@author A0096620E
 public class Task {
 
 	private static final String START_TIME_PREP = " at ";
