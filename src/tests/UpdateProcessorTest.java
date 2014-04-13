@@ -1,4 +1,4 @@
-//@ A0101324A
+//@author A0101324A
 package tests;
 
 import static org.junit.Assert.assertEquals;
