@@ -1,6 +1,4 @@
-/**
- * 
- */
+//@ A0101324A
 package tests;
 
 import static org.junit.Assert.assertEquals;
@@ -25,20 +23,23 @@ import todomato.UpdateProcessor;
 
 public class UpdateProcessorTest {
 
-	private static final String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#2014-04-10 00:33:20.173000000#LOW#false#null#2014-04-13 16:29:01.763000000#null";
+	private static final String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#2014-04-10 00:33:20.173000000#LOW#false#null#2014-04-13 16:29:01.763000000#null\r\n";
 	private static final String TASK2 = "Breakfast#07:00#null#2014-04-01#2014-04-01#null#0#1046042885#2014-04-09 16:19:17.842000000#LOW#true#null#null#null\r\n";
-	private static final String TASK3 = "Project meeting#null#14:00#2014-04-01#2014-04-10#null#0#570051783#2014-04-09 16:18:48.669000000#MEDIUM#true#null#null#null\r\n";
+	private static final String TASK3 = "walk with dog and wash car#01:00#02:00#null#null#utown#0#978601153#null00:33:20.173000000#LOW#false#null#null16:29:01.763000000#null\r\n";
 	private static final String STATUS_MSG = "Updated the task(s)";
-	String startEndTime = "1 starttime 730pm endtime 930pm";
-	String descLoc = "2 desc CS2103\" location com1\\";
-	String startEndDate = "1 startdate 11 apr enddate 12 apr";
-	String invalidkey = "1 rubbish";
-	String invalidIndex = "100";
-	int index1 = 0;
-	String INDEX_OUT_OF_BOUND = "Index is out of the list.";
-	String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
-	String INVALID_DATE = "Start time cannot be greater than end time";
-	String invalidDate = "1 startdate 12 apr enddate 11 apr";
+	private static final String startEndTime = "1 starttime 730pm endtime 930pm";
+	private static final String descLoc = "2 desc CS2103\" location com1\\";
+	private static final String startEndDate = "3 startdate 11 apr enddate 12 apr";
+	private static final String invalidkey = "1 rubbish";
+	private static final String invalidIndex = "100";
+	private static final String LOC = "utown";
+	private static final String MULTIPLE_INDEX = "1,2,3 @utown";
+	private static final String INDEX_OUT_OF_BOUND = "Index is out of the list.";
+	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
+	private static final String INVALID_DATE = "Start time cannot be greater than end time";
+	private static final String INVALID_TIME = "Invalid Time";
+	private static final String invalidDate = "1 startdate 12 apr enddate 11 apr";
+	private static final String invalidTime = "2 starttime 2359pm endtime 7am";
 	private static final String LIST = "list";
 	private static final String FILE_DIR = "user.dir";
 	private static final String FILE_NAME = "tasks.txt";
@@ -102,16 +103,16 @@ public class UpdateProcessorTest {
 
 	// testing start and end time, desc and location, start and end date
 	@Test
-	public void testUpdate1() throws InvalidInputException {
-		String task1 = UpdateProcessor.processUpdate(startEndTime);
-		String task2 = UpdateProcessor.processUpdate(descLoc);
-		String task3 = UpdateProcessor.processUpdate(startEndDate);
-		assertEquals(STATUS_MSG, task1);
-		assertEquals(STATUS_MSG, task2);
-		assertEquals(STATUS_MSG, task3);
+	public void testUpdateFeatures() throws InvalidInputException {
+		String task1Msg = UpdateProcessor.processUpdate(startEndTime);
+		String task2Msg = UpdateProcessor.processUpdate(descLoc);
+		String task3Msg = UpdateProcessor.processUpdate(startEndDate);
+		assertEquals(STATUS_MSG, task1Msg);
+		assertEquals(STATUS_MSG, task2Msg);
+		assertEquals(STATUS_MSG, task3Msg);
 	}
 
-	// testing for invalid time or date
+	// testing for invalid date
 	@Test
 	public void testInvalidDate() throws InvalidInputException {
 		try {
@@ -119,6 +120,27 @@ public class UpdateProcessorTest {
 			fail("Should have thrown invalid input");
 		} catch (InvalidInputException e) {
 			assertEquals(INVALID_DATE, e.getMessage());
+		}
+	}
+
+	// testing for invalid time
+	@Test
+	public void testInvalidTime() throws InvalidInputException {
+		try {
+			UpdateProcessor.processUpdate(invalidTime);
+			fail("Should have thrown invalid input");
+		} catch (InvalidInputException e) {
+			assertEquals(INVALID_TIME, e.getMessage());
+		}
+	}
+
+	// testing for multiple updates
+	@Test
+	public void testMultipleIndex() throws InvalidInputException {
+		String tasksMsg = UpdateProcessor.processUpdate(MULTIPLE_INDEX);
+		assertEquals(STATUS_MSG, tasksMsg);
+		for (int i = 0; i < Processor.getList().getSize(); i++) {
+			assertEquals(LOC, Processor.getList().getListItem(i).getLocation());
 		}
 	}
 }
