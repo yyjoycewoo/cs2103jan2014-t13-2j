@@ -25,7 +25,12 @@ public class HelpProcessor {
 			"- <detail> is not required when updating completion status \n\n" +
 			"3. Deleting task \n" +
 			"\t delete <index> \n\n" +
-			"Refer to user guide for more details.";
+			"Todomato also supports these features: \n" +
+			"- Finding tasks containing your specified search term \n" +
+			"- Sorting of tasks in the list \n" +
+			"- Undo \n" +
+			"- Redo \n\n" +
+			"Please refer to user guide for more details.";
 	
 	public static void processHelp() {
 		JFrame frame= new JFrame("Help");
@@ -36,7 +41,7 @@ public class HelpProcessor {
 		frame.add(panel);
 		panel.add(helpText, "wrap, push, grow");
 		frame.setSize(500,400);
-		frame.setMinimumSize(new Dimension(400, 300));
+		frame.setMinimumSize(new Dimension(400, 350));
 		frame.setVisible(true);
 	}
 }
