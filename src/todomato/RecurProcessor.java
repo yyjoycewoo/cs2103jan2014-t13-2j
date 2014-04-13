@@ -25,7 +25,7 @@ public class RecurProcessor extends Processor {
 	 * @param task
 	 */
 	
-	protected static void addsRecurringTask(Task task) {
+	private static void addsRecurringTask(Task task) {
 		if (needsToBeRecurred(task)) {
 			Task newTask = new Task(task);
 			newTask.setEndDate(task.getEndDate().plusDays(task.getRecurrencePeriod()));
@@ -37,7 +37,7 @@ public class RecurProcessor extends Processor {
 	 * @param task
 	 * @return Boolean
 	 */
-	protected static Boolean checkIfDuplicateRecurTaskExist (Task task) {
+	private static Boolean checkIfDuplicateRecurTaskExist (Task task) {
 
 		DateTime recurDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
 		for (int i = 0; i < list.getSize(); i++) {

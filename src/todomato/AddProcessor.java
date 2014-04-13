@@ -148,7 +148,7 @@ public class AddProcessor extends Processor {
 			input = setDescWithWordsInsideInvertedCommas(input);
 			taskDesExtracted = true;
 		}
-		
+
 		if (!isKeywordForTimePresentFound(input)) {
 			if (isTodayOrTomorrowFound(input)) {
 				//Removes today and tomorrow from the string so that it does not appear in description
@@ -163,8 +163,10 @@ public class AddProcessor extends Processor {
 		while (keywordIsInString(input)) {
 			keywordIndex = getFirstKeyword(input);
 			stringFragments = splitByKeyword(input, keywords[keywordIndex]);
+			//Extracts Task Description during the first run of the program if it has not been
+			//extracted via other means such as if they are enclosed in inverted commas
 			if (!taskDesExtracted) {
-				taskDetails[INDEX_OF_DESC] = stringFragments[0];
+				taskDetails[INDEX_OF_DESC] = stringFragments[FIRST_WORD];
 				taskDesExtracted = true;
 			}
 			taskDetails = keywordHandler(keywordIndex, stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS]);
@@ -322,6 +324,18 @@ public class AddProcessor extends Processor {
 		}
 		return startTimeString;
 	}
+	
+	/**
+	 * Retrieves Start or User Date from a String that could contain both valid
+	 * time and date formats.
+	 * startOrEndTimeIndex is dependent on whether you wish to have the Date String stored
+	 * in the start date position in the taskDetails array
+	 * 
+	 * @param timeString
+	 * @param startOrEndTimeIndex
+	 * @return
+	 * @throws InvalidInputException
+	 */
 	
 	private static String retrieveDateFromTimeString (String timeString, int startOrEndTimeIndex) throws InvalidInputException {
 		String parts[] = timeString.split(" ");
