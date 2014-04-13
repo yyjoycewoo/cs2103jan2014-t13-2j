@@ -21,6 +21,7 @@ public class Processor {
 	protected static Stack<TaskList> undoList = new Stack<TaskList>();
 	protected static Stack<TaskList> redoList = new Stack<TaskList>();
 	
+	protected static final int AM = 0;
 	protected static final int PM = 1;
 	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR = 1;
 	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
@@ -48,6 +49,7 @@ public class Processor {
 	protected static final String SG_TIMEZONE = "GMT+8:00";
 	protected static final String DEFAULT_MINUTE_FORMAT = "00";
 	protected static final String DATETIME_PADDING = "0";
+	protected static final String ZERO = "0";
 	protected static final String DATE_FORMAT_SYMBOL = "-";
 	protected static final String TIME_FORMAT_SYMBOL = ":";
 	protected static final String SPACE = " ";
@@ -360,6 +362,11 @@ public class Processor {
 			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
 				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
 				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+			}
+		}
+		if (meridiemIndex == AM) {
+			if (Integer.parseInt(userHour) == NOON) {
+				userHour = ZERO;
 			}
 		}
 		if (meridiemIndex == PM) { 	
