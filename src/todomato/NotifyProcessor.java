@@ -56,6 +56,8 @@ public class NotifyProcessor extends Processor {
 	private static String NOTIFIED = "Recorded the notified time.";
 	private static String notifyKeyword = " time ";
 	private static int NO_OF_CHAR_IN_NTIME = 6;
+	private static String NO_DATE = "No start or end date for the selected task.";
+	private static String LIMIT_TODAY = "Notification time is only for today's task!";
 
 	public static String processNotify(String argument)
 			throws InvalidInputException {
@@ -70,17 +72,20 @@ public class NotifyProcessor extends Processor {
 	// limited to today's task
 	private static void notifyTime(int index, int which, String argument)
 			throws InvalidInputException {
-		String item_date = convertDateToStandardForm(list.getListItem(index)
-				.getEndDate().getMonth().toString(), list.getListItem(index)
-				.getEndDate().getDay().toString());
-		if (!item_date.contains(CurrentDate.date())) {
-			throw new InvalidInputException(
-					"Notification time is only for today's task, not for future task!");
+		if (list.getListItem(index).getEndDate() != null) {
+			String item_date = convertDateToStandardForm(list
+					.getListItem(index).getEndDate().getMonth().toString(),
+					list.getListItem(index).getEndDate().getDay().toString());
+			if (!item_date.contains(CurrentDate.date())) {
+				throw new InvalidInputException(LIMIT_TODAY);
+			}
+			DateTime time = convertStringToDateTime(parseTimeString(argument
+					.substring(which + NO_OF_CHAR_IN_NTIME)));
+			list.getListItem(index).setNoticeTime(time);
+			fileHandler.updateFile(list);
+		} else {
+			throw new InvalidInputException(NO_DATE);
 		}
-		DateTime time = convertStringToDateTime(parseTimeString(argument
-				.substring(which + NO_OF_CHAR_IN_NTIME)));
-		list.getListItem(index).setNoticeTime(time);
-		fileHandler.updateFile(list);
 	}
 
 	/**
@@ -103,6 +108,7 @@ public class NotifyProcessor extends Processor {
 	private static void printInvalidIndexMsg(int index)
 			throws InvalidInputException {
 		if (index >= list.getSize()) {
+			index = index + 1;
 			throw new InvalidInputException("Index " + index
 					+ " is out of the list.");
 		}
@@ -127,7 +133,7 @@ public class NotifyProcessor extends Processor {
 			throws InvalidInputException {
 		if (argument.length() <= 2) {
 			throw new InvalidInputException(
-					"Please include any keywords to update i.e. starttime, endtime, location, desc, date");
+					"Have you type notify <index> time <time>?");
 		}
 	}
 }
