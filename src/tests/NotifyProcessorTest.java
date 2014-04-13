@@ -1,6 +1,6 @@
+//@author A0101324A
 package tests;
 
-//@author A0101324A
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 

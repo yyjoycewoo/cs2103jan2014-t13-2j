@@ -86,7 +86,6 @@ public class UpdateProcessor extends Processor {
 			" recur ", " priority ", " complete", " !", " @" };
 
 	/**
-	 * @author Hao Eng
 	 * @param argument
 	 *            : <index of the task> time <startTime e.g. 1300> or <index of
 	 *            the task> desc <description e.g. cut dog's hair>
@@ -423,9 +422,10 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
-	
+
 	/**
 	 * Checks whether start time/date is greater than end time/date
+	 * 
 	 * @param input
 	 * @return true if start time is greater than end time
 	 */

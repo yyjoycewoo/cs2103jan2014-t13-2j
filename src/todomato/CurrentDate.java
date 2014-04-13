@@ -1,13 +1,11 @@
-/**
- * 
- */
+//@author A0101324A
+
 package todomato;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-//@author A0101324A
 /**
  * This class stores the current date.
  * 

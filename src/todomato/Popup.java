@@ -1,14 +1,10 @@
-/**
- * 
- */
+//@author A0101324A
 package todomato;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-//@author A0101324A
 
 // showing the tasks that are due in 3 days
 public class Popup extends Processor {

@@ -1,6 +1,4 @@
-/**
- * 
- */
+//@author A0101324A
 package todomato;
 
 import java.awt.BorderLayout;
@@ -24,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
 
-//@author A0101324A
 /**
  * This class creates a pop up notification to appear on the desktop.
  * 

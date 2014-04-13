@@ -1,6 +1,4 @@
-/**
- * 
- */
+//@author A0101324A
 package todomato;
 
 import java.text.SimpleDateFormat;
@@ -8,8 +6,6 @@ import java.util.Calendar;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-
-//@author A0101324A
 
 /*
  * Checking the notify time for each task (if possible) and enable pop up 
