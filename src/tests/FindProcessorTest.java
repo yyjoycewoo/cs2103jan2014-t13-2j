@@ -1,5 +1,5 @@
 package tests;
-//@author A0120766H
+
 import static org.junit.Assert.*;
 
 import java.io.BufferedWriter;
@@ -21,6 +21,7 @@ import todomato.FindProcessor;
 import todomato.Processor;
 import todomato.TaskList;
 
+//@author A0120766H
 public class FindProcessorTest {
 	private static final String ENDLINE_CHAR = "\n";
 	
@@ -39,7 +40,7 @@ public class FindProcessorTest {
 	
 	private static final String NO_TASKS_FOUND_MESSAGE = "No tasks found";
 	private static final String SUCCESS_MSG = "Search completed";
-
+	
 	private File tasks;
 
 	@Rule 

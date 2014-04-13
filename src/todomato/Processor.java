@@ -1,4 +1,3 @@
-//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -7,6 +6,7 @@ import java.io.IOException;
 import java.util.Stack;
 import java.util.TimeZone;
 
+//@author A0096620E
 /**
  * This class stores information needed to process a user's command, and
  * contains methods to parse a command's arguments.
