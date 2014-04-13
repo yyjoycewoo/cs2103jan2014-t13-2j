@@ -58,13 +58,15 @@ public class NotifyProcessor extends Processor {
 	private static int NO_OF_CHAR_IN_NTIME = 6;
 	private static String NO_DATE = "No start or end date for the selected task.";
 	private static String LIMIT_TODAY = "Notification time is only for today's task!";
+	private static String GOT_KEYWORDS = "Have you type notify <index> time <time>?";
+	private static String INVALID_INDEX = "Index %d is out of the list.";
+	private static String NOTHING_ERROR = "Please include the index(s) and keyword(s).";
 
 	public static String processNotify(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
-		printInvalidKeywords(argument);
+		checkingInputErrors(argument);
 		int index = getTaskIndex(argument) - 1;
-		printInvalidIndexMsg(index);
 		notifyTime(index, findDetailToEdit(argument), argument);
 		return NOTIFIED;
 	}
@@ -89,6 +91,27 @@ public class NotifyProcessor extends Processor {
 	}
 
 	/**
+	 * 
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void checkingInputErrors(String argument)
+			throws InvalidInputException {
+		if (argument.isEmpty()) {
+			throw new InvalidInputException(NOTHING_ERROR);
+		}
+		String[] words = argument.split(" ");
+		// checking index is zero
+		if (words.length >= 1) {
+			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
+		} else if (words.length == 0) {
+			printInvalidIndexMsg(0, null);
+		} else {
+			printInvalidKeywords(argument);
+		}
+	}
+
+	/**
 	 * @param argument
 	 *            that contains index, time, date e.g. 1 time 1300 date 03/01
 	 * @return the starting index of which task detail to change
@@ -105,12 +128,13 @@ public class NotifyProcessor extends Processor {
 	 * @param index
 	 * @throws InvalidInputException
 	 */
-	private static void printInvalidIndexMsg(int index)
+	private static void printInvalidIndexMsg(int index, String argument)
 			throws InvalidInputException {
-		if (index >= list.getSize()) {
-			index = index + 1;
-			throw new InvalidInputException("Index " + index
-					+ " is out of the list.");
+		if ((index > list.getSize()) || (index <= 0) || argument.equals(null)) {
+			String INDEX_OUT_BOUNDS = String.format(INVALID_INDEX, index);
+			throw new InvalidInputException(INDEX_OUT_BOUNDS);
+		} else {
+			printInvalidKeywords(argument);
 		}
 	}
 
@@ -132,8 +156,7 @@ public class NotifyProcessor extends Processor {
 	private static void printInvalidKeywords(String argument)
 			throws InvalidInputException {
 		if (argument.length() <= 2) {
-			throw new InvalidInputException(
-					"Have you type notify <index> time <time>?");
+			throw new InvalidInputException(GOT_KEYWORDS);
 		}
 	}
 }
