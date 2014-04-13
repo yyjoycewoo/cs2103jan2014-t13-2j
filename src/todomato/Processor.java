@@ -78,84 +78,7 @@ public class Processor {
 		undoList.push(lastList);
 	}
 
-	/**
-	 * Converts "2" "1" to "YYYY-MM-DD"
-	 * 
-	 *    
-	 * @param String
-	 *            month, String day
-	 * 
-	 * @return userDate
-	 * @throws IOException
-	 */
-	protected static String convertDateToStandardForm(String month, String day) {
-		String year = Integer.toString(DateTime.now(
-				TimeZone.getTimeZone(SG_TIMEZONE)).getYear());
-		if (month.length() == ONE_DIGIT) {
-			month = DATETIME_PADDING + month;
-		}
-		if (day.length() == ONE_DIGIT) {
-			day = DATETIME_PADDING + day;
-		}
-		return year + DATE_FORMAT_SYMBOL + day + DATE_FORMAT_SYMBOL + month;
-	}
-
-	/**
-	 * Checks whether "am" or "pm" is in the string
-	 * 
-	 *    
-	 * @param input
-	 * @return 0 for am, 1 for pm, -1 for not found
-	 */
-
-	protected static int checkMeridiem(String input) {
-		for (int meridiemPos = 0; meridiemPos < meridiems.length; meridiemPos++) {
-			if (input.contains(meridiems[meridiemPos])) {
-				return meridiemPos;
-			}
-		}
-		return NOT_FOUND;
-	}
 	
-	/**
-	 * Function to determine if a string can be parsed into a date
-	 * @param input
-	 * @return true or false
-	 */
-	
-	protected static Boolean isParseableByDate (String input) {
-		try {
-			if(isParseableByInt(input)) {
-				return false;
-			}
-			if (isParseableByTime(input)) {
-				return false;
-			}
-			input = parseDateString(input);
-			if (!DateTime.isParseable(input)) {
-				return false;
-			}
-		} catch (InvalidInputException e) {
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Function determines if a string can be parsed into an integer
-	 * @param input
-	 * @return true or false
-	 */
-	
-	protected static Boolean isParseableByTime (String input) {
-		try {
-			parseTimeString(input);
-		} catch (InvalidInputException e) {
-			return false;
-		}
-		return true;
-	}
-
 	/**
 	 * Converts "Jan 1" to "YYYY-MM-DD" (DateTime format) Other input formats
 	 * include days of the week "Monday", "Tuesday", etc You can also put next
@@ -213,13 +136,93 @@ public class Processor {
 
 		return standardFormDate;
 	}
+	
 	/**
+	 * Converts "2" "1" to "YYYY-MM-DD"
+	 * 
+	 *    
+	 * @param String
+	 *            month, String day
+	 * 
+	 * @return userDate
+	 * @throws IOException
+	 */
+	protected static String convertDateToStandardForm(String month, String day) {
+		String year = Integer.toString(DateTime.now(
+				TimeZone.getTimeZone(SG_TIMEZONE)).getYear());
+		if (month.length() == ONE_DIGIT) {
+			month = DATETIME_PADDING + month;
+		}
+		if (day.length() == ONE_DIGIT) {
+			day = DATETIME_PADDING + day;
+		}
+		return year + DATE_FORMAT_SYMBOL + day + DATE_FORMAT_SYMBOL + month;
+	}
+
+	/**
+	 * Checks whether "am" or "pm" is in the string
+	 * 
+	 *    
+	 * @param input
+	 * @return 0 for am, 1 for pm, -1 for not found
+	 */
+
+	private static int checkMeridiem(String input) {
+		for (int meridiemPos = 0; meridiemPos < meridiems.length; meridiemPos++) {
+			if (input.contains(meridiems[meridiemPos])) {
+				return meridiemPos;
+			}
+		}
+		return NOT_FOUND;
+	}
+	
+	/**
+	 * Function to determine if a string can be parsed into a date
+	 * @param input
+	 * @return true or false
+	 */
+	
+	protected static Boolean isParseableByDate (String input) {
+		try {
+			if(isParseableByInt(input)) {
+				return false;
+			}
+			if (isParseableByTime(input)) {
+				return false;
+			}
+			input = parseDateString(input);
+			if (!DateTime.isParseable(input)) {
+				return false;
+			}
+		} catch (InvalidInputException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Function determines if a string can be parsed into an integer
+	 * @param input
+	 * @return true or false
+	 */
+	
+	protected static Boolean isParseableByTime (String input) {
+		try {
+			parseTimeString(input);
+		} catch (InvalidInputException e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Helper method for parseDateString
 	 * Returns true if "today" "tomorrow" or "tmr" is in string
 	 * @param input
 	 * @return
 	 */
 	
-	protected static Boolean hasTodayOrTmr (String input) {
+	private static Boolean hasTodayOrTmr (String input) {
 		for (int keywordPos = 0; keywordPos < dateKeywords.length; keywordPos++) {
 			if (input.contains(dateKeywords[keywordPos])) {
 				return true;
@@ -229,12 +232,13 @@ public class Processor {
 	}
 	
 	/**
+	 * Helper method for parseDateString
 	 * Returns today or tomorrow's date depending on which keyword is present
 	 * @param input
 	 * @return
 	 */
 	
-	protected static String getDateIfTdyOrTmrInString (String input) {
+	private static String getDateIfTdyOrTmrInString (String input) {
 		String userDate;
 		for (int keywordPos = 0; keywordPos < dateKeywords.length; keywordPos++) {
 			if (input.contains(dateKeywords[keywordPos])) {
@@ -260,7 +264,7 @@ public class Processor {
 	 * @return
 	 */
 
-	protected static int daysFromCurrentDay(String input) {
+	private static int daysFromCurrentDay(String input) {
 		int currentDay = currentDate.getWeekDay();
 		int userDay = checkForDay(input);
 		
@@ -284,7 +288,7 @@ public class Processor {
 	 * @return integer (1 - 7)
 	 */
 
-	protected static int checkForDay(String input) {
+	private static int checkForDay(String input) {
 		int dayValue = 0;
 		for (int dayPos = 0; dayPos < days.length; dayPos++) {
 			if (input.contains(days[dayPos])) {
@@ -430,6 +434,7 @@ public class Processor {
 	}
 	
 	/**
+	 * Helper method for parsePriorityFromString
 	 * Parses priority from a number
 	 * default = low
 	 * 1 = low
@@ -439,7 +444,7 @@ public class Processor {
 	 * @return
 	 */
 	
-	protected static String parsePriorityFromNumber (String input) {
+	private static String parsePriorityFromNumber (String input) {
 		int noPriority = Integer.parseInt(input);
 		switch (noPriority) {
 		case 1:
@@ -453,13 +458,14 @@ public class Processor {
 	}
 	
 	/**
+	 * Helper method for parsePriorityFromString
 	 * Parses priority from a string
 	 * an invalid input will default to low
 	 * @param input
 	 * @return
 	 */
 	
-	protected static String parsePriorityFromWords (String input) {
+	private static String parsePriorityFromWords (String input) {
 		String priorityLevels[] = new String[] { "low", "med", "high" };
 		input = input.toLowerCase();
 		for (int i = 0; i < priorityLevels.length; i++) {
