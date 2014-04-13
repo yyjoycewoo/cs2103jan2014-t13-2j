@@ -69,7 +69,7 @@ public class UpdateProcessor extends Processor {
 	private static final int NO_OF_CHAR_IN_EDATE = 9;
 	private static final int NO_OF_CHAR_IN_RECUR = 7;
 	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
-	private static final int NO_OF_CHAR_IN_PRIORITY_SYMBOL = 4;
+	private static final int NO_OF_CHAR_IN_PRIORITY_SYMBOL = 2;
 	private static final int NO_EDIT = -1;
 	private static final int NO_OF_DETAILS_TO_EDIT = 11;
 	private static final String START_TIME_GT_END_TIME = "Start time cannot be greater than end time";
@@ -148,11 +148,11 @@ public class UpdateProcessor extends Processor {
 					break;
 				case 9:
 					// for !
-					updatePriority(index, whichToEdit[8], argument);
+					updatePriority(index, whichToEdit[9], argument);
 					break;
 				case 10:
 					// for @
-					updateLocation(index, whichToEdit[9], argument);
+					updateLocation(index, whichToEdit[10], argument);
 					break;
 				}
 			}

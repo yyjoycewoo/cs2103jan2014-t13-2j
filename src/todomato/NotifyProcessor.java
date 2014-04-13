@@ -53,7 +53,7 @@ import hirondelle.date4j.DateTime;
  */
 public class NotifyProcessor extends Processor {
 
-	private static String NOTIFIED = "Recorded the notified time for task no. ";
+	private static String NOTIFIED = "Recorded the notified time.";
 	private static String notifyKeyword = " time ";
 	private static int NO_OF_CHAR_IN_NTIME = 6;
 
@@ -64,7 +64,7 @@ public class NotifyProcessor extends Processor {
 		int index = getTaskIndex(argument) - 1;
 		printInvalidIndexMsg(index);
 		notifyTime(index, findDetailToEdit(argument), argument);
-		return NOTIFIED + index;
+		return NOTIFIED;
 	}
 
 	// limited to today's task
