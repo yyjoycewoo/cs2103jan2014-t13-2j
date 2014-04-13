@@ -165,7 +165,6 @@ public class Task {
 	 * 
 	 * @return Task object generated from taskString, null if taskString is
 	 *         empty
-	 * @author Daryl
 	 * @throws InvalidInputException
 	 */
 	public static Task createTaskFromFileString(String fileInput) {
