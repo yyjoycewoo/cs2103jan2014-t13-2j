@@ -1,3 +1,4 @@
+//@author A0101578H
 package tests;
 
 import static org.junit.Assert.*;
@@ -42,14 +43,11 @@ private  File tasks;
         
         FileHandler fileHandler = new FileHandler("tasks.txt");
         TaskList newList = fileHandler.readFile();
-        //System.out.println(newList.toString());
         Field f = Processor.class.getDeclaredField("list");
         f.setAccessible(true);
         if ("list".equals(f.getName())) {
             f.setAccessible(true);
-            //System.out.println(f.get("list"));
             f.set("list", newList);
-            System.out.println(f.get("list"));
         }
 	}
 	
@@ -79,7 +77,6 @@ private  File tasks;
 				"5: " + ITEM_FOUR;
 		SortProcessor.processSort("startdate");
 		String resultList = getList().toString();
-		System.out.print(resultList);
 		assertEquals(expectedList, resultList);
 	}
 	
@@ -93,7 +90,6 @@ private  File tasks;
 				"5: " + ITEM_FOUR;
 		SortProcessor.processSort("startdate a");
 		String resultList = getList().toString();
-		System.out.print(resultList);
 		assertEquals(expectedList, resultList);
 	}
 	

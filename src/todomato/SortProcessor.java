@@ -56,18 +56,28 @@ public class SortProcessor extends Processor{
 	
 	private static final String descending[] = {"descending", "d", "desc"};
 	private static final String ascending[] = {"ascending", "a", "asc"};
-	private static final int INVALID_PARAMETERS = -1;
+	private static final int INDC_INVALID_PARAMETERS = -1;
+	private static final int INDEX_OF_TYPE = 0;
+	private static final int INDEX_OF_ORDER = 1;
+	private static final int NO_OF_ARG_WITH_ORDER = 2;
 	
+	/**
+	 * Method for processing different types of sort
+	 * 
+	 * @param argument containing type (and order)
+	 * @return success message
+	 * @throws InvalidInputException
+	 */
 	public static String processSort(String argument) throws InvalidInputException {
 		if (argument.isEmpty()) {
 			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
 		}
 		
 		String argArr[] = argument.split(" ", 2);
-		String type = argArr[0];
+		String type = argArr[INDEX_OF_TYPE];
 		String order = "";
-		if (argArr.length == 2) {
-			order = argArr[1];
+		if (argArr.length == NO_OF_ARG_WITH_ORDER) {
+			order = argArr[INDEX_OF_ORDER];
 		}
 		
 		if (type.equalsIgnoreCase(ARGUMENT_START_DATE)) {
@@ -82,18 +92,22 @@ public class SortProcessor extends Processor{
 		if (type.equalsIgnoreCase(ARGUMENT_COMPLETION)) {
 			return sortByCompletion(order);
 		}
-		
 		throw new InvalidInputException(INVALID_INPUT_TYPE);
 	}
 	
-	// Sort in order of..
-	// Default/Ascending: unfinished -> completed tasks
-	// Descending: completed -> unfinished tasks
+	/**
+	 * Sort by completion in order of:
+	 * Default/Ascending: unfinished -> completed tasks
+	 * Descending: order reversed from ascending order
+	 * 
+	 * @param order: user-specified
+	 * @return success sort by completion message
+	 * @throws InvalidInputException
+	 */
 	private static String sortByCompletion(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
 			throw new InvalidInputException(INVALID_INPUT_ORDER);
 		}
-		
 		bubbleSort(ARGUMENT_COMPLETION);
 		if (isDescending(order)) {
 			list.reverse();
@@ -102,41 +116,57 @@ public class SortProcessor extends Processor{
 		return SUCCESS_SORT_BY_COMPLETION;
 	}
 
-	// Sort in order of..
-	// Default/Descending: High -> Medium -> Low priority
-	// Ascending: Low -> Medium -> High priority
+	/**
+	 * Sort by priority in order of:
+	 * Default/Descending: High -> Medium -> Low -> completed
+	 * Ascending: order reversed from descending order
+	 * 
+	 * @param order: user-specified
+	 * @return
+	 * @throws InvalidInputException
+	 */
 	private static String sortByPriority(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
 			throw new InvalidInputException(INVALID_INPUT_ORDER);
 		}
-		
 		bubbleSort(ARGUMENT_PRIORITY);
 		if (isAscending(order)) {
 			list.reverse();
 		}
-		//fileHandler.updateFile(list);
+		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_PRIORITY;
 	}
 	
-	// Sort in order of..
-	// Default/Ascending: Most recent -> Least recent -> No date
-	// Descending: No date -> Least recent -> Most recent
+	/**
+	 * Sort by start date in order of:
+	 * Default/Ascending: Most recent -> Least recent -> No date -> completed
+	 * Descending: in reverse order from ascending order
+	 * 
+	 * @param order
+	 * @return success sort by date message
+	 * @throws InvalidInputException
+	 */
 	private static String sortByStartDate(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
 			throw new InvalidInputException(INVALID_INPUT_ORDER);
-		}
-		
+		}		
 		bubbleSort(ARGUMENT_START_DATE);
 		if (isDescending(order)) {
 			list.reverse();
 		}
-		//fileHandler.updateFile(list);
+		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
 	}
 	
-	// Sort in order of..
-	// Default/Ascending: Most recent -> Least recent -> No date
-	// Descending: No date -> Least recent -> Most recent
+	/**
+	 * Sort by end date in order of:
+	 * Default/Ascending: Most recent -> Least recent -> No date -> completed
+	 * Descending: in reverse order from ascending order
+	 * 
+	 * @param order
+	 * @return success sort by date message
+	 * @throws InvalidInputException
+	 */
 	private static String sortByEndDate(String order) throws InvalidInputException {
 		if (!isValidOrder(order)) {
 			throw new InvalidInputException(INVALID_INPUT_ORDER);
@@ -146,46 +176,17 @@ public class SortProcessor extends Processor{
 		if (isDescending(order)) {
 			list.reverse();
 		}
-		//fileHandler.updateFile(list);
+		fileHandler.updateFile(list);
 		return SUCCESS_SORT_BY_DATE;
 	}
 	
-	private static void bubbleSort(String type) {
-		for (int i = 0; i < (list.getSize() - 1); i++) {
-			for (int j = 0; j < (list.getSize() - i - 1); j++) {
-				if (needSwap(type, j)) {
-					list.swap(j, j + 1);
-				}
-			}
-		}
-	}
-
-	private static boolean needSwap(String type, int j) {
-		if (type.equals(ARGUMENT_START_DATE)) {
-			if (compareStartDate(j, j + 1)) {
-				return true;
-			}
-		}
-		if (type.equals(ARGUMENT_END_DATE)) {
-			if (compareEndDate(j, j + 1)) {
-				return true;
-			}
-		}
-		if (type.equals(ARGUMENT_PRIORITY)) {
-			if (comparePriority(j, j + 1)) {
-				return true;
-			}
-		} 
-		if (type.equals(ARGUMENT_COMPLETION)) {
-			if (compareCompletion(j, j + 1)) {
-				return true;
-			}
-		} 
-		return false;
-	}
-	
-//	Returns true if..
-//	list[i] is completed but list[j] is not
+	/**
+	 * Compares completion status of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i is completed but task j is not
+	 */
 	private static boolean compareCompletion(int i, int j) {
 		if (list.getListItem(i).getCompleted()) {
 			if (!list.getListItem(j).getCompleted()) {
@@ -194,11 +195,58 @@ public class SortProcessor extends Processor{
 		}
 		return false;
 	}
-
-	// Returns true if..
-	// list[i] starts later than list[j]
-	// Tasks without date is considered latest
-	// Tasks that are completed will also be ranked as latest
+	
+	/**
+	 * Compares priority levels of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i has lower priority than task j
+	 */
+	private static boolean comparePriority(int i, int j) {
+		if (list.getListItem(i).getCompleted()) {
+			if (list.getListItem(j).getCompleted()) {
+				return false;
+			}
+			return true;
+		}
+		if (isSamePriority(i, j)) {
+			return false;
+		}
+		String iPriority = list.getListItem(i).getPriorityLevel();
+		String jPriority = list.getListItem(j).getPriorityLevel();
+		if ((iPriority.equals(PRIORITY_HIGH)) || (jPriority.equals(PRIORITY_LOW))) {
+			return false;
+		}
+		if ((jPriority.equals(PRIORITY_HIGH)) || (iPriority.equals(PRIORITY_LOW))) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if priority levels of two tasks are the same
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if priority levels are same
+	 */
+	private static boolean isSamePriority(int i, int j) {
+		String iPriority = list.getListItem(i).getPriorityLevel();
+		String jPriority = list.getListItem(j).getPriorityLevel();
+		if(iPriority.equals(jPriority)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Compares start dates of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i starts later than task j
+	 */
 	private static boolean compareStartDate(int i, int j) {
 		if (list.getListItem(i).getCompleted()) {
 			if (!list.getListItem(j).getCompleted()) {
@@ -220,10 +268,13 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 	
-	// Returns true if..
-	// list[i] ends later than list[j]
-	// Tasks without date is considered latest
-	// Tasks that are completed will also be ranked as latest
+	/**
+	 * Compares end dates of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i ends later than task j
+	 */
 	private static boolean compareEndDate(int i, int j) {
 		if (list.getListItem(i).getCompleted()) {
 			if (!list.getListItem(j).getCompleted()) {
@@ -245,30 +296,13 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 	
-//	Returns true if..
-//	list[i] has lower priority than list[j]
-	private static boolean comparePriority(int i, int j) {
-		if (list.getListItem(i).getCompleted()) {
-			if (list.getListItem(j).getCompleted()) {
-				return false;
-			}
-			return true;
-		}
-		if (list.getListItem(i).getPriorityLevel().equals(PRIORITY_LOW)) {
-			if (list.getListItem(j).getPriorityLevel().equals(PRIORITY_LOW)) {
-				return false;
-			}
-			return true;
-		}
-		if (list.getListItem(i).getPriorityLevel().equals(PRIORITY_MED)) {
-			if(list.getListItem(j).getPriorityLevel().equals(PRIORITY_HIGH)) {
-				return true;
-			}
-			return false;
-		}
-		return false;
-	}
-	
+	/**
+	 * Checks if start/end date of two tasks are the same 
+	 * @param type: type of date to be checked
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if tasks lie on the same start/end date
+	 */
 	private static boolean hasSameDate(String type, int i, int j) {
 		if (type.equals(ARGUMENT_START_DATE)) {
 			DateTime iStartDate = list.getListItem(i).getStartDate();
@@ -303,11 +337,10 @@ public class SortProcessor extends Processor{
 	 * Compares two tasks by either start or end time
 	 * If the times are the same, j will be returned
 	 * 
-	 * @param type
-	 * @param i
-	 * @param j
+	 * @param type: type of time to be compared
+	 * @param i: index of first task
+	 * @param j: index of second task
 	 * @return later task of the i'th and j'th tasks
-	 *  
 	 */
 	private static int getLaterTimeTask(String type, int i, int j) {
 		if (type.equals(ARGUMENT_START_DATE)) {
@@ -346,18 +379,17 @@ public class SortProcessor extends Processor{
 			}
 			return i;
 		}
-		return INVALID_PARAMETERS;
+		return INDC_INVALID_PARAMETERS;
 	}
 	
 	/**
 	 * Compares two tasks by either start or end date
 	 * If the dates are the same, j will be returned
 	 * 
-	 * @param type
-	 * @param i
-	 * @param j
+	 * @param type: type of date to be compared
+	 * @param i: index of first task
+	 * @param j: index of second task
 	 * @return later task of the i'th and j'th tasks
-	 *  
 	 */
 	private static int getLaterDateTask(String type, int i, int j) {
 		if (type.equals(ARGUMENT_START_DATE)) {
@@ -396,9 +428,62 @@ public class SortProcessor extends Processor{
 			}
 			return i;
 		}
-		return INVALID_PARAMETERS;
+		return INDC_INVALID_PARAMETERS;
 	}
 	
+	/**
+	 * Bubble sort algorithm
+	 * 
+	 * @param type: type to sort by
+	 */
+	private static void bubbleSort(String type) {
+		for (int i = 0; i < (list.getSize() - 1); i++) {
+			for (int j = 0; j < (list.getSize() - i - 1); j++) {
+				if (needSwap(type, j)) {
+					list.swap(j, j + 1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Determine if there is a need to swap a task with the next 
+	 * for bubble sort
+	 * 
+	 * @param type: type to sort by
+	 * @param j: index of task
+	 * @return true if swap is needed
+	 */
+	private static boolean needSwap(String type, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			if (compareStartDate(j, j + 1)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			if (compareEndDate(j, j + 1)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_PRIORITY)) {
+			if (comparePriority(j, j + 1)) {
+				return true;
+			}
+		} 
+		if (type.equals(ARGUMENT_COMPLETION)) {
+			if (compareCompletion(j, j + 1)) {
+				return true;
+			}
+		} 
+		return false;
+	}
+	
+	/**
+	 * Check if user input for order is ascending
+	 * 
+	 * @param order: user input
+	 * @return true if user input matches allowed commands for ascending
+	 */
 	private static boolean isAscending(String order) {
 		for (String s: ascending) {
 			if (order.equalsIgnoreCase(s)) {
@@ -408,6 +493,12 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 	
+	/**
+	 * Check if user input for order is descending
+	 * 
+	 * @param order: user input
+	 * @return true if user input matches allowed commands for descending
+	 */
 	private static boolean isDescending(String order) {
 		for (String s: descending) {
 			if (order.equalsIgnoreCase(s)) {
@@ -417,6 +508,12 @@ public class SortProcessor extends Processor{
 		return false;
 	}
 	
+	/**
+	 * Check if user input for order is ascending or descending
+	 * 
+	 * @param order: user input
+	 * @return true if user input is empty(default) or ascending/descending
+	 */
 	private static boolean isValidOrder(String order) {
 		if (order.isEmpty()) {
 			return true;
