@@ -1,6 +1,6 @@
+//@author A0096620E
 /**
  * Simple class to set username and password via CLI
- * @author A0096620E
  *
  */
 package todomato;
