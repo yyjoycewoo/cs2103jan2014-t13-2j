@@ -161,6 +161,10 @@ public class UpdateProcessor extends Processor {
 		}
 	}
 
+	/**
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
 	private static void checkingInputErrors(String argument)
 			throws InvalidInputException {
 		if (argument.isEmpty()) {
@@ -168,7 +172,7 @@ public class UpdateProcessor extends Processor {
 		}
 		String[] words = argument.split(" ");
 		// checking index is zero
-		if (words.length == 1) {
+		if (words.length >= 1) {
 			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
 		} else if (words.length == 0) {
 			printInvalidIndexMsg(0, null);
@@ -183,7 +187,7 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static void printInvalidIndexMsg(int index, String argument)
 			throws InvalidInputException {
-		if ((index > list.getSize()) || (index == 0) || argument.equals(null)) {
+		if ((index > list.getSize()) || (index <= 0) || argument.equals(null)) {
 			throw new InvalidInputException(INDEX_OUT_OF_BOUND);
 		} else {
 			printInvalidKeywords(argument);

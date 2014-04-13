@@ -2,6 +2,7 @@ package tests;
 
 //@ A0101324A
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,9 +32,12 @@ public class NotifyProcessorTest {
 	private static final String FILE_NAME = "tasks.txt";
 	private static final String FILE_HEADING = "null\r\nnull\r\nnull\r\n";
 	private static final String task1 = "1 time 3pm";
-	private static final String NO_DATE = "No start or end date for the selected task.";
 	private static final String task2 = "2 time 3pm";
+	private static final String task3 = "3 ";
+	private static final String wrongIndexRightKey = "0 time 3pm";
+	private static final String NO_DATE = "No start or end date for the selected task.";
 	private static final String NEED_TODAY = "Notification time is only for today's task!";
+	private static final String GOT_KEYWORDS = "Have you type notify <index> time <time>?";
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
@@ -54,6 +58,7 @@ public class NotifyProcessorTest {
 		// by modifying list in Processor
 		FileHandler fileHandler = new FileHandler(FILE_NAME);
 		TaskList newList = fileHandler.readFile();
+		System.out.println(newList);
 		Field f = Processor.class.getDeclaredField(LIST);
 		f.setAccessible(true);
 		if (LIST.equals(f.getName())) {
@@ -79,6 +84,26 @@ public class NotifyProcessorTest {
 			NotifyProcessor.processNotify(task2);
 		} catch (InvalidInputException e) {
 			assertEquals(NEED_TODAY, e.getMessage());
+		}
+	}
+
+	// Testing for notify keyword
+	@Test
+	public void testKeyword() throws InvalidInputException {
+		try {
+			NotifyProcessor.processNotify(task3);
+		} catch (InvalidInputException e) {
+			assertEquals(GOT_KEYWORDS, e.getMessage());
+		}
+	}
+
+	// Testing for wrong index with right keywords
+	@Test
+	public void testWrongIndexRightKey() throws InvalidInputException {
+		try {
+			NotifyProcessor.processNotify(wrongIndexRightKey);
+			fail("Should have thrown invalid index.");
+		} catch (InvalidInputException e) {
 		}
 	}
 }
