@@ -1,3 +1,4 @@
+//@author A0099332Y
 package todomato;
 import hirondelle.date4j.DateTime;
 
@@ -37,7 +38,6 @@ import org.apache.http.util.EntityUtils;
 
 /**
  * This class is the process for the Google Sync of the application.
- * @author A0099332Y
  *
  */
 
