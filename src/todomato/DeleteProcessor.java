@@ -60,8 +60,10 @@ public class DeleteProcessor extends Processor {
 	
 	
 	/**
-	 * @param argument
-	 * @return String of success/error message accordingly 
+	 * Method for processing different ways to delete tasks
+	 * 
+	 * @param argument: user-specified
+	 * @return success message 
 	 */
 	public static String processDelete(String argument) throws InvalidInputException {
 		//logger.log(Level.INFO, "processing delete");
@@ -73,9 +75,7 @@ public class DeleteProcessor extends Processor {
 			//logger.log(Level.WARNING, "exited due to missing argument");
 			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
 		}
-		
 		storeCurrentList();
-		
 		String[] argArr = argument.split(DELIMITER_FOR_ARGUMENT);
 		String argType = argArr[INDEX_OF_TYPE];
 		argType.toLowerCase();
@@ -102,11 +102,8 @@ public class DeleteProcessor extends Processor {
 			else {
 				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argType);
 			}
-			
 			displayList = list;
-			
 			fileHandler.updateFile(list);
-			
 			//logger.log(Level.INFO, "end of processing");
 			return statusMessage;
 		} catch(NumberFormatException e) {
@@ -123,13 +120,13 @@ public class DeleteProcessor extends Processor {
 	/**
 	 * Method for deleting a range of tasks
 	 * 
-	 * @param argument containing user-specified range
+	 * @param argument: contains user-specified range
 	 * @return number of tasks deleted
 	 * @throws InvalidInputException
 	 */
-	private static String deleteRange(String argument) throws InvalidInputException {
+	private static String deleteRange(String arg) throws InvalidInputException {
 		//logger.log(Level.INFO, "processing delete range");
-		String[] rangeLimits = argument.split(DELIMITER_FOR_RANGE);
+		String[] rangeLimits = arg.split(DELIMITER_FOR_RANGE);
 		if (!(rangeLimits.length == NUMBER_OF_LIMITS)) {
 			throw new InvalidInputException(INVALID_NUMBER_OF_LIMITS);
 		}
@@ -165,7 +162,8 @@ public class DeleteProcessor extends Processor {
 
 	/**
 	 * Method for deleting all tasks that starts on a date
-	 * @param arg containing user-specified date
+	 * 
+	 * @param arg: contains user-specified date
 	 * @return number of tasks deleted
 	 */
 	private static String deleteStartDate(String[] arg) {
@@ -188,8 +186,9 @@ public class DeleteProcessor extends Processor {
 	
 	/**
 	 * Method for checking if a task's startdate is same as a specified date
-	 * @param i - index of task
-	 * @param dateDT - date to be checked against
+	 * 
+	 * @param i: user-specified index of task
+	 * @param dateDT: date to be checked against
 	 * @return true if task's startdate is the same
 	 */
 	private static boolean isSameStartDate(int i, DateTime dateDT) {
@@ -204,7 +203,8 @@ public class DeleteProcessor extends Processor {
 	
 	/**
 	 * Method for deleting all tasks that ends on a specified date
-	 * @param arg containing user-specified date
+	 * 
+	 * @param arg: contains user-specified date
 	 * @return number of tasks deleted
 	 */
 	private static String deleteEndDate(String[] arg) {
@@ -227,8 +227,9 @@ public class DeleteProcessor extends Processor {
 
 	/**
 	 * Method for checking if a task's enddate is same as a specified date
-	 * @param i index of task 
-	 * @param dateDT date to be checked against
+	 * 
+	 * @param i: user-specified index of task 
+	 * @param dateDT: date to be checked against
 	 * @return true if task has the same date
 	 */
 	private static boolean isSameEndDate(int i, DateTime dateDT) {
@@ -259,21 +260,20 @@ public class DeleteProcessor extends Processor {
 	/**
 	 * Method for deleting a single task 
 	 * 
-	 * @param indexString user-specified index of task to be deleted
+	 * @param indexStr: user-specified index of task to be deleted
 	 * @return task details of deleted task
 	 */
-	private static String deleteSingle(String indexString) {
-		int index = Integer.parseInt(indexString) - 1;
+	private static String deleteSingle(String indexStr) {
+		int index = Integer.parseInt(indexStr) - 1;
 		Task deletedTask = list.getListItem(index);
 		list.deleteListItem(index);
-		
 		return deletedTask.toString();
 	}
 	
 	/**
 	 * Method for deleting multiple tasks
 	 * 
-	 * @param strIndices user-specified indices of tasks to be deleted
+	 * @param strIndices: user-specified indices of tasks to be deleted
 	 * @return number of tasks deleted
 	 */
 	private static String deleteMultiple(String[] strIndices) {
@@ -292,7 +292,7 @@ public class DeleteProcessor extends Processor {
 	/**
 	 * Method for reversing order in an array
 	 * 
-	 * @param arr array to be reversed
+	 * @param arr: array to be reversed
 	 */
 	private static void reverse(int[] arr) {
 		int length = arr.length;
