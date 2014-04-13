@@ -56,13 +56,17 @@ public class NotifyProcessor extends Processor {
 	private static String NOTIFIED = "Recorded the notified time.";
 	private static String notifyKeyword = " time ";
 	private static int NO_OF_CHAR_IN_NTIME = 6;
+	private static String NO_DATE = "No start or end date for the selected task.";
+	private static String LIMIT_TODAY = "Notification time is only for today's task!";
+	private static String GOT_KEYWORDS = "Have you type notify <index> time <time>?";
+	private static String INVALID_INDEX = "Index %d is out of the list.";
+	private static String NOTHING_ERROR = "Please include the index(s) and keyword(s).";
 
 	public static String processNotify(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
-		printInvalidKeywords(argument);
+		checkingInputErrors(argument);
 		int index = getTaskIndex(argument) - 1;
-		printInvalidIndexMsg(index);
 		notifyTime(index, findDetailToEdit(argument), argument);
 		return NOTIFIED;
 	}
@@ -70,17 +74,41 @@ public class NotifyProcessor extends Processor {
 	// limited to today's task
 	private static void notifyTime(int index, int which, String argument)
 			throws InvalidInputException {
-		String item_date = convertDateToStandardForm(list.getListItem(index)
-				.getEndDate().getMonth().toString(), list.getListItem(index)
-				.getEndDate().getDay().toString());
-		if (!item_date.contains(CurrentDate.date())) {
-			throw new InvalidInputException(
-					"Notification time is only for today's task, not for future task!");
+		if (list.getListItem(index).getEndDate() != null) {
+			String item_date = convertDateToStandardForm(list
+					.getListItem(index).getEndDate().getMonth().toString(),
+					list.getListItem(index).getEndDate().getDay().toString());
+			if (!item_date.contains(CurrentDate.date())) {
+				throw new InvalidInputException(LIMIT_TODAY);
+			}
+			DateTime time = convertStringToDateTime(parseTimeString(argument
+					.substring(which + NO_OF_CHAR_IN_NTIME)));
+			list.getListItem(index).setNoticeTime(time);
+			fileHandler.updateFile(list);
+		} else {
+			throw new InvalidInputException(NO_DATE);
 		}
-		DateTime time = convertStringToDateTime(parseTimeString(argument
-				.substring(which + NO_OF_CHAR_IN_NTIME)));
-		list.getListItem(index).setNoticeTime(time);
-		fileHandler.updateFile(list);
+	}
+
+	/**
+	 * 
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void checkingInputErrors(String argument)
+			throws InvalidInputException {
+		if (argument.isEmpty()) {
+			throw new InvalidInputException(NOTHING_ERROR);
+		}
+		String[] words = argument.split(" ");
+		// checking index is zero
+		if (words.length >= 1) {
+			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
+		} else if (words.length == 0) {
+			printInvalidIndexMsg(0, null);
+		} else {
+			printInvalidKeywords(argument);
+		}
 	}
 
 	/**
@@ -100,11 +128,13 @@ public class NotifyProcessor extends Processor {
 	 * @param index
 	 * @throws InvalidInputException
 	 */
-	private static void printInvalidIndexMsg(int index)
+	private static void printInvalidIndexMsg(int index, String argument)
 			throws InvalidInputException {
-		if (index >= list.getSize()) {
-			throw new InvalidInputException("Index " + index
-					+ " is out of the list.");
+		if ((index > list.getSize()) || (index <= 0) || argument.equals(null)) {
+			String INDEX_OUT_BOUNDS = String.format(INVALID_INDEX, index);
+			throw new InvalidInputException(INDEX_OUT_BOUNDS);
+		} else {
+			printInvalidKeywords(argument);
 		}
 	}
 
@@ -126,8 +156,7 @@ public class NotifyProcessor extends Processor {
 	private static void printInvalidKeywords(String argument)
 			throws InvalidInputException {
 		if (argument.length() <= 2) {
-			throw new InvalidInputException(
-					"Please include any keywords to update i.e. starttime, endtime, location, desc, date");
+			throw new InvalidInputException(GOT_KEYWORDS);
 		}
 	}
 }

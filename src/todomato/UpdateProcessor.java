@@ -77,6 +77,9 @@ public class UpdateProcessor extends Processor {
 	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
 	private static final String INVALID_RECUR = "Need Date before adding recurrence period";
 	private static final String UPDATED = "Updated the task(s)";
+	private static String INDEX_OUT_OF_BOUND = "Index is out of the list.";
+	private static String NOTHING_ERROR = "Please include the index(s) and keyword(s).";
+	private static String ESC_CHAR = "\\";
 
 	private static String[] updateKeywords = new String[] { " starttime ",
 			" endtime ", " desc ", " startdate ", " enddate ", " location ",
@@ -93,13 +96,12 @@ public class UpdateProcessor extends Processor {
 	public static String processUpdate(String argument)
 			throws InvalidInputException {
 		storeCurrentList();
-		printInvalidKeywords(argument);
+		checkingInputErrors(argument);
 		int[] whichToEdit = new int[NO_OF_DETAILS_TO_EDIT];
 		Arrays.fill(whichToEdit, NO_EDIT);
 		int[] indices = getTaskIndex(argument);
 		for (int indice : indices) {
 			int index = indice - 1;
-			printInvalidIndexMsg(index);
 			whichToEdit = findDetailToEdit(argument);
 			updater(argument, whichToEdit, index);
 			displayList = list;
@@ -160,24 +162,35 @@ public class UpdateProcessor extends Processor {
 	}
 
 	/**
-	 * @param index
-	 * 
+	 * @param argument
+	 * @throws InvalidInputException
 	 */
-
-	private static void updateUpdateTime(int index) {
-		DateTime currentTime = DateTime.now(TimeZone.getDefault());
-		list.getListItem(index).setUpdateTime(currentTime);
+	private static void checkingInputErrors(String argument)
+			throws InvalidInputException {
+		if (argument.isEmpty()) {
+			throw new InvalidInputException(NOTHING_ERROR);
+		}
+		String[] words = argument.split(" ");
+		// checking index is zero
+		if (words.length >= 1) {
+			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
+		} else if (words.length == 0) {
+			printInvalidIndexMsg(0, null);
+		} else {
+			printInvalidKeywords(argument);
+		}
 	}
 
 	/**
 	 * @param index
 	 * @throws InvalidInputException
 	 */
-	private static void printInvalidIndexMsg(int index)
+	private static void printInvalidIndexMsg(int index, String argument)
 			throws InvalidInputException {
-		if (index >= list.getSize()) {
-			throw new InvalidInputException("Index " + index
-					+ " is out of the list.");
+		if ((index > list.getSize()) || (index <= 0) || argument.equals(null)) {
+			throw new InvalidInputException(INDEX_OUT_OF_BOUND);
+		} else {
+			printInvalidKeywords(argument);
 		}
 	}
 
@@ -187,9 +200,32 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static void printInvalidKeywords(String argument)
 			throws InvalidInputException {
+		// check the argument contains any keywords
+		boolean available = false;
+
 		if (argument.length() <= 2) {
 			throw new InvalidInputException(NO_KEYWORDS_FOUND);
 		}
+
+		for (String updateKeyword : updateKeywords) {
+			if (argument.contains(updateKeyword)) {
+				available = true;
+			}
+		}
+
+		if (!available) {
+			throw new InvalidInputException(NO_KEYWORDS_FOUND);
+		}
+	}
+
+	/**
+	 * @param index
+	 * 
+	 */
+
+	private static void updateUpdateTime(int index) {
+		DateTime currentTime = DateTime.now(TimeZone.getDefault());
+		list.getListItem(index).setUpdateTime(currentTime);
 	}
 
 	/**
@@ -259,10 +295,10 @@ public class UpdateProcessor extends Processor {
 
 	private static Task updateLocation(int index, int editLoc, String argument) {
 		int stopIndex = argument.length();
-		if (argument.contains("\\")) {
-			int escChar = argument.indexOf("\\");
+		if (argument.contains(ESC_CHAR)) {
+			int escChar = argument.indexOf(ESC_CHAR);
 			if (escChar < editLoc) {
-				stopIndex = argument.lastIndexOf("\\");
+				stopIndex = argument.lastIndexOf(ESC_CHAR);
 			} else {
 				stopIndex = escChar;
 			}
@@ -288,10 +324,10 @@ public class UpdateProcessor extends Processor {
 	 */
 	private static Task updateDesc(int index, int editDesc, String argument) {
 		int stopIndex = argument.length();
-		if (argument.contains("\\")) {
-			int escChar = argument.indexOf("\\");
+		if (argument.contains(ESC_CHAR)) {
+			int escChar = argument.indexOf(ESC_CHAR);
 			if (escChar < editDesc) {
-				stopIndex = argument.lastIndexOf("\\");
+				stopIndex = argument.lastIndexOf(ESC_CHAR);
 			} else {
 				stopIndex = escChar;
 			}
