@@ -7,7 +7,6 @@ import org.apache.http.ParseException;
 //@author A0099332Y
 /**
  * This is the class that handles google sync function
- * @author Yiwen
  *
  */
 public class SyncProcessor extends Processor {
