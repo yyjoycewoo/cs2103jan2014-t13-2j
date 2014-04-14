@@ -1,0 +1,1300 @@
+//@author: a0101324a
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\CurrentDate.java
+	 */
+
+/**
+ * This class stores the current date.
+ * 
+ */
+public class CurrentDate {
+	private static String format = "yyyy-dd-MM";
+
+	protected static String date() {
+		DateFormat dateFormat = new SimpleDateFormat(format);
+		// get current date time with Date()
+		Date date = new Date();
+		return dateFormat.format(date);
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\CurrentDate.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\KeepChecking.java
+	 */
+
+/*
+ * Checking the notify time for each task (if possible) and enable pop up 
+ * if the current time matches the notify time for that task
+ */
+public class KeepChecking implements Job {
+	private static String timeFormat = "HH:mm";
+	TaskList today_pop = new TaskList();
+
+	@Override
+	public void execute(JobExecutionContext context) {
+		today_pop.clearList();
+		// getting current time
+		String timeStamp = new SimpleDateFormat(timeFormat).format(Calendar
+				.getInstance().getTime());
+
+		for (int i = 0; i < Processor.getList().getSize(); i++) {
+			// if there is notify time for that task
+			if (Processor.getList().getListItem(i).getNoticeTime() != null) {
+				// if the current time matches the notify time
+				if (Processor.getList().getListItem(i).getNoticeTime()
+						.toString().contains(timeStamp)) {
+					// pop up the relevant task at that time
+					today_pop.addToList(Processor.getList().getListItem(i));
+				}
+			}
+		}
+		if (today_pop.getSize() != 0) {
+			// inform the notification to pop up the relevant tasks for today
+			Notification.popUpNotice(today_pop);
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\KeepChecking.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Notification.java
+	 */
+
+/**
+ * This class creates a pop up notification to appear on the desktop.
+ * 
+ */
+
+public abstract class Notification implements ActionListener {
+	private static int count = 0;
+	private static int width = 200;
+	private static int fwidth = 300;
+	private static int fheight = 125;
+	private static int inset_num = 5;
+	private static int grid_xy = 0;
+	private static int textWidth = 300;
+	private static int textHeight = 100;
+	private static float lweight_xy = 0f;
+	private static float fweight_xy = 1.0f;
+	private static String htmlCode = "<html><div WIDTH=%d>%s</div><html>";
+	private static String msg = "~~~Reminder! Do now or never!~~~";
+	private static String jFrame_name = "Reminder";
+	private static String labelHTML = "<HtMl>";
+	// pop up disappeared after 2sec
+	private static int waitfor = 2000;
+	private static int closeBt_inset_top_bot = 1;
+	private static int closeBt_inset_left_right = 4;
+
+	/**
+	 * @param myownlist
+	 * @param taskToDo
+	 */
+	protected static void popUpNotice(TaskList list) {
+		// create and set up the window
+		final JFrame frame = new JFrame(jFrame_name);
+		frame.setSize(fwidth, fheight);
+		// remove the title bar and border
+		frame.setUndecorated(true);
+		// change the window location to bottom right corner of the screen
+		// size of the screen
+		Dimension scrSize = Toolkit.getDefaultToolkit().getScreenSize();
+		// height of the task bar
+		Insets toolHeight = Toolkit.getDefaultToolkit().getScreenInsets(
+				frame.getGraphicsConfiguration());
+		frame.setLocation((scrSize.width - frame.getWidth()), (scrSize.height
+				- (frame.getHeight()) - toolHeight.bottom));
+		frame.setLayout(new GridBagLayout());
+		frame.setAlwaysOnTop(true);
+
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = grid_xy;
+		constraints.gridy = grid_xy;
+		constraints.weightx = fweight_xy;
+		constraints.weighty = fweight_xy;
+		constraints.insets = new Insets(inset_num, inset_num, inset_num,
+				inset_num);
+		constraints.fill = GridBagConstraints.BOTH;
+
+		final JLabel textLabel = new JLabel();
+		buttonsAction(textLabel, list);
+
+		textLabel.setPreferredSize(new Dimension(textWidth, textHeight));
+		textLabel.setOpaque(false);
+		frame.getContentPane().add(textLabel, constraints);
+		constraints.gridx++;
+		constraints.weightx = lweight_xy;
+		constraints.weighty = lweight_xy;
+		constraints.fill = GridBagConstraints.NONE;
+		constraints.anchor = GridBagConstraints.NORTH;
+
+		@SuppressWarnings("serial")
+		// allow closing of button
+		JButton closeBt = new JButton(new AbstractAction("X") {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				frame.dispose();
+			}
+		});
+
+		closeBt.setMargin(new Insets(closeBt_inset_top_bot,
+				closeBt_inset_left_right, closeBt_inset_top_bot,
+				closeBt_inset_left_right));
+		closeBt.setFocusable(false);
+		frame.getContentPane().add(closeBt, constraints);
+		constraints.gridx = grid_xy;
+		constraints.gridy++;
+		constraints.weightx = fweight_xy;
+		constraints.weighty = fweight_xy;
+		constraints.insets = new Insets(inset_num, inset_num, inset_num,
+				inset_num);
+		constraints.fill = GridBagConstraints.BOTH;
+
+		JLabel msgLabel = new JLabel(labelHTML + msg);
+		// Centralizing the text on the JLabel
+		msgLabel.setHorizontalAlignment(JLabel.CENTER);
+		frame.add(msgLabel, constraints);
+		// close window after clicking on cross
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+
+		// to make pop up disappear after some time
+		new Thread() {
+			@Override
+			public void run() {
+				// when mouse over, it wont disappear until the mouse exits
+				mouseActions(waitfor, frame);
+			}
+		}.start();
+	}
+
+	/**
+	 * @param waitfor
+	 * @param frame
+	 */
+	protected static void mouseActions(final int waitfor, final JFrame frame) {
+		// ensure that the pop up wont disappear when mouse over
+		frame.addMouseListener(new MouseAdapter() {
+			Timer timer;
+
+			@Override
+			public void mouseEntered(MouseEvent event) {
+				// cos can only cancel timer for one time only!
+				// need new timer every time the mouse enters pop up
+				if (timer != null) {
+					timer.cancel();
+				}
+			}
+
+			@Override
+			public void mouseExited(MouseEvent event) {
+				// If mouse pointer is still within the bounds of the
+				// frame, do not set the timer to close the notification
+				// window
+				Rectangle frameRect = new Rectangle(frame.getLocationOnScreen());
+				frameRect.setSize(frame.getWidth(), frame.getHeight());
+				Point mousePointer = event.getLocationOnScreen();
+				if (!frameRect.contains(mousePointer)) {
+					// Otherwise, schedule a timer
+					timer = new Timer();
+					timer.schedule(new java.util.TimerTask() {
+						@Override
+						public void run() {
+							frame.dispose();
+						}
+					}, waitfor);
+				}
+			}
+
+		});
+	};
+
+	/**
+	 * @param textLabel
+	 * @return
+	 */
+	protected static void buttonsAction(final JLabel textLabel,
+			final TaskList list) {
+		// allow the next task to be shown after clicking the button
+		ActionListener actionListener_prev = new ActionListener() {
+			private String text;
+
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				if (count <= 0) {
+					count = 0;
+					// allow text to be within the JLabel border
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
+				} else {
+					count--;
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
+				}
+				textLabel.setText(text);
+			}
+		};
+
+		// allow the next task to be shown after clicking the button
+		ActionListener actionListener_next = new ActionListener() {
+			private String text;
+
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+
+				// get the next item in myownlist
+				if (count >= (list.getSize() - 1)) {
+					count = list.getSize() - 1;
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
+
+				} else {
+					count++;
+					// allow text to be within the JLabel border
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
+				}
+				textLabel.setText(text);
+			}
+		};
+		putButtonsOnLabel(textLabel, actionListener_prev, actionListener_next,
+				list);
+	}
+
+	/**
+	 * @param textLabel
+	 * @param actionListener_prev
+	 * @param actionListener_next
+	 */
+	protected static void putButtonsOnLabel(final JLabel textLabel,
+			ActionListener actionListener_prev,
+			ActionListener actionListener_next, TaskList list) {
+
+		// implementing buttons on the label
+		textLabel.setLayout(new BorderLayout());
+		JButton next = new BasicArrowButton(BasicArrowButton.EAST);
+		JButton prev = new BasicArrowButton(BasicArrowButton.WEST);
+		prev.addActionListener(actionListener_prev);
+		next.addActionListener(actionListener_next);
+		textLabel.add(prev, BorderLayout.WEST);
+		textLabel.add(next, BorderLayout.EAST);
+		String text = String.format(htmlCode, width, list.getListItem(0)
+				.toString());
+		textLabel.setText(text);
+		// Centralizing the text on the JLabel
+		textLabel.setHorizontalAlignment(JLabel.CENTER);
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Notification.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\NotifyProcessor.java
+	 */
+
+/**
+ * 
+ * This class contains method to change notification commands by the user. It
+ * changes the time or date to notify the user.
+ * 
+ * <p>
+ * It can process command that allows pop-up window at the new notification time
+ * or date.
+ * 
+ * <p>
+ * To change the notification of a task, start by typing "notify" followed by a
+ * valid index. The following keywords are necessary for the attributes, while
+ * the order is flexible:
+ * <ul>
+ * <li>"time" for the time
+ * <li>"date" for the date
+ * </ul>
+ * 
+ * <p>
+ * Each keyword should be proceeded by the new attribute.
+ * 
+ * <p>
+ * Examples:
+ * <ul>
+ * <li>"notify 1 time 1900"
+ * </ul>
+ * 
+ * <p>
+ * The following time formats are supported:
+ * <ul>
+ * <li>930am/pm
+ * <li>9am/pm
+ * <li>1230
+ * <li>0730
+ * <li>0730pm
+ * </ul>
+ */
+public class NotifyProcessor extends Processor {
+
+	private static String NOTIFIED = "Recorded the notified time.";
+	private static String notifyKeyword = " time ";
+	private static int NO_OF_CHAR_IN_NTIME = 6;
+	private static String NO_DATE = "No start or end date for the selected task.";
+	private static String LIMIT_TODAY = "Notification time is only for today's task!";
+	private static String GOT_KEYWORDS = "Have you type notify <index> time <time>?";
+	private static String INVALID_INDEX = "Index %d is out of the list.";
+	private static String NOTHING_ERROR = "Please include the index(s) and keyword(s).";
+
+	public static String processNotify(String argument)
+			throws InvalidInputException {
+		storeCurrentList();
+		checkingInputErrors(argument);
+		int index = getTaskIndex(argument) - 1;
+		notifyTime(index, findDetailToEdit(argument), argument);
+		return NOTIFIED;
+	}
+
+	// limited to today's task
+	private static void notifyTime(int index, int which, String argument)
+			throws InvalidInputException {
+		if (list.getListItem(index).getEndDate() != null) {
+			String item_date = convertDateToStandardForm(list
+					.getListItem(index).getEndDate().getMonth().toString(),
+					list.getListItem(index).getEndDate().getDay().toString());
+			if (!item_date.contains(CurrentDate.date())) {
+				throw new InvalidInputException(LIMIT_TODAY);
+			}
+			DateTime time = convertStringToDateTime(parseTimeString(argument
+					.substring(which + NO_OF_CHAR_IN_NTIME)));
+			list.getListItem(index).setNoticeTime(time);
+			fileHandler.updateFile(list);
+		} else {
+			throw new InvalidInputException(NO_DATE);
+		}
+	}
+
+	/**
+	 * 
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void checkingInputErrors(String argument)
+			throws InvalidInputException {
+		if (argument.isEmpty()) {
+			throw new InvalidInputException(NOTHING_ERROR);
+		}
+		String[] words = argument.split(" ");
+		// checking index is zero
+		if (words.length >= 1) {
+			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
+		} else if (words.length == 0) {
+			printInvalidIndexMsg(0, null);
+		} else {
+			printInvalidKeywords(argument);
+		}
+	}
+
+	/**
+	 * @param argument
+	 *            that contains index, time, date e.g. 1 time 1300 date 03/01
+	 * @return the starting index of which task detail to change
+	 */
+	private static int findDetailToEdit(String argument) {
+		int edit = -1;
+		if (argument.contains(notifyKeyword)) {
+			edit = argument.indexOf(notifyKeyword);
+		}
+		return edit;
+	}
+
+	/**
+	 * @param index
+	 * @throws InvalidInputException
+	 */
+	private static void printInvalidIndexMsg(int index, String argument)
+			throws InvalidInputException {
+		if ((index > list.getSize()) || (index <= 0) || argument.equals(null)) {
+			String INDEX_OUT_BOUNDS = String.format(INVALID_INDEX, index);
+			throw new InvalidInputException(INDEX_OUT_BOUNDS);
+		} else {
+			printInvalidKeywords(argument);
+		}
+	}
+
+	/**
+	 * @param argument
+	 * @return task index
+	 * @throws NumberFormatException
+	 */
+	private static int getTaskIndex(String argument)
+			throws NumberFormatException {
+		int spaceAfterIndex = argument.indexOf(" ");
+		return (Integer.parseInt(argument.substring(0, spaceAfterIndex)));
+	}
+
+	/**
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void printInvalidKeywords(String argument)
+			throws InvalidInputException {
+		if (argument.length() <= 2) {
+			throw new InvalidInputException(GOT_KEYWORDS);
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\NotifyProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Popup.java
+	 */
+
+
+// showing the tasks that are due in 3 days
+public class Popup extends Processor {
+	// list of tasks that are near deadline
+	protected static TaskList myownlist = new TaskList();
+	// how many days from today for tasks to pop up
+	protected static int daysB4deadline = 3;
+	protected static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-dd-MM");
+
+	public static void show() {
+		// create calendar instance
+		Calendar now = Calendar.getInstance();
+		now.add(Calendar.DATE, daysB4deadline);
+		myownlist.clearList();
+
+		// for notification checking
+		for (int i = 0; i < Processor.getList().getSize(); i++) {
+			Task item = Processor.getList().getListItem(i);
+			// task has date and is not completed
+			tasksNearingDeadline(now, item);
+		}
+		if (myownlist.getSize() != 0) {
+			Notification.popUpNotice(myownlist);
+		}
+	}
+
+	/**
+	 * @param now
+	 * @param item
+	 *            Checking tasks that fall within the 3 days from now
+	 */
+	protected static void tasksNearingDeadline(Calendar now, Task item) {
+		if ((item.getEndDate() != null) && !item.getCompleted()) {
+			int m = now.get(Calendar.MONTH) + 1;
+			String deadline = convertDateToStandardForm("" + m,
+					"" + now.get(Calendar.DATE));
+			String present = CurrentDate.date();
+			String item_date = convertDateToStandardForm(item.getEndDate()
+					.getMonth().toString(), item.getEndDate().getDay()
+					.toString());
+			try {
+				Date max = sdf.parse(deadline);
+				Date min = sdf.parse(present);
+				Date d = sdf.parse(item_date);
+				// check whether the task falls between today and #days
+				// after today
+				if ((d.after(min) && d.before(max))) {
+					myownlist.addToList(item);
+				}
+				// check task's date == today
+				if (d.equals(min)) {
+					myownlist.addToList(item);
+				}
+				// check task's date == #days after today
+				if (d.equals(max)) {
+					myownlist.addToList(item);
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Popup.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Scheduling.java
+	 */
+
+/*
+ * Enable the quartz scheduler to keep running the program to check the
+ * notify time of the tasks before the program exits More efficient than a
+ * "while" loop
+ */
+public class Scheduling {
+	/**
+	 * @return Scheduler
+	 * @throws SchedulerException
+	 *             Get the tasks checking started
+	 */
+	protected static Scheduler schedulingTasks() throws SchedulerException {
+		// Grab the Scheduler instance from the Factory
+		SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
+		Scheduler scheduler = schedFact.getScheduler();
+		// and start it off
+		scheduler.start();
+		schedulingNotification(scheduler);
+		return scheduler;
+	}
+
+	protected static void schedulingNotification(Scheduler sche) {
+		// define the job and tie it to KeepChecking class
+		JobDetail job = newJob(KeepChecking.class).withIdentity("myJob",
+				"group").build();
+
+		// Trigger the job to run now, and then every 40 seconds
+		Trigger trigger = newTrigger()
+				.withIdentity("myTrigger", "group")
+				.startNow()
+				.withSchedule(
+						simpleSchedule().withIntervalInSeconds(40)
+								.repeatForever()).build();
+
+		// Tell quartz to schedule the job using trigger
+		try {
+			sche.scheduleJob(job, trigger);
+
+		} catch (SchedulerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Scheduling.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\UpdateProcessor.java
+	 */
+
+/**
+ * This class contains methods to process update commands by the user. It
+ * updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * It can process commands that update a description, a start time, an end time,
+ * a date and a location. Any subset of the possible attributes can be updated.
+ * 
+ * <p>
+ * To update a task, start by typing "update," followed by a valid index. The
+ * following keywords are necessary for the attributes, while the order is
+ * flexible:
+ * <ul>
+ * <li>"starttime" for the start time
+ * <li>"endtime" for the end time
+ * <li>"desc" for the description, followed by '\' afterwards
+ * <li>"location" for the location, followed by '\' afterwards
+ * <li>"date" for the date
+ * <li>"recur" for recurrence interval
+ * <li>"priority" or "!" for priority level
+ * <li>"complete" for completion status
+ * </ul>
+ * 
+ * <p>
+ * Each keyword should be proceeded by the new attribute.
+ * 
+ * <p>
+ * Examples:
+ * <ul>
+ * <li>"update 2 enddate 4 Jan"
+ * <li>"update 2,3,4 !high"
+ * <li>"update 1 starttime 1900 desc dinner with parents\ location home\
+ * </ul>
+ * 
+ * <p>
+ * The following time formats are supported:
+ * <ul>
+ * <li>930am/pm
+ * <li>9am/pm
+ * <li>1230
+ * <li>0730
+ * <li>0730pm
+ * </ul>
+ * 
+ * <p>
+ * The following date formats are supported (case does not matter):
+ * <ul>
+ * <li>jan 1
+ * <li>1 january
+ * <li>january 1
+ * </ul>
+ * 
+ */
+public class UpdateProcessor extends Processor {
+	private static final int NO_OF_CHAR_IN_STIME = 11;
+	private static final int NO_OF_CHAR_IN_ETIME = 9;
+	private static final int NO_OF_CHAR_IN_LOC = 10;
+	private static final int NO_OF_CHAR_IN_AT_LOC = 2;
+	private static final int NO_OF_CHAR_IN_SDATE = 11;
+	private static final int NO_OF_CHAR_IN_DESC = 6;
+	private static final int NO_OF_CHAR_IN_EDATE = 9;
+	private static final int NO_OF_CHAR_IN_RECUR = 7;
+	private static final int NO_OF_CHAR_IN_PRIORITY = 10;
+	private static final int NO_OF_CHAR_IN_PRIORITY_SYMBOL = 2;
+	private static final int NO_EDIT = -1;
+	private static final int NO_OF_DETAILS_TO_EDIT = 11;
+	private static final String START_TIME_GT_END_TIME = "Start time cannot be greater than end time";
+	private static final String INVALID_INDEX = "Invalid Index";
+	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
+	private static final String INVALID_RECUR = "Need Date before adding recurrence period";
+	private static final String UPDATED = "Updated the task(s)";
+	private static String INDEX_OUT_OF_BOUND = "Index is out of the list.";
+	private static String NOTHING_ERROR = "Please include the index(s) and keyword(s).";
+	private static String ESC_CHAR = "\\";
+
+	private static String[] updateKeywords = new String[] { " starttime ",
+			" endtime ", " desc ", " startdate ", " enddate ", " location ",
+			" recur ", " priority ", " complete", " !", " @" };
+
+	/**
+	 * 
+	 * @param argument
+	 *            : <index of the task> time <startTime e.g. 1300> or <index of
+	 *            the task> desc <description e.g. cut dog's hair>
+	 * @return Updated Task
+	 * @throws InvalidInputException
+	 */
+	public static String processUpdate(String argument)
+			throws InvalidInputException {
+		storeCurrentList();
+		checkingInputErrors(argument);
+		int[] whichToEdit = new int[NO_OF_DETAILS_TO_EDIT];
+		Arrays.fill(whichToEdit, NO_EDIT);
+		int[] indices = getTaskIndex(argument);
+		for (int indice : indices) {
+			int index = indice - 1;
+			printInvalidIndexMsg(indice, argument);
+			whichToEdit = findDetailToEdit(argument);
+			updater(argument, whichToEdit, index);
+			displayList = list;
+		}
+		return UPDATED;
+	}
+
+	/**
+	 * @param argument
+	 * @param whichToEdit
+	 * @param index
+	 * @throws InvalidInputException
+	 */
+	private static void updater(String argument, int[] whichToEdit, int index)
+			throws InvalidInputException {
+		for (int i = 0; i < whichToEdit.length; i++) {
+			updateUpdateTime(index);
+			if (whichToEdit[i] != -1) {
+				switch (i) {
+				case 0:
+					updateStartTime(index, whichToEdit[0], argument);
+					break;
+				case 1:
+					updateEndTime(index, whichToEdit[1], argument);
+					break;
+				case 2:
+					updateDesc(index, whichToEdit[2], argument);
+					break;
+				case 3:
+					updateStartDate(index, whichToEdit[3], argument);
+					break;
+				case 4:
+					updateEndDate(index, whichToEdit[4], argument);
+					break;
+				case 5:
+					updateLocation(index, whichToEdit[5], argument);
+					break;
+				case 6:
+					updateRecur(index, whichToEdit[6], argument);
+					break;
+				case 7:
+					updatePriority(index, whichToEdit[7], argument);
+					break;
+				case 8:
+					updateCompletion(index);
+					break;
+				case 9:
+					// for !
+					updatePriority(index, whichToEdit[9], argument);
+					break;
+				case 10:
+					// for @
+					updateLocation(index, whichToEdit[10], argument);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void checkingInputErrors(String argument)
+			throws InvalidInputException {
+		if (argument.isEmpty()) {
+			throw new InvalidInputException(NOTHING_ERROR);
+		}
+		String[] words = argument.split(" |,");
+		// checking index is zero
+		if (words.length >= 1) {
+			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
+		} else if (words.length == 0) {
+			printInvalidIndexMsg(0, null);
+		} else {
+			printInvalidKeywords(argument);
+		}
+	}
+
+	/**
+	 * @param index
+	 * @throws InvalidInputException
+	 */
+	private static void printInvalidIndexMsg(int index, String argument)
+			throws InvalidInputException {
+		if ((index > list.getSize()) || (index <= 0) || argument.equals(null)) {
+			throw new InvalidInputException(INDEX_OUT_OF_BOUND);
+		} else {
+			printInvalidKeywords(argument);
+		}
+	}
+
+	/**
+	 * @param argument
+	 * @throws InvalidInputException
+	 */
+	private static void printInvalidKeywords(String argument)
+			throws InvalidInputException {
+		// check the argument contains any keywords
+		boolean available = false;
+
+		if (argument.length() <= 2) {
+			throw new InvalidInputException(NO_KEYWORDS_FOUND);
+		}
+
+		for (String updateKeyword : updateKeywords) {
+			if (argument.contains(updateKeyword)) {
+				available = true;
+			}
+		}
+
+		if (!available) {
+			throw new InvalidInputException(NO_KEYWORDS_FOUND);
+		}
+	}
+
+	/**
+	 * @param index
+	 * 
+	 */
+
+	private static void updateUpdateTime(int index) {
+		DateTime currentTime = DateTime.now(TimeZone.getDefault());
+		list.getListItem(index).setUpdateTime(currentTime);
+	}
+
+	/**
+	 * @param index
+	 * @param editTime
+	 * @param argument
+	 *            that contains new time 1300
+	 * @return updated task
+	 * @throws InvalidInputException
+	 */
+	private static Task updateStartTime(int index, int editStartTime,
+			String argument) throws InvalidInputException {
+		argument = argument.substring(editStartTime + NO_OF_CHAR_IN_STIME);
+		String[] parts = argument.split(" ");
+		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
+		list.getListItem(index).setStartTime(time);
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		} else {
+			fileHandler.updateFile(list);
+		}
+		return list.getListItem(index);
+	}
+
+	private static Task updateEndTime(int index, int editEndTime,
+			String argument) throws InvalidInputException {
+		argument = argument.substring(editEndTime + NO_OF_CHAR_IN_ETIME);
+		String[] parts = argument.split(" ");
+		DateTime time = convertStringToDateTime(parseTimeString(parts[0]));
+		list.getListItem(index).setEndTime(time);
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		} else {
+			fileHandler.updateFile(list);
+		}
+		return list.getListItem(index);
+	}
+
+	private static Task updateStartDate(int index, int editDate, String argument)
+			throws InvalidInputException {
+		DateTime date = convertStringToDateTime(parseDateString(argument
+				.substring(editDate + NO_OF_CHAR_IN_SDATE)));
+		list.getListItem(index).setStartDate(date);
+		// Ensures that any task with a start date has an end date
+		if (list.getListItem(index).getEndDate() == null) {
+			list.getListItem(index).setEndDate(date);
+		}
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		} else {
+			fileHandler.updateFile(list);
+		}
+		return list.getListItem(index);
+	}
+
+	private static Task updateEndDate(int index, int editDate, String argument)
+			throws InvalidInputException {
+		DateTime date = convertStringToDateTime(parseDateString(argument
+				.substring(editDate + NO_OF_CHAR_IN_EDATE)));
+		list.getListItem(index).setEndDate(date);
+		if (isStartTimeGreaterThanEndTime(list.getListItem(index))) {
+			throw new InvalidInputException(START_TIME_GT_END_TIME);
+		}
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	private static Task updateLocation(int index, int editLoc, String argument) {
+		int stopIndex = argument.length();
+		if (argument.contains(ESC_CHAR)) {
+			int escChar = argument.indexOf(ESC_CHAR);
+			if (escChar < editLoc) {
+				stopIndex = argument.lastIndexOf(ESC_CHAR);
+			} else {
+				stopIndex = escChar;
+			}
+		}
+		if (argument.contains(" @")) {
+			list.getListItem(index).setLocation(
+					argument.substring(editLoc + NO_OF_CHAR_IN_AT_LOC,
+							stopIndex));
+		} else {
+			list.getListItem(index).setLocation(
+					argument.substring(editLoc + NO_OF_CHAR_IN_LOC, stopIndex));
+		}
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * @param index
+	 * @param editDesc
+	 * @param argument
+	 *            that contains new description
+	 * @return updated task
+	 */
+	private static Task updateDesc(int index, int editDesc, String argument) {
+		int stopIndex = argument.length();
+		if (argument.contains(ESC_CHAR)) {
+			int escChar = argument.indexOf(ESC_CHAR);
+			if (escChar < editDesc) {
+				stopIndex = argument.lastIndexOf(ESC_CHAR);
+			} else {
+				stopIndex = escChar;
+			}
+		}
+		list.getListItem(index).setDescription(
+				argument.substring(editDesc + NO_OF_CHAR_IN_DESC, stopIndex));
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * Updates task with the new recurrent period
+	 * 
+	 * @param index
+	 * @param recurDesc
+	 * @param argument
+	 *            that contains recurrence period
+	 * @return updated task
+	 * @throws InvalidInputException
+	 */
+
+	private static Task updateRecur(int index, int recurDesc, String argument)
+			throws InvalidInputException {
+		int stopIndex = argument.length();
+		int userRecurrence = list.getListItem(index).getRecurrencePeriod();
+		try {
+			userRecurrence = Integer.parseInt(argument.substring(recurDesc
+					+ NO_OF_CHAR_IN_RECUR, stopIndex));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+		if (list.getListItem(index).getEndDate() == null) {
+			throw new InvalidInputException(INVALID_RECUR);
+		}
+		list.getListItem(index).setRecurrencePeriod(userRecurrence);
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * Updates task with the new priority
+	 * 
+	 * @param index
+	 * @param recurDesc
+	 * @param argument
+	 *            that contains priority
+	 * @return updated task
+	 */
+
+	private static Task updatePriority(int index, int priorityDesc,
+			String argument) {
+		int stopIndex = argument.length();
+		String priority = null;
+		if (argument.contains(" !")) {
+			priority = parsePriorityFromString(argument.substring(priorityDesc
+					+ NO_OF_CHAR_IN_PRIORITY_SYMBOL, stopIndex));
+		} else {
+			priority = parsePriorityFromString(argument.substring(priorityDesc
+					+ NO_OF_CHAR_IN_PRIORITY, stopIndex));
+		}
+		list.getListItem(index).setPriorityLevel(priority);
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * Toggles task completion status
+	 * 
+	 * @param index
+	 * @return updated tasks
+	 */
+	private static Task updateCompletion(int index) {
+		if (list.getListItem(index).getCompleted()) {
+			list.getListItem(index).setCompleted(false);
+		} else {
+			list.getListItem(index).setCompleted(true);
+		}
+		fileHandler.updateFile(list);
+		return list.getListItem(index);
+	}
+
+	/**
+	 * @param argument
+	 *            that contains index, time, date e.g. 1 time 1300 date 03/01
+	 * @return the starting index of which task detail to change
+	 */
+	private static int[] findDetailToEdit(String argument) {
+		int[] edit = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+		for (int i = 0; i < edit.length; i++) {
+			if (argument.contains(updateKeywords[i])) {
+				edit[i] = argument.indexOf(updateKeywords[i]);
+			}
+		}
+		return edit;
+	}
+
+	/**
+	 * Checks whether start time/date is greater than end time/date
+	 * 
+	 * @param input
+	 * @return true if start time is greater than end time
+	 */
+
+	private static Boolean isStartTimeGreaterThanEndTime(Task input) {
+		if ((input.getStartDate() != null) && (input.getEndDate() != null)) {
+			if (input.getStartDate().gt(input.getEndDate())) {
+				return true;
+			}
+			if (input.getStartDate().equals(input.getEndDate())) {
+				if ((input.getStartTime() != null)
+						&& (input.getEndTime() != null)) {
+					if (input.getStartTime().gt(input.getEndTime())) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param argument
+	 * @return task index
+	 * @throws NumberFormatException
+	 * @throws InvalidInputException
+	 */
+	private static int[] getTaskIndex(String argument)
+			throws NumberFormatException, InvalidInputException {
+		int spaceAfterIndex = argument.indexOf(" ");
+		// no index found
+		if (spaceAfterIndex == NOT_FOUND) {
+			throw new InvalidInputException(INVALID_INDEX);
+		}
+		// split different index
+		String[] index = argument.substring(0, spaceAfterIndex).split(",");
+		int[] indices = new int[index.length];
+
+		// only single index
+		if (index.length == ONE_WORD) {
+			if (!isParseableByInt(index[0])) {
+				throw new InvalidInputException(INVALID_INDEX);
+			} else {
+				indices[0] = Integer.parseInt(index[0]);
+				return indices;
+			}
+		}
+		// multiple index
+		else {
+
+			// change all strings to integers
+			for (int i = 0; i < index.length; i++) {
+				indices[i] = Integer.parseInt(index[i]);
+			}
+			return indices;
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\UpdateProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\NotifyProcessorTest.java
+	 */
+
+public class NotifyProcessorTest {
+
+	private static String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#null00:33:20.173000000#LOW#false#null#null16:29:01.763000000#null\r\n";
+	private static String TASK2 = "revise CS2106#null#18:00#2014-04-09#2014-04-10#null#0#-1351579072#2014-04-09 16:18:25.784000000#LOW#false#null#null#null\r\n";
+	private static String TASK3 = "walk with dog and wash car#01:00#02:00#null#null#utown#0#978601153#null00:33:20.173000000#LOW#false#null#null16:29:01.763000000#null\r\n";
+	private File tasks;
+	private static final String LIST = "list";
+	private static final String FILE_DIR = "user.dir";
+	private static final String FILE_NAME = "tasks.txt";
+	private static final String FILE_HEADING = "null\r\nnull\r\nnull\r\n";
+	private static final String task1 = "1 time 3pm";
+	private static final String task2 = "2 time 3pm";
+	private static final String task3 = "3 ";
+	private static final String wrongIndexRightKey = "0 time 3pm";
+	private static final String NO_DATE = "No start or end date for the selected task.";
+	private static final String NEED_TODAY = "Notification time is only for today's task!";
+	private static final String GOT_KEYWORDS = "Have you type notify <index> time <time>?";
+
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
+
+	@Before
+	public void createTestData() throws IOException, NoSuchFieldException,
+			SecurityException, IllegalArgumentException, IllegalAccessException {
+		System.setProperty(FILE_DIR, folder.getRoot().toString());
+		tasks = folder.newFile(FILE_NAME);
+		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
+		out.write(FILE_HEADING);
+		out.write(TASK1);
+		out.write(TASK2);
+		out.write(TASK3);
+		out.close();
+
+		// To reset list to the tasks written before each test case
+		// by modifying list in Processor
+		FileHandler fileHandler = new FileHandler(FILE_NAME);
+		TaskList newList = fileHandler.readFile();
+		System.out.println(newList);
+		Field f = Processor.class.getDeclaredField(LIST);
+		f.setAccessible(true);
+		if (LIST.equals(f.getName())) {
+			f.setAccessible(true);
+			f.set(LIST, newList);
+		}
+	}
+
+	// Testing for notify time on tasks with no dates
+	@Test
+	public void testNoDate() throws InvalidInputException {
+		try {
+			NotifyProcessor.processNotify(task1);
+		} catch (InvalidInputException e) {
+			assertEquals(NO_DATE, e.getMessage());
+		}
+	}
+
+	// Testing for notify time on past or future tasks
+	@Test
+	public void testPastOrFutureTask() throws InvalidInputException {
+		try {
+			NotifyProcessor.processNotify(task2);
+		} catch (InvalidInputException e) {
+			assertEquals(NEED_TODAY, e.getMessage());
+		}
+	}
+
+	// Testing for notify keyword
+	@Test
+	public void testKeyword() throws InvalidInputException {
+		try {
+			NotifyProcessor.processNotify(task3);
+		} catch (InvalidInputException e) {
+			assertEquals(GOT_KEYWORDS, e.getMessage());
+		}
+	}
+
+	// Testing for wrong index with right keywords
+	@Test
+	public void testWrongIndexRightKey() throws InvalidInputException {
+		try {
+			NotifyProcessor.processNotify(wrongIndexRightKey);
+			fail("Should have thrown invalid index.");
+		} catch (InvalidInputException e) {
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\NotifyProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\UpdateProcessorTest.java
+	 */
+
+public class UpdateProcessorTest {
+
+	private static final String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#2014-04-10 00:33:20.173000000#LOW#false#null#2014-04-13 16:29:01.763000000#null\r\n";
+	private static final String TASK2 = "Breakfast#07:00#null#2014-04-01#2014-04-01#null#0#1046042885#2014-04-09 16:19:17.842000000#LOW#true#null#null#null\r\n";
+	private static final String TASK3 = "walk with dog and wash car#01:00#02:00#null#null#utown#0#978601153#null00:33:20.173000000#LOW#false#null#null16:29:01.763000000#null\r\n";
+	private static final String STATUS_MSG = "Updated the task(s)";
+	private static final String startEndTime = "1 starttime 7pm endtime 9pm";
+	private static final String descLoc = "2 desc CS2103\" location com1\\";
+	private static final String startEndDate = "3 startdate 11 apr enddate 12 apr";
+	private static final String invalidkey = "1 rubbish";
+	private static final String invalidIndex = "100";
+	private static final String LOC = "utown";
+	private static final String MULTIPLE_INDEX = "1,2,3 @utown";
+	private static final String INDEX_OUT_OF_BOUND = "Index is out of the list.";
+	private static final String NO_KEYWORDS_FOUND = "Please include any keywords to update i.e. starttime, endtime, location, desc, date";
+	private static final String INVALID_DATE = "Start time cannot be greater than end time";
+	private static final String INVALID_TIME = "Invalid Time";
+	private static final String invalidDate = "1 startdate 12 apr enddate 11 apr";
+	private static final String invalidTime = "2 starttime 2359pm endtime 7am";
+	private static final String LIST = "list";
+	private static final String FILE_DIR = "user.dir";
+	private static final String FILE_NAME = "tasks.txt";
+	private static final String FILE_HEADING = "null\r\nnull\r\nnull\r\n";
+
+	private File tasks;
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\UpdateProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\UpdateProcessorTest.java
+	 */
+
+	// testing the out of bound index
+	@Test(expected = InvalidInputException.class)
+	public void testInvalidIndexOne() throws InvalidInputException {
+		String invalidIndex = "0";
+		UpdateProcessor.processUpdate(invalidIndex);
+	}
+
+	// testing index out of the list's index
+	@Test
+	public void testExceedIndex() {
+		try {
+			UpdateProcessor.processUpdate(invalidIndex);
+		} catch (InvalidInputException e) {
+			assertEquals(INDEX_OUT_OF_BOUND, e.getMessage());
+		}
+	}
+
+	// testing for invalid keyword
+	@Test
+	public void testInvalidKeyword() {
+		try {
+			UpdateProcessor.processUpdate(invalidkey);
+		} catch (InvalidInputException e) {
+			assertEquals(NO_KEYWORDS_FOUND, e.getMessage());
+		}
+	}
+
+	// testing start and end time, desc and location, start and end date
+	@Test
+	public void testUpdateFeatures() throws InvalidInputException {
+		String task1Msg = UpdateProcessor.processUpdate(startEndTime);
+		String task2Msg = UpdateProcessor.processUpdate(descLoc);
+		String task3Msg = UpdateProcessor.processUpdate(startEndDate);
+		assertEquals(STATUS_MSG, task1Msg);
+		assertEquals(STATUS_MSG, task2Msg);
+		assertEquals(STATUS_MSG, task3Msg);
+	}
+
+	// testing for invalid date
+	@Test
+	public void testInvalidDate() throws InvalidInputException {
+		try {
+			UpdateProcessor.processUpdate(invalidDate);
+			fail("Should have thrown invalid input");
+		} catch (InvalidInputException e) {
+			assertEquals(INVALID_DATE, e.getMessage());
+		}
+	}
+
+	// testing for invalid time
+	@Test
+	public void testInvalidTime() throws InvalidInputException {
+		try {
+			UpdateProcessor.processUpdate(invalidTime);
+			fail("Should have thrown invalid input");
+		} catch (InvalidInputException e) {
+			assertEquals(INVALID_TIME, e.getMessage());
+		}
+	}
+
+	// testing for multiple updates
+	@Test
+	public void testMultipleIndex() throws InvalidInputException {
+		String tasksMsg = UpdateProcessor.processUpdate(MULTIPLE_INDEX);
+		assertEquals(STATUS_MSG, tasksMsg);
+		for (int i = 0; i < Processor.getList().getSize(); i++) {
+			assertEquals(LOC, Processor.getList().getListItem(i).getLocation());
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\UpdateProcessorTest.java
+
+
+
+
+

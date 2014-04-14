@@ -1,0 +1,1798 @@
+//@author: a0096620e
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\AddProcessor.java
+	 */
+
+/**
+ * This class contains methods to process add commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * It can process commands with a description, a start time, an end
+ * time, a date and a location. Only a description is mandatory.
+ * 
+ * <p>
+ * The following keywords are necessary, while the order is flexible:
+ * <ul>
+ * <li>" at " or " from " keyword for the start time
+ * <li>" to ", " until ", " due " for the end time
+ * <li>" on " for the date
+ * <li>" in " or " @" for the location <- no space after the @
+ * <li> " priority " or " !" <- take note there is no space after the !
+ * </ul>
+ * 
+ * <p>
+ * Example: "add dinner with bob at 1900 on mar 3 in uTown"
+ * 
+ * <p>
+ * The following time formats are supported:
+ * <ul>
+ * <li>930am/pm
+ * <li>9am/pm
+ * <li>1230
+ * <li>0730
+ * <li>0730pm
+ * </ul>
+ * 
+ * <p>
+ * The following date formats are supported (case does not matter):
+ * <ul>
+ * <li>jan 1
+ * <li>1 january
+ * <li>january 1
+ * </ul>
+ * 
+ * 
+ */
+public class AddProcessor extends Processor {
+
+
+	private static String[] keywords = new String[] { " from ", " at ", 
+			" until ", " due ", " on ", " in ", " @", " recur ", " priority ", " !"};
+	
+	private static int INDEX_OF_WORDS_AFTER_KEYWORDS = 1;
+	private static final int NO_OF_KEYWORDS_FOR_TIME = 5;
+
+	private static int NOT_FOUND = -1;
+	private static String INVALID_INPUT = "Invalid Input format ";
+	private static String INVALID_START_TIME = "Invalid Start Time ";
+	private static String INVALID_END_TIME = "Invalid End Time ";
+	private static String INVALID_END_DATE = "Invalid End Date format ";
+	private static String INVALID_RECUR = "Invalid Recur format : Need Date before adding recurrence period";
+	private static final String INVALID_INDEX = "Index must be 3 or 4";
+	private static int INDEX_OF_DESC = 0;
+	private static int INDEX_OF_START_TIME = 1;
+	private static int INDEX_OF_END_TIME = 2;
+	private static int INDEX_OF_START_DATE = 3;
+	private static int INDEX_OF_END_DATE = 4;
+	private static int INDEX_OF_LOCATION = 5;
+	private static int INDEX_OF_RECUR = 6;
+	private static int INDEX_OF_PRIORITY = 7;
+	private static int NO_OF_TASK_DETAILS = 8;
+	private static int DEFAULT_RECUR_PERIOD = 0;
+	private static String INVERTED_COMMA = "\"";
+	private static String TODAY = " today";
+	private static String TOMORROW1 = " tmr";
+	private static String TOMORROW2 = " tomorrow";
+	private static String ADD_SUCCESSFUL = "Added ";
+	private static Boolean[] errorsInInput = new Boolean[NO_OF_TASK_DETAILS];
+	private static String[] taskDetails = new String[NO_OF_TASK_DETAILS];
+	private static DateTime currentDate = DateTime.today(TimeZone.getDefault());
+	
+
+
+	/**
+	 * Adds Task to the list and writes to file the updated list
+	 * @param input
+	 * @return Task
+	 * @throws InvalidInputException
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
+	public static String processAdd(String input) throws NumberFormatException {
+		storeCurrentList();
+		Arrays.fill(errorsInInput,false);
+		Task userTask = null;
+		userTask = parseTask(input);
+		list.addToList(userTask);
+		fileHandler.updateFile(list);
+		
+		displayList = list;
+		
+		String statusString = "";
+		Boolean errorPresent = false;
+		for (int i = 0; i < errorsInInput.length; i++) {
+			if (errorsInInput[i] == true) {
+				errorPresent = true;
+				switch (i) {
+				case 1:
+					statusString += INVALID_START_TIME;
+					break;
+				case 2:
+					statusString += INVALID_END_TIME;
+					break;
+				case 4:
+					statusString += INVALID_END_DATE;
+					break;
+				case 6:
+					statusString += INVALID_RECUR;
+					break;
+				}
+			}
+		}
+		if (!errorPresent) {
+			return ADD_SUCCESSFUL + userTask.toString();
+		}
+		else {
+			return statusString;
+		}
+	}
+	
+	/**
+	 * Parses Task from a String
+	 * @param input
+	 * @return Task
+	 * @throws InvalidInputException
+	 */
+	public static Task parseTask(String input) {
+		Arrays.fill(taskDetails,null);
+		boolean taskDesExtracted = false;
+		int keywordIndex = NOT_FOUND;
+		Task userTaskDT = null;
+		String[] stringFragments = null;
+		
+		if (checkForInvertedCommas(input)) {
+			input = setDescWithWordsInsideInvertedCommas(input);
+			taskDesExtracted = true;
+		}
+
+		//Only is called if "at", "on", "due" and "until" is not present in the String
+		if (!isKeywordForTimePresentFound(input)) {
+			if (isTodayOrTomorrowFound(input)) {
+				//Removes today and tomorrow from the string so that it does not appear in description
+				input = setDateForTodayOrTomorrow(input);
+			}
+		}
+		
+		if (!keywordIsInString(input) && !taskDesExtracted) {
+			taskDetails[INDEX_OF_DESC] = input;
+		}
+		
+		while (keywordIsInString(input)) {
+			keywordIndex = getFirstKeyword(input);
+			stringFragments = splitByKeyword(input, keywords[keywordIndex]);
+			//Extracts Task Description during the first run of the program if it has not been
+			//extracted via other means such as if they are enclosed in inverted commas
+			if (!taskDesExtracted) {
+				taskDetails[INDEX_OF_DESC] = stringFragments[FIRST_WORD];
+				taskDesExtracted = true;
+			}
+			taskDetails = keywordHandler(keywordIndex, stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS]);
+			input = stringFragments[INDEX_OF_WORDS_AFTER_KEYWORDS];
+		}
+		userTaskDT = setUserTask(taskDetails);
+		
+		return userTaskDT;
+	}
+	
+	/**
+	 * Creates and sets userTask with all the information stored in
+	 * an array
+	 * @param taskDetails
+	 * @return userTaskDT with all the task details
+	 * @throws InvalidInputException 
+	 */
+	
+	private static Task setUserTask(String[] taskDetails) {
+		Task userTask = new Task(taskDetails[INDEX_OF_DESC]);
+		DateTime startTime = convertStringToDateTime(taskDetails[INDEX_OF_START_TIME]);
+		DateTime endTime = convertStringToDateTime(taskDetails[INDEX_OF_END_TIME]);
+		DateTime startDate = convertStringToDateTime(taskDetails[INDEX_OF_START_DATE]);
+		DateTime endDate = convertStringToDateTime(taskDetails[INDEX_OF_END_DATE]);
+		if (startDate != null && endDate != null) {
+			if (startDate.gt(endDate)) {
+				endDate = startDate;
+			}
+			if (startDate.equals(endDate)) {
+				if (startTime!= null && endTime != null) {
+					if (startTime.gt(endTime)) {
+						errorsInInput[INDEX_OF_START_TIME] = true;
+						startTime = null;
+					}
+				}
+			}
+		} else if (startDate != null && endDate == null) {
+			if (endTime != null && startTime != null) {
+				if (endTime.lt(startTime)) {
+					endDate = startDate.plusDays(ONE_DAY);
+				} else {
+					endDate = startDate;
+				}
+			} else {
+				endDate = startDate;
+			}
+		}
+		
+			
+		int recurPeriod = DEFAULT_RECUR_PERIOD;
+		try {
+			if (endDate == null && taskDetails[INDEX_OF_RECUR] != null) {
+				errorsInInput[INDEX_OF_RECUR] = true;
+			} else if (taskDetails[INDEX_OF_RECUR] != null && endDate != null){
+				recurPeriod = parseRecurrencePeriodFromString(taskDetails[INDEX_OF_RECUR]);
+			}
+		}
+		catch (NumberFormatException e) {
+			System.out.print(INVALID_INPUT);
+		}
+		userTask.setStartTime(startTime);
+		userTask.setEndTime(endTime);
+		userTask.setStartDate(startDate);
+		userTask.setEndDate(endDate);
+		userTask.setLocation(taskDetails[INDEX_OF_LOCATION]);
+		userTask.setRecurrencePeriod(recurPeriod);
+		userTask.setPriorityLevel(parsePriorityFromString(taskDetails[INDEX_OF_PRIORITY]));
+		return userTask;
+	}
+	
+	/**
+	 * Calls helper methods based on what keyword type it is
+	 * @param keywordType
+	 * @param input
+	 * @return String array with all the relevant task details
+	 * @throws InvalidInputException
+	 */
+
+	private static String[] keywordHandler (int keywordType, String input) {
+	
+		int spaceIndex = input.indexOf(" ");
+		if (spaceIndex == NOT_FOUND) {
+			spaceIndex = input.length();
+		}
+		switch (keywordType) {
+			case 0:
+			case 1:
+				try {
+					taskDetails[INDEX_OF_START_TIME] = retrieveStartTime(input);
+				} catch (InvalidInputException invalidStartTime) {
+					errorsInInput[INDEX_OF_START_TIME] = true;
+				}
+				break;
+			case 2:
+			case 3:
+				try {
+					taskDetails[INDEX_OF_END_TIME] = retrieveEndTime(input);
+				} catch (InvalidInputException invalidEndTime) {
+					errorsInInput[INDEX_OF_END_TIME] = true;
+				}
+				break;
+			case 4:
+				try {
+					taskDetails[INDEX_OF_END_DATE] = retrieveDate(input);
+				}
+				catch (InvalidInputException invalidDate) {
+					errorsInInput[INDEX_OF_END_DATE] = true;
+				}
+				break;
+			case 5:
+			case 6:
+				taskDetails[INDEX_OF_LOCATION] = retrieveLocation(input);
+				break;
+			case 7:
+				taskDetails[INDEX_OF_RECUR] = retrieveRecurPeriod(input, spaceIndex);
+				break;
+			case 8:
+			case 9:
+				taskDetails[INDEX_OF_PRIORITY] = retrievePriority(input,spaceIndex);
+				break;
+		}
+
+		return taskDetails;
+	}
+
+	/**
+	 * Retrieves the recurring period (first word) from input
+	 * @param input
+	 * @param spaceIndex
+	 * @return recurPeriod
+	 */
+	
+	private static String retrieveRecurPeriod (String input, int spaceIndex) {
+		String recurPeriod = (input.substring(0, spaceIndex));
+		return recurPeriod;
+	}
+	
+	/**
+	 * Retrieves the start time (first word) from input in the DateTime format (HH:MM)
+	 * @param input
+	 * @return startTimeString
+	 * @throws InvalidInputException 
+	 */
+	
+	private static String retrieveStartTime (String input) throws InvalidInputException {
+		String startTimeString = null;
+		if (getFirstKeyword(input) == NOT_FOUND) {
+			startTimeString = input;
+		} else {
+			startTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
+		}
+		startTimeString = retrieveDateFromTimeString(startTimeString, INDEX_OF_START_DATE);
+		if (startTimeString != null) {
+			startTimeString = parseTimeString(startTimeString);
+		}
+		return startTimeString;
+	}
+	
+	/**
+	 * Retrieves Start or User Date from a String that could contain both valid
+	 * time and date formats.
+	 * startOrEndTimeIndex is dependent on whether you wish to have the Date String stored
+	 * in the start date position in the taskDetails array
+	 * 
+	 * @param timeString
+	 * @param startOrEndTimeIndex
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	
+	private static String retrieveDateFromTimeString (String timeString, int startOrEndTimeIndex) throws InvalidInputException {
+		if (startOrEndTimeIndex != INDEX_OF_START_DATE && startOrEndTimeIndex != INDEX_OF_END_DATE) {
+			throw new InvalidInputException(INVALID_INDEX);
+		}
+		
+		String parts[] = timeString.split(" ");
+		String dateString = null;
+		if (parts.length == THREE_WORDS) {
+			String firstWordPlusSecondWord = parts[FIRST_WORD] + SPACE + parts[SECOND_WORD];
+			String secondWordPlusThirdWord = parts[SECOND_WORD] + SPACE + parts[THIRD_WORD];
+			if (isParseableByDate(firstWordPlusSecondWord)) {
+				dateString = parseDateString(firstWordPlusSecondWord);
+				timeString = parseTimeString(parts[THIRD_WORD]);
+			} else if (isParseableByDate (secondWordPlusThirdWord)) {
+				dateString = parseDateString(secondWordPlusThirdWord);
+				timeString = parseTimeString(parts[FIRST_WORD]);
+			}
+		} else if (parts.length == TWO_WORDS) {
+			String firstWordPlusSecondWord = parts[FIRST_WORD] + SPACE + parts[SECOND_WORD];
+			if (isParseableByDate(parts[FIRST_WORD])) {
+				dateString = parseDateString(parts[FIRST_WORD]);
+				timeString = parts[SECOND_WORD];
+			} else if (isParseableByDate(parts[SECOND_WORD])) {
+				dateString = parseDateString(parts[SECOND_WORD]);
+				timeString = parts[FIRST_WORD];
+			} else if (isParseableByDate (firstWordPlusSecondWord)) {
+				dateString = parseDateString(firstWordPlusSecondWord);
+				timeString = null;
+			}
+		} else if (parts.length == ONE_WORD) {
+			if (isParseableByDate(parts[FIRST_WORD])) {
+				dateString = parseDateString(parts[FIRST_WORD]);
+				timeString = null;
+			}
+		}
+		taskDetails[startOrEndTimeIndex] = dateString;
+		return timeString;
+	}
+	
+	/**
+	 * Retrieves the end time (first word) from input in the DateTime format (HH:MM)
+	 * @param input
+	 * @param spaceIndex
+	 * @return endTimeString
+	 * @throws InvalidInputException 
+	 */
+	
+	private static String retrieveEndTime (String input) throws InvalidInputException {
+		String endTimeString = null;
+		if (getFirstKeyword(input) == NOT_FOUND) {
+			endTimeString = input;
+		} else {
+			endTimeString = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
+		}
+		endTimeString = retrieveDateFromTimeString(endTimeString, INDEX_OF_END_DATE);
+		if (endTimeString != null) {
+			endTimeString = parseTimeString(endTimeString);
+		}
+		return endTimeString;
+	}
+	
+	/**
+	 * Retrieves location from input
+	 * @param input
+	 * @param spaceIndex
+	 * @return startTimeString
+	 */
+	
+	private static String retrieveLocation (String input) {
+		String location = null;
+		if (getFirstKeyword(input) == NOT_FOUND) {
+			location = input;
+		} else {
+			location = getWordsBeforeNextKeyword(input, keywords[getFirstKeyword(input)]);
+		}
+		
+		return location;
+	}
+	
+	/**
+	 * Retrieves the Date from input in the DateTime format (YYYY-MM-DD)
+	 * @param input
+	 * @param spaceIndex
+	 * @return dateString
+	 */
+	
+	private static String retrieveDate (String input) throws InvalidInputException {
+		if (!isParseableByDate(input)) {
+			throw new InvalidInputException(INVALID_DATE);
+		} 
+		String dateString = parseDateString(input);
+		return dateString;
+	}
+	
+	private static Boolean isKeywordForTimePresentFound (String input) {
+		for (int timeKeywordPos = 0; timeKeywordPos < NO_OF_KEYWORDS_FOR_TIME; timeKeywordPos++) {
+			if (input.contains(keywords[timeKeywordPos])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+
+	/**
+	 * Retrieves the priority
+	 * @param input
+	 * @param spaceIndex
+	 * @return priorityString
+	 */
+	
+	private static String retrievePriority(String input, int spaceIndex) {
+		String priorityString = input.substring(0, spaceIndex);
+		return priorityString;
+	}
+	
+
+	/**
+	 * Returns words before the specified keyword
+	 * @param input
+	 * @param keyword
+	 * @return wordsBeforeNextKeyword
+	 */
+
+	private static String getWordsBeforeNextKeyword(String input, String keyword) {
+		String wordsBeforeNextKeyword;
+		wordsBeforeNextKeyword = input.substring(0, input.indexOf(keyword));
+		return wordsBeforeNextKeyword;
+	}
+	
+	/**
+	 * Checks whether there are any keywords in the string
+	 * @param input
+	 * @return true for yes/false for no
+	 */
+
+	private static Boolean keywordIsInString(String input) {
+		for (String keyword : keywords) {
+			if (input.contains(keyword)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Retrieves the first keyword in the string
+	 * @param input
+	 * @return
+	 */
+
+	private static int getFirstKeyword(String input) {
+		int firstKeywordPos = input.length();
+		int firstKeyword = NOT_FOUND;
+
+		for (int keywordPos = 0; keywordPos < keywords.length; keywordPos++) {
+			if (input.contains(keywords[keywordPos])) {
+				if (input.indexOf(keywords[keywordPos]) < firstKeywordPos) {
+					firstKeywordPos = input.indexOf(keywords[keywordPos]);
+					firstKeyword = keywordPos;
+				}
+			}
+		}
+		return firstKeyword;
+	}
+	
+	/**
+	 * Splits the input into 2, one portion before the keyword, the other after
+	 * @param input
+	 * @param keyword
+	 * @return
+	 */
+
+	private static String[] splitByKeyword(String input, String keyword) {
+		String[] splitWords = null;
+		Pattern pattern = Pattern.compile(Pattern.quote(keyword));
+		splitWords = pattern.split(input);
+
+		return splitWords;
+	}
+	
+	/**
+	 * Checks if the input string has "today" "tmr" or tomorrow
+	 * @param input
+	 * @return true or false
+	 */
+	
+	private static Boolean isTodayOrTomorrowFound (String input) {
+		if (input.contains(TODAY) || input.contains(TOMORROW1) || input.contains(TOMORROW2)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Updates Tasklist with current date or tomorrow's date
+	 * @param input
+	 * @return input without the today or tomorrow word
+	 */
+	
+	private static String setDateForTodayOrTomorrow (String input) {		
+		if (input.contains(TODAY)) {
+			taskDetails[INDEX_OF_END_DATE] = currentDate.toString();	
+			input = input.substring(0,input.indexOf(TODAY)) + input.substring(input.indexOf(TODAY) + TODAY.length());
+		} else if (input.contains(TOMORROW1)) {
+			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(ONE_DAY).toString();			
+			input = input.substring(0,input.indexOf(TOMORROW1)) + input.substring(input.indexOf(TOMORROW1) + TOMORROW1.length());
+		} else if (input.contains(TOMORROW2)) {
+			taskDetails[INDEX_OF_END_DATE] = currentDate.plusDays(ONE_DAY).toString();			
+			input = input.substring(0,input.indexOf(TOMORROW2)) + input.substring(input.indexOf(TOMORROW2) + TOMORROW2.length());
+		}
+		return input;
+	}
+	
+	/**
+	 * Checks if the string has two inverted commas
+	 * @param input
+	 * @return
+	 */
+	
+	private static Boolean checkForInvertedCommas (String input) {
+		if (input.contains(INVERTED_COMMA)) {
+			if (input.substring(input.indexOf(INVERTED_COMMA)+1).contains(INVERTED_COMMA)) {
+				return true;
+			}
+		} 
+		return false;
+	}
+	
+	/**
+	 * Sets the task detail containing description with the words within the inverted commas
+	 * @param input
+	 * @return input without the description
+	 */
+	
+	private static String setDescWithWordsInsideInvertedCommas (String input) {
+		int firstIndex = input.indexOf(INVERTED_COMMA);
+		int secondIndex = input.lastIndexOf(INVERTED_COMMA);
+		//Extracts the task Description from in between the two quotation marks
+		taskDetails[INDEX_OF_DESC] = input.substring(1, secondIndex - firstIndex);
+		input = input.substring(secondIndex);
+		return input;
+	}
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\AddProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Processor.java
+	 */
+
+/**
+ * This class stores information needed to process a user's command, and
+ * contains methods to parse a command's arguments.
+ * 
+ */
+public class Processor {
+
+	protected static String fileLoc = "tasks.txt";
+	protected static FileHandler fileHandler = new FileHandler(fileLoc);
+	protected static TaskList list = fileHandler.readFile();
+	protected static TaskList displayList = list;
+	protected static Stack<TaskList> undoList = new Stack<TaskList>();
+	protected static Stack<TaskList> redoList = new Stack<TaskList>();
+	
+	protected static final int AM = 0;
+	protected static final int PM = 1;
+	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR = 1;
+	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR = 2;
+	protected static final int NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES = 3;
+	protected static final int NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES = 4;
+	protected static final int MAX_TIME_LENGTH = 5;
+	protected static final int POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR = 1;
+	protected static final int POS_OF_MINUTE = 2;
+	protected static final int ONE_DAY = 1;
+	protected static final int DAY_OFFSET = 1;
+	protected static final int DAYS_IN_A_WEEK = 7;
+	protected static final int SUNDAY_IN_DATETIME = 0;
+	protected static final int NOON = 12;
+	protected static final int PM_OFFSET = 12;
+	protected static final int POSITION_OFFSET = 1;
+	protected static final int ONE_DIGIT = 1;
+	protected static final int FIRST_WORD = 0;
+	protected static final int SECOND_WORD = 1;
+	protected static final int THIRD_WORD = 2;
+	protected static int THREE_WORDS = 3;
+	protected static int TWO_WORDS = 2;
+	protected static int ONE_WORD = 1;
+	protected static int NO_RECURRENCE = 0;
+	
+	protected static final String SG_TIMEZONE = "GMT+8:00";
+	protected static final String DEFAULT_MINUTE_FORMAT = "00";
+	protected static final String DATETIME_PADDING = "0";
+	protected static final String ZERO = "0";
+	protected static final String DATE_FORMAT_SYMBOL = "-";
+	protected static final String TIME_FORMAT_SYMBOL = ":";
+	protected static final String SPACE = " ";
+	protected static final String INVALID_DATE = "Invalid Date";
+	protected static final String INVALID_TIME = "Invalid Time";
+	
+	protected static final int NOT_FOUND = -1;
+	
+	protected static final String PRIORITY_LOW = "LOW";
+	protected static final String PRIORITY_MED = "MEDIUM";
+	protected static final String PRIORITY_HIGH = "HIGH";
+	
+	protected static DateTime currentDate = DateTime.today(TimeZone
+			.getDefault());
+	
+	protected static final String[] days = new String[] { "mon", "tues", "wed",
+			"thurs", "fri", "sat", "sun" };
+	protected static final String[] dateKeywords = new String[] { "today", "tomorrow", "tmr" };
+	protected static final String meridiems[] = new String[] { "am", "pm" };
+
+	/**
+	 * This stores a copy of the current list before modifications are made for
+	 * possible undo operations in the future.
+	 */
+	protected static void storeCurrentList() {
+		TaskList lastList = new TaskList();
+		lastList.deepCopy(list);
+		undoList.push(lastList);
+	}
+
+	
+	/**
+	 * Converts "Jan 1" to "YYYY-MM-DD" (DateTime format) Other input formats
+	 * include days of the week "Monday", "Tuesday", etc You can also put next
+	 * before the days of the week This will set the string the DateTime format
+	 * of the specified day
+	 *    
+	 * @param input
+	 * @return standardFormDate
+	 * @throws InvalidInputException
+	 */
+	protected static String parseDateString(String input)
+			throws InvalidInputException {
+		if (input == null) {
+			throw new InvalidInputException(INVALID_DATE);
+		}
+
+		if (DateTime.isParseable(input)) {
+			return input;
+		}
+
+		input = input.toLowerCase();
+		String standardFormDate = null;
+		if (hasTodayOrTmr(input)) {
+			standardFormDate = getDateIfTdyOrTmrInString(input);
+			return standardFormDate;
+		}
+
+
+		int dayIndex = checkForDay(input);
+		if (dayIndex != NOT_FOUND) {
+			standardFormDate = currentDate.plusDays(daysFromCurrentDay(input))
+					.toString();
+			return standardFormDate;
+		}
+
+		String[] parts = input.split(" ");
+		String[] months = new String[] { "jan", "feb", "mar", "apr", "may",
+				"jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+
+		for (int monthPos = 0; monthPos < months.length; monthPos++) {
+			if (parts.length > ONE_WORD) {
+				if (parts[FIRST_WORD].contains(months[monthPos])) {
+					standardFormDate = convertDateToStandardForm(parts[SECOND_WORD],
+							String.valueOf(monthPos + POSITION_OFFSET));
+				} else if (parts[SECOND_WORD].contains(months[monthPos])) {
+					standardFormDate = convertDateToStandardForm(parts[FIRST_WORD],
+							String.valueOf(monthPos + POSITION_OFFSET));
+				}
+			}
+		}
+
+		if (standardFormDate == null) {
+			throw new InvalidInputException(INVALID_DATE);
+		}
+
+		return standardFormDate;
+	}
+	
+	/**
+	 * Converts "2" "1" to "YYYY-MM-DD"
+	 * 
+	 *    
+	 * @param String
+	 *            month, String day
+	 * 
+	 * @return userDate
+	 * @throws IOException
+	 */
+	protected static String convertDateToStandardForm(String month, String day) {
+		String year = Integer.toString(DateTime.now(
+				TimeZone.getTimeZone(SG_TIMEZONE)).getYear());
+		if (month.length() == ONE_DIGIT) {
+			month = DATETIME_PADDING + month;
+		}
+		if (day.length() == ONE_DIGIT) {
+			day = DATETIME_PADDING + day;
+		}
+		return year + DATE_FORMAT_SYMBOL + day + DATE_FORMAT_SYMBOL + month;
+	}
+
+	/**
+	 * Checks whether "am" or "pm" is in the string
+	 * 
+	 *    
+	 * @param input
+	 * @return 0 for am, 1 for pm, -1 for not found
+	 */
+
+	private static int checkMeridiem(String input) {
+		for (int meridiemPos = 0; meridiemPos < meridiems.length; meridiemPos++) {
+			if (input.contains(meridiems[meridiemPos])) {
+				return meridiemPos;
+			}
+		}
+		return NOT_FOUND;
+	}
+	
+	/**
+	 * Function to determine if a string can be parsed into a date
+	 * @param input
+	 * @return true or false
+	 */
+	
+	protected static Boolean isParseableByDate (String input) {
+		try {
+			if(isParseableByInt(input)) {
+				return false;
+			}
+			if (isParseableByTime(input)) {
+				return false;
+			}
+			input = parseDateString(input);
+			if (!DateTime.isParseable(input)) {
+				return false;
+			}
+		} catch (InvalidInputException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Function determines if a string can be parsed into an integer
+	 * @param input
+	 * @return true or false
+	 */
+	
+	protected static Boolean isParseableByTime (String input) {
+		try {
+			parseTimeString(input);
+		} catch (InvalidInputException e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Helper method for parseDateString
+	 * Returns true if "today" "tomorrow" or "tmr" is in string
+	 * @param input
+	 * @return
+	 */
+	
+	private static Boolean hasTodayOrTmr (String input) {
+		for (int keywordPos = 0; keywordPos < dateKeywords.length; keywordPos++) {
+			if (input.contains(dateKeywords[keywordPos])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Helper method for parseDateString
+	 * Returns today or tomorrow's date depending on which keyword is present
+	 * @param input
+	 * @return
+	 */
+	
+	private static String getDateIfTdyOrTmrInString (String input) {
+		String userDate;
+		for (int keywordPos = 0; keywordPos < dateKeywords.length; keywordPos++) {
+			if (input.contains(dateKeywords[keywordPos])) {
+				switch (keywordPos) {
+				case 0:
+					userDate = currentDate.toString();
+					return userDate;
+				case 1:
+				case 2:
+					userDate = currentDate.plusDays(ONE_DAY).toString();
+					return userDate;
+				}
+			}
+		}
+		return input;
+	}
+
+	/**
+	 * Returns the number of days it is from the current day Example : if today
+	 * is Wednesday, and input is Tuesday, it will return -1
+	 * 
+	 * @param input
+	 * @return
+	 */
+
+	private static int daysFromCurrentDay(String input) {
+		int currentDay = currentDate.getWeekDay();
+		int userDay = checkForDay(input);
+		
+		//1 is used as Sunday is the first day in DateTime, while Monday is
+		// first day in this program, the next 3 lines is to readjust
+		 
+		currentDay -= DAY_OFFSET;
+		if (currentDay == SUNDAY_IN_DATETIME) {
+			currentDay = DAYS_IN_A_WEEK;
+		}
+		int daysFromCurrent = userDay - currentDay;
+		if (input.contains("next")) {
+			daysFromCurrent += DAYS_IN_A_WEEK;
+		}
+		return daysFromCurrent;
+	}
+	/**
+	 * Checks whether input contains "monday" or "tuesday"
+	 * Returns an integer depending on which day it is
+	 * @param input
+	 * @return integer (1 - 7)
+	 */
+
+	private static int checkForDay(String input) {
+		int dayValue = 0;
+		for (int dayPos = 0; dayPos < days.length; dayPos++) {
+			if (input.contains(days[dayPos])) {
+				dayValue = dayPos + POSITION_OFFSET;
+				return dayValue;
+			}
+		}
+		return NOT_FOUND;
+	}
+
+	/**
+	 * Converts "930pm" to HH:MM (DateTime Format)
+	 * 
+	 * @param input
+	 * @return standardFormDate
+	 * @throws InvalidInputException
+	 */
+
+	protected static String parseTimeString(String input)
+			throws InvalidInputException {
+		String timeString = null;
+		if (input == null) {
+			throw new InvalidInputException(INVALID_TIME);
+		}
+		if (input.length() > MAX_TIME_LENGTH) {
+			throw new InvalidInputException(INVALID_TIME);
+		}
+		if ((input.length() == MAX_TIME_LENGTH) && input.contains(TIME_FORMAT_SYMBOL)) {
+			if (DateTime.isParseable(input)) {
+				return input;		
+			}
+		}
+		
+		timeString = convertStringToStdTimeString(input);
+		return timeString;
+	}
+	
+	/**
+	 * converts a String to HH:MM(DateTime format)
+	 * Supported String inputs are:
+	 * 930pm
+	 * 930
+	 * 9
+	 * 2130
+	 * @param input
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	
+	protected static String convertStringToStdTimeString (String input) throws InvalidInputException {
+		String userHour = null;
+		String userMinute = DEFAULT_MINUTE_FORMAT;
+		String timeString = null;
+		int meridiemIndex = checkMeridiem(input);
+		
+		//if am or pm is present, removes them from the string
+		if (meridiemIndex != NOT_FOUND) {
+			input = input.substring(0, input.indexOf(meridiems[meridiemIndex]));
+		}
+		if (!isParseableByInt(input)) {
+			throw new InvalidInputException(INVALID_TIME);
+		} else {
+			if ((input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR)
+					|| (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR)) {
+				userHour = input;
+			} else if (input.length() == NO_OF_CHAR_IN_DOUBLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE);
+				userMinute = input.substring(POS_OF_MINUTE);
+			} else if (input.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR_AND_MINUTES) {
+				userHour = input.substring(0, POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+				userMinute = input.substring(POS_OF_MINUTE_AFTER_SINGLE_DIGIT_HOUR);
+			}
+		}
+		if (meridiemIndex == AM) {
+			if (Integer.parseInt(userHour) == NOON) {
+				userHour = ZERO;
+			}
+		}
+		if (meridiemIndex == PM) { 	
+			if (Integer.parseInt(userHour) != NOON) {
+				// Adds 12 hours to the hour if there is PM
+				userHour = Integer.toString(Integer.parseInt(userHour) + PM_OFFSET);
+			}
+		}
+		if (userHour.length() == NO_OF_CHAR_IN_SINGLE_DIGIT_HOUR) {
+			// pads a single digit hour to fit the DateTime format
+			userHour = DATETIME_PADDING + userHour;
+		}
+		timeString = userHour + TIME_FORMAT_SYMBOL + userMinute;
+		return timeString;
+	}
+	/**
+	 * Returns true if the string can be parsed by int
+	 * Returns false if not
+	 * @param input
+	 * @return
+	 */
+
+	protected static Boolean isParseableByInt(String input) {
+		try {
+			Integer.parseInt(input);
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Converts strings of form YYYY-MM-DD or HH:MM to DateTime format
+	 * 
+	 * @param input
+	 * @return DateTime
+	 */
+
+	protected static DateTime convertStringToDateTime(String input) {
+		DateTime userDateTime = null;
+		if (input == null) {
+			return null;
+		} else {
+			if (!DateTime.isParseable(input)) {
+				return null;
+			} else {
+				userDateTime = new DateTime(input);
+				if (!userDateTime.hasYearMonthDay()) {
+					userDateTime = new DateTime(userDateTime.toString());
+				}
+			}
+		}
+		return userDateTime;
+	}
+	
+	/**
+	 * Parses Priority from string
+	 * The input can either be "1", "2" or "3" or
+	 * "high", "med", "low"
+	 * @param input
+	 * @return
+	 */
+
+	protected static String parsePriorityFromString(String input) {
+		if (input == null) {
+			return PRIORITY_LOW;
+		}
+		if (isParseableByInt(input)) {
+			return parsePriorityFromNumber(input);
+		}
+		return parsePriorityFromWords(input);
+	}
+	
+	/**
+	 * Helper method for parsePriorityFromString
+	 * Parses priority from a number
+	 * default = low
+	 * 1 = low
+	 * 2 = med
+	 * 3 = high
+	 * @param input
+	 * @return
+	 */
+	
+	private static String parsePriorityFromNumber (String input) {
+		int noPriority = Integer.parseInt(input);
+		switch (noPriority) {
+		case 1:
+			return PRIORITY_LOW;
+		case 2:
+			return PRIORITY_MED;
+		case 3:
+			return PRIORITY_HIGH;
+		}
+		return PRIORITY_LOW;
+	}
+	
+	/**
+	 * Helper method for parsePriorityFromString
+	 * Parses priority from a string
+	 * an invalid input will default to low
+	 * @param input
+	 * @return
+	 */
+	
+	private static String parsePriorityFromWords (String input) {
+		String priorityLevels[] = new String[] { "low", "med", "high" };
+		input = input.toLowerCase();
+		for (int i = 0; i < priorityLevels.length; i++) {
+			if (input.contains(priorityLevels[i])) {
+				switch (i) {
+				case 0:
+					return PRIORITY_LOW;
+				case 1:
+					return PRIORITY_MED;
+				case 2:
+					return PRIORITY_HIGH;
+				}
+			}
+		}
+		return PRIORITY_LOW;
+		
+	}
+	
+	/**
+	 * Checks if the String contains "daily" or "weekly" and
+	 * returns an integer
+	 * Daily = 1
+	 * Weekly = 7
+	 * @param input
+	 * @return
+	 */
+		
+	protected static int parseRecurrencePeriodFromString(String input) {
+		if (isParseableByInt(input)) {
+			return Integer.parseInt(input);
+		}
+		String recurPeriodKeywords[] = new String[] { "daily", "weekly"};
+		input = input.toLowerCase();
+		for (int i = 0; i < recurPeriodKeywords.length; i++) {
+			if (input.contains(recurPeriodKeywords[i])) {
+				switch (i) {
+				case 0:
+					return ONE_DAY;
+				case 1:
+					return DAYS_IN_A_WEEK;
+				}
+				
+			}
+		}
+		return NO_RECURRENCE;
+	}
+
+	public static TaskList getList() {
+		return list;
+	}
+
+	public static TaskList getDisplayList() {
+		return displayList;
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Processor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\RecurProcessor.java
+	 */
+
+public class RecurProcessor extends Processor {
+	
+	private static String RECURRING_TASKS_ADDED = "Recurring tasks have been added";
+	
+	public static String processRecur(String input) {
+		for (int i = 0; i < list.getSize(); i++){
+			addsRecurringTask(list.getListItem(i));
+		}
+		fileHandler.updateFile(list);
+		return RECURRING_TASKS_ADDED;
+	}
+	
+	/**
+	 * Adds tasks that have expired (date is after current date) and needs to be recurred
+	 * @param task
+	 */
+	
+	private static void addsRecurringTask(Task task) {
+		if (needsToBeRecurred(task)) {
+			Task newTask = new Task(task);
+			if (newTask.getStartDate() != null) {
+				newTask.setStartDate(task.getStartDate().plusDays(task.getRecurrencePeriod()));
+			}
+			newTask.setEndDate(task.getEndDate().plusDays(task.getRecurrencePeriod()));
+			newTask.setTimeCreated(DateTime.now(TimeZone.getTimeZone(SG_TIMEZONE)));
+			newTask.setCompleted(false);
+			list.addToList(newTask);
+		}
+	}
+	/**
+	 * Checks if there will be a duplicate task
+	 * @param task
+	 * @return Boolean
+	 */
+	private static Boolean checkIfDuplicateRecurTaskExist (Task task) {
+
+		DateTime recurEndDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
+		for (int i = 0; i < list.getSize(); i++) {
+			if (list.getListItem(i).getEndDate() == null) {
+				return false;
+			}
+			if (list.getListItem(i).getEndDate().equals(recurEndDate)) {
+				if (list.getListItem(i).compareDescAndLocation(task)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if the task needs to be readded to the list
+	 * These are the two conditions for recurrence:
+	 * Task must have expired
+	 * There must not be another task with the same description
+	 * and location on the date it is set to be recurred
+	 * @param task
+	 * @return Boolean
+	 */
+
+	protected static Boolean needsToBeRecurred(Task task) {
+		if (task.getRecurrencePeriod() == 0) {
+			return false;
+		}
+		TimeZone SGT = TimeZone.getTimeZone(SG_TIMEZONE);
+		DateTime recurEndDate = task.getEndDate().plusDays(task.getRecurrencePeriod());
+		if (DateTime.today(SGT).numDaysFrom(recurEndDate) < task.getRecurrencePeriod()) {
+			if (!checkIfDuplicateRecurTaskExist(task)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\RecurProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\SetSyncProcessor.java
+	 */
+
+/**
+ * Class to set username and password via CLI
+ *
+ */
+public class SetSyncProcessor extends Processor {
+	private static final String SET_SUCCESSFUL = "Username and password successful set";
+	private static final String INVALID_USERNAME = "Invalid username and password. Format is <username> <password>";
+	public static String processSetSync(String input) {
+		String[] parts = input.split(" ");
+		if (parts.length != 2) {
+			return INVALID_USERNAME;
+		}
+		String username = parts[FIRST_WORD];
+		String password = parts[SECOND_WORD];
+		list.setUserNameAndPassword(username, password);
+		fileHandler.updateFile(list);
+		return SET_SUCCESSFUL;
+	}
+
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\SetSyncProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Task.java
+	 */
+
+public class Task {
+
+	private static final String START_TIME_PREP = " at ";
+	private static final String END_TIME_PREP = " until ";
+	private static final String LOCATION_PREP = " in ";
+	private static final String DATE_PREP = " on ";
+	private static final String SEPERATOR = "#";
+	private static final String PRIORITY_LOW = "LOW";
+	private static final String IS_TRUE = "true";
+	private static int INDEX_OF_DESC = 0;
+	private static int INDEX_OF_START_TIME = 1;
+	private static int INDEX_OF_END_TIME = 2;
+	private static int INDEX_OF_START_DATE = 3;
+	private static int INDEX_OF_END_DATE = 4;
+	private static int INDEX_OF_LOCATION = 5;
+	private static int INDEX_OF_RECUR = 6;
+	private static int INDEX_OF_ID = 7;
+	private static int INDEX_OF_TIME_CREATED = 8;
+	private static int INDEX_OF_PRIORITY = 9;
+	private static int INDEX_OF_IS_COMPLETED = 10;
+	private static int INDEX_OF_EVENT_ID = 11;
+	private static int INDEX_OF_UPDATE_TIME = 12;
+	private static int INDEX_OF_NOTICE_TIME = 13;
+
+	private String description;
+	private DateTime startTime;
+	private DateTime endTime;
+	private DateTime noticeTime;
+	private DateTime startDate;
+	private DateTime endDate;
+	private String location;
+	private String eventId;
+	private DateTime updateTime;
+	private int recurrencePeriod;
+	private int id;
+	private String priorityLevel;
+	private DateTime timeCreated;
+	private Boolean isCompleted;
+
+	public Task(String userDes) {
+		description = userDes;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
+	}
+
+	public Task(String userDes, DateTime userStart, DateTime userEnd,
+			DateTime userEndDate, String userLocation) {
+		description = userDes;
+		startTime = userStart;
+		endDate = userEndDate;
+		endTime = userEnd;
+		location = userLocation;
+		recurrencePeriod = 0;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
+	}
+
+	public Task(String userDes, DateTime userStart, DateTime userEnd, DateTime userStartDate,
+			DateTime userEndDate, String userLocation, int userRecurrencePeriod) {
+		description = userDes;
+		startTime = userStart;
+		startDate = userStartDate;
+		endDate = userEndDate;
+		endTime = userEnd;
+		location = userLocation;
+		recurrencePeriod = userRecurrencePeriod;
+		timeCreated = DateTime.now(TimeZone.getDefault());
+		id = timeCreated.toString().hashCode();
+		priorityLevel = PRIORITY_LOW;
+		isCompleted = false;
+	}
+
+	public Task(Task copy) {
+		description = copy.getDescription();
+		startTime = copy.getStartTime();
+		endTime = copy.getEndTime();
+		startDate = copy.getStartDate();
+		endDate = copy.getEndDate();
+		location = copy.getLocation();
+		recurrencePeriod = copy.getRecurrencePeriod();
+		timeCreated = copy.getTimeCreated();
+		id = copy.getId();
+		priorityLevel = copy.getPriorityLevel();
+		isCompleted = copy.getCompleted();
+	}
+
+	public static boolean isEqual(String string1, String string2) {
+		return (string1 == string2)
+				|| ((string1 != null) && string1.equals(string2));
+	}
+
+	public Boolean compareDescAndLocation(Task task) {
+		if (isEqual(this.description, task.getDescription())
+				&& isEqual(this.location, task.getLocation())) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		String task = description;
+		if (startTime != null) {
+			task += START_TIME_PREP + startTime;
+		}
+		if (startDate != null) {
+			task += DATE_PREP + startDate.format("MMM DD YYYY", new Locale("US"));
+		}
+		if (endTime != null) {
+			task += END_TIME_PREP + endTime;
+		}
+		if (startDate == null && endDate != null) {
+			task += DATE_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+		} else if (endDate != null) {
+			if (!endDate.equals(startDate)) {
+				if (endTime != null) {
+					task += DATE_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+				} else if (!endDate.equals(startDate)) {
+				task += END_TIME_PREP + endDate.format("MMM DD YYYY", new Locale("US"));
+				}
+			}
+		}
+		if (location != null) {
+			task += LOCATION_PREP + location;
+		}
+		if (recurrencePeriod != 0) {
+			task += " recurring every " + recurrencePeriod + " days";
+		}
+
+		return task;
+	}
+
+	/**
+	 * Creates a String from task of the following format:
+	 * <desc>#<startTime>#<endTime>#<startDate>
+	 * >#<endDate>#<location>#<recurrencePeriod>#<id>#<timeCreated
+	 * >#<priorityLevel>#<isCompleted>#<eventId>#<updateTime>#<noticeTime>
+	 * 
+	 * @return
+	 */
+	public String toFileString() {
+		String task = description;
+		task += SEPERATOR + startTime + SEPERATOR + endTime + SEPERATOR + startDate 
+				+ SEPERATOR + endDate + SEPERATOR + location + SEPERATOR + recurrencePeriod
+				+ SEPERATOR + id + SEPERATOR + timeCreated + SEPERATOR
+				+ priorityLevel + SEPERATOR + isCompleted + SEPERATOR + eventId
+				+ SEPERATOR + updateTime + SEPERATOR + noticeTime;
+		return task;
+	}
+
+	/**
+	 * Create a new Task object from a taskString in the standard format (from data file)
+	 * 
+	 * @return Task object generated from taskString, null if taskString is
+	 *         empty
+	 * @throws InvalidInputException
+	 */
+	public static Task createTaskFromFileString(String fileInput) {
+		String[] parts = fileInput.split(SEPERATOR);
+		String description = parts[INDEX_OF_DESC];
+		DateTime startTime = null;
+		DateTime endTime = null;
+		DateTime startDate = null;
+		DateTime endDate = null;
+		String location = null;
+		String eventId = null;
+		DateTime updateTime = null;
+		DateTime noticeTime = null;
+		if (DateTime.isParseable(parts[INDEX_OF_START_TIME])) {
+			startTime = new DateTime(parts[INDEX_OF_START_TIME]);
+		}
+		if (DateTime.isParseable(parts[INDEX_OF_END_TIME])) {
+			endTime = new DateTime(parts[INDEX_OF_END_TIME]);
+		}
+		if (DateTime.isParseable(parts[INDEX_OF_START_DATE])) {
+			startDate = new DateTime(parts[INDEX_OF_START_DATE]);
+		}
+		if (DateTime.isParseable(parts[INDEX_OF_END_DATE])) {
+			endDate = new DateTime(parts[INDEX_OF_END_DATE]);
+		}
+		if (!parts[INDEX_OF_LOCATION].equals("null")) {
+			location = parts[INDEX_OF_LOCATION];
+		}
+		int recurrencePeriod = Integer.parseInt(parts[INDEX_OF_RECUR]);
+		int id = Integer.parseInt(parts[INDEX_OF_ID]);
+		DateTime timeCreated = new DateTime(parts[INDEX_OF_TIME_CREATED]);
+		String prioritylevel = parts[INDEX_OF_PRIORITY];
+		Boolean isCompleted = false;
+		if (parts[INDEX_OF_IS_COMPLETED].equals(IS_TRUE)) {
+			isCompleted = true;
+		}
+		eventId = parts[INDEX_OF_EVENT_ID];
+		if (DateTime.isParseable(parts[INDEX_OF_UPDATE_TIME])) {
+			updateTime = new DateTime(parts[INDEX_OF_UPDATE_TIME]);
+		}
+		if (DateTime.isParseable(parts[INDEX_OF_NOTICE_TIME])) {
+			noticeTime = new DateTime(parts[INDEX_OF_NOTICE_TIME]);
+		}
+		Task userTask = new Task(description);
+		userTask.setStartTime(startTime);
+		userTask.setEndTime(endTime);
+		userTask.setStartDate(startDate);
+		userTask.setEndDate(endDate);		
+		userTask.setLocation(location);
+		userTask.setRecurrencePeriod(recurrencePeriod);
+		userTask.setId(id);
+		userTask.setTimeCreated(timeCreated);
+		userTask.setPriorityLevel(prioritylevel);
+		userTask.setCompleted(isCompleted);
+		userTask.setEventId(eventId);
+		userTask.setUpdateTime(updateTime);
+		userTask.setNoticeTime(noticeTime);
+		return userTask;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public DateTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(DateTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public DateTime getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(DateTime endTime) {
+		this.endTime = endTime;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public void setStartDate(DateTime date) {
+		this.startDate = date;
+	}
+
+	public DateTime getStartDate() {
+		return startDate;
+	}
+
+	public void setEndDate(DateTime date) {
+		this.endDate = date;
+	}
+
+	public DateTime getEndDate() {
+		return endDate;
+	}
+
+	public int getRecurrencePeriod() {
+		return recurrencePeriod;
+	}
+
+	public void setRecurrencePeriod(int recurrencePeriod) {
+		this.recurrencePeriod = recurrencePeriod;
+	}
+
+	public String getPriorityLevel() {
+		return priorityLevel;
+	}
+
+	public void setPriorityLevel(String priorityLevel) {
+		this.priorityLevel = priorityLevel;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public DateTime getTimeCreated() {
+		return timeCreated;
+	}
+
+	public void setTimeCreated(DateTime timeCreated) {
+		this.timeCreated = timeCreated;
+	}
+
+	public Boolean getCompleted() {
+		return isCompleted;
+	}
+
+	public void setCompleted(Boolean isCompleted) {
+		this.isCompleted = isCompleted;
+	}
+
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
+	}
+
+	public void setUpdateTime(DateTime updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getEventId() {
+		return eventId;
+	}
+
+	public DateTime getUpdateTime() {
+		return updateTime;
+	}
+
+	public DateTime getNoticeTime() {
+		return noticeTime;
+	}
+
+	public void setNoticeTime(DateTime time) {
+		this.noticeTime = time;
+
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\AddProcessorTest.java
+	 */
+
+public class AddProcessorTest {
+
+	/*This is a test case to test for locations for more than one words*/
+	@Test
+	public void testAddTimeDateLoc() throws InvalidInputException {
+		Task testTask = null;
+		Integer startHour = 14;
+		Integer endHour = 16;
+		Integer month = 3;
+		Integer day = 22;
+		String test = "dinner with parents at 2pm March 22 until 4pm in utown starbucks";
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", testTask.getDescription(), "dinner with parents");
+		assertEquals("", testTask.getStartTime().getHour(), startHour);
+		assertEquals("", testTask.getEndTime().getHour(), endHour);
+		assertEquals("", testTask.getStartDate().getDay(), day);
+		assertEquals("", testTask.getStartDate().getMonth(), month);
+		assertEquals("", testTask.getLocation(), "utown starbucks");
+	}
+	
+	/*This is a test case to test for locations of one word*/
+	@Test
+	public void testAddTimeDateLocOneWord() throws InvalidInputException {
+		Task testTask = null;
+		Integer hour = 0;
+		Integer month = 3;
+		Integer day = 15;
+		String test = "dinner with parents at 0am on March 15 in utown";
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", testTask.getDescription(), "dinner with parents");
+		assertEquals("", testTask.getStartTime().getHour(), hour);
+		assertEquals("", testTask.getEndDate().getDay(), day);
+		assertEquals("", testTask.getEndDate().getMonth(), month);
+		assertEquals("", testTask.getLocation(), "utown");
+	}
+	
+	/*Tests boundary case of 12pm for the Time Parser
+	 *Tests at keyword that has time and date
+	 *Tests until keyword that has time and date */
+	@Test
+	public void testAddDateTime() throws InvalidInputException {
+		Task testTask = null;
+		String test = "project at 12pm dec 4 until 11am dec 31";
+		Integer day = 31;
+		Integer month = 12;
+		Integer startHour = 12;
+		Integer endHour = 11;
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", "project", testTask.getDescription());
+		assertEquals("", month, testTask.getStartDate().getMonth());
+		assertEquals("", (Integer) 4 , testTask.getStartDate().getDay());
+		assertEquals("", month, testTask.getEndDate().getMonth());
+		assertEquals("", day, testTask.getEndDate().getDay());
+		assertEquals("", startHour, testTask.getStartTime().getHour());
+		assertEquals("", endHour, testTask.getEndTime().getHour());
+	}
+	/* This is a boundary case of Jan 1  for the Date Parser
+	 * Tests description with keywords enclosed in ""*/
+	@Test
+	public void testAddDateJan1() throws InvalidInputException {
+		Task testTask= null;
+		String test = "\"grab lunch on the way to school\" on 1 Jan at 09:00";
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", testTask.getDescription(), "grab lunch on the way to school");
+		assertEquals("", testTask.getStartTime(), new DateTime("09:00"));
+		assertEquals("",testTask.getEndDate(), new DateTime("2014-01-01"));
+	}	
+	
+	/* Tests boundary case of Dec 31  for the Date Parser
+	 * Tests parameter weekly for recurrence
+	 * Tests @ location keyword */
+	@Test
+	public void testAddDateDec31() throws InvalidInputException {
+		Task testTask= null;
+		String test = "dinner with parents at 1900 Dec 31 recur weekly priority 2 @food court";
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", testTask.getLocation(), "food court");
+		assertEquals("", testTask.getPriorityLevel(), "MEDIUM");
+		assertEquals("", testTask.getRecurrencePeriod(), 7);
+		assertEquals("", testTask.getDescription(), "dinner with parents");
+		assertEquals("", testTask.getEndDate(), new DateTime("2014-12-31"));
+		assertEquals("", testTask.getEndDate(), new DateTime("2014-12-31"));
+	}	
+	
+	/* Tests for "today" for date
+	 * Tests for shortcut ! for priority
+	 * Tests daily for recurrence*/
+	@Test
+	public void testAddDateToday() throws InvalidInputException {
+		Task testTask = null;
+		String test = "lunch with parents on today at 11am !high recur daily";
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", testTask.getDescription(), "lunch with parents");
+		assertEquals("", testTask.getStartTime(), new DateTime("11:00"));
+		assertEquals("", testTask.getPriorityLevel(), "HIGH");
+		assertEquals("", testTask.getRecurrencePeriod(), 1);
+		assertEquals("", testTask.getEndDate(), DateTime.today(TimeZone.getDefault()));
+	}
+	
+
+	public void testAddDateTomorrow() throws InvalidInputException {
+		Task testTask = null;
+		String test = "dinner with parents at 7pm until 2100 tomorrow";
+		testTask = AddProcessor.parseTask(test);
+		assertEquals("", testTask.getDescription(), "dinner with parents");
+		assertEquals("", testTask.getStartDate(), DateTime.today(TimeZone.getDefault()).plusDays(1));
+		assertEquals("", testTask.getStartTime(), new DateTime("19:00:00"));
+		assertEquals("", testTask.getEndTime(), new DateTime("21:00:00"));
+		assertEquals("", testTask.getEndDate(), DateTime.today(TimeZone.getDefault()).plusDays(1));
+	}
+	
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\AddProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\IntegrationTest.java
+	 */
+
+public class IntegrationTest {
+	private File tasks;
+	
+	@Rule 
+	public TemporaryFolder folder= new TemporaryFolder();
+	
+	@Before
+	public void createTestData() throws IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		System.setProperty("user.dir", folder.getRoot().toString());
+		tasks = folder.newFile("tasks.txt");
+		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
+		out.write("null\r\nnull\r\nnull\r\n");
+        out.write("CS2103 Tutorial#13:00#null#2014-04-10#2014-04-10#Home#0#395871680#2014-04-09 20:27:24.669000000#LOW#false#null#null#null\r\n");
+        out.write("ES1531 Exam Prep#null#null#null#2014-04-23#Home#0#-1379251807#2014-04-09 20:27:29.951000000#HIGH#false#null#null#null\r\n");
+        out.write("CS2103 Presentation#13:00#null#2014-04-17#2014-04-17#null#0#1463178207#2014-04-09 20:27:54.869000000#LOW#false#null#null#null\r\n");
+        out.close();
+        
+        // To reset list to the tasks written ^ before each test case
+        // by modifying list in Processor
+        FileHandler fileHandler = new FileHandler("tasks.txt");
+        TaskList newList = fileHandler.readFile();
+        Field f = Processor.class.getDeclaredField("list");
+        f.setAccessible(true);
+        if ("list".equals(f.getName())) {
+            f.setAccessible(true);
+            f.set("list", newList);
+        }
+	}
+
+	
+	@Test
+	public void testIntegrated() throws InvalidInputException, IOException {
+		String fileLoc = "tasks.txt";
+		String command = "";
+		FileHandler fileHandler = new FileHandler(fileLoc);
+		TaskList list = fileHandler.readFile();
+		
+		assertEquals("CS2103 Tutorial", list.getListItem(0).getDescription());
+		String messageAdd1 = SplitProcessorsHandler.processCommand("add something");
+		assertEquals("Added something", messageAdd1);
+		
+		String messageUndo1 = SplitProcessorsHandler.processCommand("undo");
+		assertEquals("Last action undone", messageUndo1);
+		
+		//test undo when there is nothing to undo
+		String messageUndo2 = SplitProcessorsHandler.processCommand("undo");
+		assertEquals("No changes to undo", messageUndo2);
+		
+		String messageRedo1 = SplitProcessorsHandler.processCommand("redo");
+		assertEquals("Last action redone", messageRedo1);
+		
+		//test redo when there is nothing to redo
+		String messageRedo2 = SplitProcessorsHandler.processCommand("redo");
+		assertEquals("No changes to redo", messageRedo2);
+
+		//test case of a task that does not exist
+		String messageFind1 = SplitProcessorsHandler.processCommand("find AONETUHEONUTHOu");
+		assertEquals("No tasks found", messageFind1);
+
+		//test boundary case of searching an empty string
+		String messageFind2 = FindProcessor.processFind("");
+		assertEquals("Search completed", messageFind2);
+		String original_list = Processor.getList().toString();
+		String found_list = Processor.getDisplayList().toString();
+		assertEquals(original_list, found_list);	
+
+		String messageAdd2 = SplitProcessorsHandler.processCommand("add Tutorial @ERC-SR2 on 5 Feb at 2pm");		
+		assertEquals("Added Tutorial at 14:00 on Feb 05 2014 in ERC-SR2", messageAdd2);
+
+		//test case of a task that does exist 
+		command = "tutorial";
+		String messageFind3 = FindProcessor.processFind(command);
+		assertEquals("Search completed", messageFind3);
+		
+		String messageUpdate1 = SplitProcessorsHandler.processCommand("update 4 desc Dinner with Parents\\ location home\\");
+		assertEquals("Updated the task(s)", messageUpdate1);
+		
+		String messageDelete1 = SplitProcessorsHandler.processCommand("delete all");
+		assertEquals("Deleted: 5 task(s)", messageDelete1);
+		assertEquals(Processor.getList().toString(), "");
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\IntegrationTest.java
+
+
+
+
+
