@@ -1,8 +1,8 @@
-//@author A0101324A
 package todomato;
 
 import hirondelle.date4j.DateTime;
 
+//@author A0101324A
 /**
  * 
  * This class contains method to change notification commands by the user. It

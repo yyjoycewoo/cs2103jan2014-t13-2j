@@ -1,4 +1,3 @@
-//@author A0101324A
 package todomato;
 
 import static org.quartz.JobBuilder.newJob;
@@ -11,6 +10,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 
+//@author A0101324A
 /*
  * Enable the quartz scheduler to keep running the program to check the
  * notify time of the tasks before the program exits More efficient than a
