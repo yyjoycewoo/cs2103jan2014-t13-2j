@@ -67,7 +67,6 @@ public class UpdateProcessorTest {
 		// by modifying list in Processor
 		FileHandler fileHandler = new FileHandler(FILE_NAME);
 		TaskList newList = fileHandler.readFile();
-		System.out.println(newList.getSize());
 		Field f = Processor.class.getDeclaredField(LIST);
 		f.setAccessible(true);
 		if (LIST.equals(f.getName())) {
