@@ -17,14 +17,16 @@ public class SyncProcessor extends Processor {
 	private static final String SYNC_ERROR = "Sync Error: Oops, A Unknown Sync Error has occurred!";
 	
 	public static String processSync() {
+		
+		// Prepare google login credentials
 		if ((list.getUserName() == null && list.getPassword() == null) ||
 		(list.getUserName().equals("null") && list.getPassword().equals("null"))){
 			return NO_USERNAME_PW;
 		}
-		
 		String username = list.getUserName();
 		String password = list.getPassword();
 		
+		// Sync and replace the local Tasklist
 		DataSyncer Syncer = new DataSyncer(list);
 		TaskList newList;
 		try {
