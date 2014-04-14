@@ -47,6 +47,7 @@ public class UpdateProcessorTest {
 
 	private File tasks;
 
+	//@author A0101578H
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
@@ -74,6 +75,7 @@ public class UpdateProcessorTest {
 		}
 	}
 
+	//@author A0101324A
 	// testing the out of bound index
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidIndexOne() throws InvalidInputException {

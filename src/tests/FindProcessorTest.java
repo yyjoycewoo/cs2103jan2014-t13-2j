@@ -43,6 +43,7 @@ public class FindProcessorTest {
 	
 	private File tasks;
 
+	//@author A0101578H
 	@Rule 
 	public TemporaryFolder folder= new TemporaryFolder();
 
@@ -70,6 +71,7 @@ public class FindProcessorTest {
 		}
 	}
 
+	//@author A0120766H
 	@Test
 	public void testEmptyString() {
 		//test boundary case of searching an empty string

@@ -170,7 +170,7 @@ public class UpdateProcessor extends Processor {
 		if (argument.isEmpty()) {
 			throw new InvalidInputException(NOTHING_ERROR);
 		}
-		String[] words = argument.split(" ");
+		String[] words = argument.split(" |,");
 		// checking index is zero
 		if (words.length >= 1) {
 			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
