@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TimeZone;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,7 +22,52 @@ import org.apache.http.util.EntityUtils;
 //@author A0099332Y
 /**
  * This class is the process for the Google Sync of the application.
- *
+ * To sync with google calendar service. A remote API service is built by A009933Y 
+ * to handle the main logic in sync process. DataSyncer hence only need to send 
+ * HTTP Post Request and receive the response from the API server. No sync process 
+ * is done locally. 
+ * 
+ * The API service is deployed in Heroku, written in Python, using Flask microframework.
+ * 
+ * 
+ * Sample HTTP Post Request JSON:
+ * 
+ * {
+ * 	"auth": {
+ *   	"username": "todomatotest@gmail.com",
+ *   	"password": "cs2103todomato",
+ *   	"last_sync": "2014-04-14T15:55:55.000+08:00",
+ *   	"current_time": "2014-04-14T15:56:25.000+08:00"
+ * 	},
+ * 	"data": {
+ *   	"tasklist": [tasks]
+ * 	}
+ * }
+ * 
+ * tasks:
+ *     {
+ *     "created": "2014-04-14T15:56:22.000+08:00",
+ *     "description": "0101",
+ *     "edit": "2014-04-15T15:55:39.000+08:00",
+ *     "eid": "http://www.google.com/calendar/feeds/qaefsdqnfhv66or3dp2psjko40%40group.
+ *     			calendar.google.com/events/i57utfat7p3olsknjl139225o4",
+ *     "enddate": "2014-04-14",
+ *     "endtime": "20:00:00.000+08:00",
+ *     "location": "utown",
+ *     "meta": {
+ *       "completed": "true",
+ *       "id": "-2064010008",
+ *       "priority": "LOW",
+ *       "timecode": "0101"
+ *     },
+ *     "startdate": "2014-04-14",
+ *    "starttime": "19:00:00.000+08:00"
+ *   }
+ * 
+ * Once receive the response JSON, DataSyncer will reproduce Task Object based on each 
+ * task in JSON.
+ * 
+ * 
  */
 
 public class DataSyncer extends Processor {
@@ -71,8 +114,9 @@ public class DataSyncer extends Processor {
 	private static final String DATA_KEY_IN_JSON = "data";
 	private static final String AUTHORIZATION_KEY_IN_JSON = "auth";
 	private static final String TIMECODE_KEY_IN_JSON = "timecode";
-	//private static final String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
-	static String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
+	private static final String SERVER_URL = "http://todomato-sync.herokuapp.com/todomato/api/v1.0/update";
+//	for local test:
+//	private static final String SERVER_URL = "http://127.0.0.1:5000/todomato/api/v1.0/update";
 	
 	TaskList localList;
 
@@ -93,33 +137,12 @@ public class DataSyncer extends Processor {
 	 */
 	public TaskList sync(String username, String password, DateTime lastSyncTime) throws SyncErrorException, ParseException, IOException {
 
-//		System.out.println("START SYNCING");
-//		System.out.println("==================================");
-//		System.out.println("Server:\n" + SERVER_URL + "\n");
-		
 		JsonObject localJson = prepareData(this.localList, username, password, lastSyncTime);
-		
-//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//		System.out.println("Send data\n----------------------");
-//		System.out.println(gson.toJson(localJson));
-//		System.out.println("\n");
-//		System.out.println("Receive data\n----------------------");
-		
 		JsonObject responseJson = sendRequest(localJson);
-
-		
-//		System.out.println(gson.toJson(responseJson));
-//		System.out.println("\n");
-//		System.out.println("PROCESS RESPONSE");
-//		System.out.println("==================================");
-		
 		localList = processResponse(responseJson);
 		localList.setLastSyncTime(DateTime.now(TimeZone.getDefault()));
 		localList.setUserName(username);
 		localList.setPassword(password);
-		
-//		System.out.println("==================================");
-//		System.out.println("SYNC COMPLETE");
 		
 		return localList;
 	}
@@ -252,9 +275,6 @@ public class DataSyncer extends Processor {
 		Task task = createATask(isCompleted, priorityLevel, eventId, description,
 				location, updateTime, timeCreated, taskTime, id);
 		
-//		System.out.println("Task\n----------------------");
-//		System.out.println("description: " + description + "\ntimecode: " + timeCode + "\npriority:" + priorityLevel + "\ncompletion: " + isCompleted + "\n");
-//		
 		return task;
 	}
 
