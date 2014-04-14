@@ -1,4 +1,3 @@
-//@author A0101578H
 package tests;
 
 import static org.junit.Assert.*;
@@ -20,8 +19,14 @@ import todomato.Processor;
 import todomato.SortProcessor;
 import todomato.TaskList;
 
+//@author A0101578H
 public class SortProcessorTest {
-private  File tasks;
+	private  File tasks;
+	private static final String ITEM_ONE = "Lunch at 12:00 on May 09 2014\r\n";
+	private static final String ITEM_TWO = "Orientation camp at 18:00 on Apr 09 2014 until 13:00 on Apr 14 2014\r\n";
+	private static final String ITEM_THREE = "Project meeting at 08:00 on Apr 01 2014 until 14:00\r\n";
+	private static final String ITEM_FOUR = "Breakfast at 07:00 on Apr 01 2014\r\n";
+	private static final String ITEM_FIVE = "AA1234 Homework 7 on Apr 14 2014\r\n";
 	
 	@Rule 
 	public  TemporaryFolder folder= new TemporaryFolder();
@@ -50,12 +55,6 @@ private  File tasks;
             f.set("list", newList);
         }
 	}
-	
-	private static final String ITEM_ONE = "Lunch at 12:00 on May 09 2014\r\n";
-	private static final String ITEM_TWO = "Orientation camp at 18:00 on Apr 09 2014 until 13:00 on Apr 14 2014\r\n";
-	private static final String ITEM_THREE = "Project meeting at 08:00 on Apr 01 2014 until 14:00\r\n";
-	private static final String ITEM_FOUR = "Breakfast at 07:00 on Apr 01 2014\r\n";
-	private static final String ITEM_FIVE = "AA1234 Homework 7 on Apr 14 2014\r\n";
 	
 	public static TaskList getList() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		Field f = Processor.class.getDeclaredField("list");

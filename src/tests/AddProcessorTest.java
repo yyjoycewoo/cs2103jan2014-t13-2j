@@ -1,4 +1,3 @@
-//@author A0096620E
 package tests;
 
 import static org.junit.Assert.*;
@@ -13,6 +12,7 @@ import todomato.AddProcessor;
 import todomato.InvalidInputException;
 import todomato.Task;
 
+//@author A0096620E
 public class AddProcessorTest {
 
 	/*This is a test case to test for locations for more than one words*/
@@ -69,13 +69,14 @@ public class AddProcessorTest {
 		assertEquals("", startHour, testTask.getStartTime().getHour());
 		assertEquals("", endHour, testTask.getEndTime().getHour());
 	}
-	/* This is a boundary case of Jan 1  for the Date Parser*/
+	/* This is a boundary case of Jan 1  for the Date Parser
+	 * Tests description with keywords enclosed in ""*/
 	@Test
 	public void testAddDateJan1() throws InvalidInputException {
 		Task testTask= null;
-		String test = "dinner with parents on 1 Jan at 09:00";
+		String test = "\"grab lunch on the way to school\" on 1 Jan at 09:00";
 		testTask = AddProcessor.parseTask(test);
-		assertEquals("", testTask.getDescription(), "dinner with parents");
+		assertEquals("", testTask.getDescription(), "grab lunch on the way to school");
 		assertEquals("", testTask.getStartTime(), new DateTime("09:00"));
 		assertEquals("",testTask.getEndDate(), new DateTime("2014-01-01"));
 	}	
