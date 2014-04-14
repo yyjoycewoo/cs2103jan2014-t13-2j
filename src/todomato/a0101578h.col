@@ -1,0 +1,1380 @@
+//@author: a0101578h
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\DeleteProcessor.java
+	 */
+
+/**
+ * This class contains methods to process delete commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ * 
+ * <p>
+ * The following ways to delete are supported:
+ * <ul>
+ * <li> delete a single task by specifying the index
+ * <ul> <li> "delete 1" </ul>
+ * <li> delete multiple tasks
+ * <ul> <li> "delete 1,2,3" </ul>
+ * <li> delete a range of tasks
+ * <ul> <li> "delete 1-3" </ul> 
+ * <li> delete all tasks
+ * <ul> <li> "delete all" </ul>
+ * <li> delete tasks that starts on a date
+ * <ul> <li> "delete startdate 1 jan" </ul>
+ * <li> delete tasks that ends on a date
+ * <ul> <li> "delete enddate 20 jan" </ul>
+ * <li> delete tasks that are completed
+ * <ul> <li> "delete completed" </ul>
+ * </ul>
+ *
+ *
+ */
+public class DeleteProcessor extends Processor {
+	private static final String DELIMITER_FOR_ARGUMENT = "\\s*(,| )\\s*";
+	private static final String DELIMITER_FOR_RANGE = "\\s*-\\s*";
+	private static final String IDENTIFIER_RANGE = "-";
+	private static final String ARGUMENT_START_DATE = "startdate";
+	private static final String ARGUMENT_END_DATE = "enddate";
+	private static final String ARGUMENT_ALL = "all";
+	private static final String ARGUMENT_COMPLETE = "complete";
+	private static final String TASKS = " task(s)";
+	private static final String SUCCESSFUL_DELETE = "Deleted: ";
+	private static final String INVALID_INPUT_EMPTY_LIST = "empty list";
+	private static final String INVALID_INPUT_MISSING_ARGUMENT = "Missing argument";
+	private static final String INVALID_NUMBER_OF_LIMITS = "Invalid range: Upper and lower limits required";
+	private static final String INVALID_RANGE_LIMITS = "Invalid range: Enter <lower index> - <higher index>";
+	private static final String ERROR_MESSAGE_NUMBER_FORMAT = "Delete failed: Index not in number format";
+	private static final String ERROR_MESSAGE_INDEX_OUT_OF_BOUND = "Delete failed: Index out of bound";
+	
+	private static final int INDEX_OF_TYPE = 0;
+	private static final int INDEX_OF_DATE_1 = 1;
+	private static final int INDEX_OF_DATE_2 = 2;
+	private static final int INDEX_OF_LOWER_LIMIT = 0;
+	private static final int INDEX_OF_UPPER_LIMIT = 1;
+	private static final int NUMBER_OF_LIMITS = 2;
+	//private static final Logger logger = Logger.getLogger(DeleteProcessor.class.getName());
+	
+	
+	/**
+	 * Method for processing different ways to delete tasks
+	 * 
+	 * @param argument: user-specified
+	 * @return success message 
+	 */
+	public static String processDelete(String argument) throws InvalidInputException {
+		//logger.log(Level.INFO, "processing delete");
+		if (list.getSize() == 0) {
+			//logger.log(Level.INFO, "exited due to empty list");
+			throw new InvalidInputException(INVALID_INPUT_EMPTY_LIST);
+		}
+		if (argument.isEmpty()) {
+			//logger.log(Level.WARNING, "exited due to missing argument");
+			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
+		}
+		storeCurrentList();
+		String[] argArr = argument.split(DELIMITER_FOR_ARGUMENT);
+		String argType = argArr[INDEX_OF_TYPE];
+		argType.toLowerCase();
+		String statusMessage;
+		try {
+			if (argType.equalsIgnoreCase(ARGUMENT_ALL)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteAll() + TASKS; 
+			}
+			else if (argType.contains(ARGUMENT_COMPLETE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteCompleted() + TASKS;
+			}
+			else if (argType.equalsIgnoreCase(ARGUMENT_START_DATE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteStartDate(argArr) + TASKS;
+			}
+			else if (argType.equalsIgnoreCase(ARGUMENT_END_DATE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteEndDate(argArr) + TASKS;
+			}
+			else if (argument.contains(IDENTIFIER_RANGE)) {
+				statusMessage = SUCCESSFUL_DELETE + deleteRange(argument) + TASKS;
+			}
+			else if (argArr.length > 1) {
+				statusMessage = SUCCESSFUL_DELETE + deleteMultiple(argArr) + TASKS;
+			}
+			else {
+				statusMessage = SUCCESSFUL_DELETE + deleteSingle(argType);
+			}
+			displayList = list;
+			fileHandler.updateFile(list);
+			//logger.log(Level.INFO, "end of processing");
+			return statusMessage;
+		} catch(NumberFormatException e) {
+			UndoProcessor.processUndo();
+			//logger.log(Level.WARNING, "exited due to non-number");
+			return ERROR_MESSAGE_NUMBER_FORMAT;
+		} catch(IndexOutOfBoundsException e) {
+			UndoProcessor.processUndo();
+			//logger.log(Level.WARNING, "exited due to index out of bound");
+			return ERROR_MESSAGE_INDEX_OUT_OF_BOUND;
+		}		
+	}
+
+	/**
+	 * Method for deleting a range of tasks
+	 * 
+	 * @param argument: contains user-specified range
+	 * @return number of tasks deleted
+	 * @throws InvalidInputException
+	 */
+	private static String deleteRange(String arg) throws InvalidInputException {
+		//logger.log(Level.INFO, "processing delete range");
+		String[] rangeLimits = arg.split(DELIMITER_FOR_RANGE);
+		if (!(rangeLimits.length == NUMBER_OF_LIMITS)) {
+			throw new InvalidInputException(INVALID_NUMBER_OF_LIMITS);
+		}
+		//logger.log(Level.INFO, "number of limits valid");
+		int lowerLimitIndex = Integer.parseInt(rangeLimits[INDEX_OF_LOWER_LIMIT]) - 1;
+		int upperLimitIndex = Integer.parseInt(rangeLimits[INDEX_OF_UPPER_LIMIT]) - 1;
+		int numberOfTasksDeleted = 0;
+		if (lowerLimitIndex > upperLimitIndex) {
+			throw new InvalidInputException(INVALID_RANGE_LIMITS);
+		}
+		for (int i = upperLimitIndex; i >= lowerLimitIndex; i--) {
+			list.deleteListItem(i);
+			numberOfTasksDeleted++;
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+
+	/**
+	 * Method for deleting all completed tasks
+	 * 
+	 * @return number of tasks deleted
+	 */
+	private static String deleteCompleted() {
+		int numberOfTasksDeleted = 0;
+		for (int i = list.getSize() - 1; i >= 0 ; i--) { 
+			if (list.getListItem(i).getCompleted()) {
+				list.deleteListItem(i);
+				numberOfTasksDeleted++;
+			}		
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+
+	/**
+	 * Method for deleting all tasks that starts on a date
+	 * 
+	 * @param arg: contains user-specified date
+	 * @return number of tasks deleted
+	 */
+	private static String deleteStartDate(String[] arg) {
+		int numberOfTasksDeleted = 0;
+		String date = arg[INDEX_OF_DATE_1] + " " + arg[INDEX_OF_DATE_2];
+		try {
+			date = parseDateString(date);
+		} catch (InvalidInputException e) {
+			return INVALID_DATE;
+		}
+		DateTime dateDT = convertStringToDateTime(date);
+		for (int i = list.getSize() - 1; i >= 0; i--) {
+			if(isSameStartDate(i,dateDT)) {
+				list.deleteListItem(i);
+				numberOfTasksDeleted++;
+			}
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+	
+	/**
+	 * Method for checking if a task's startdate is same as a specified date
+	 * 
+	 * @param i: user-specified index of task
+	 * @param dateDT: date to be checked against
+	 * @return true if task's startdate is the same
+	 */
+	private static boolean isSameStartDate(int i, DateTime dateDT) {
+		if (list.getListItem(i).getStartDate() == null) {
+			return false;
+		}
+		if (list.getListItem(i).getStartDate().isSameDayAs(dateDT)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Method for deleting all tasks that ends on a specified date
+	 * 
+	 * @param arg: contains user-specified date
+	 * @return number of tasks deleted
+	 */
+	private static String deleteEndDate(String[] arg) {
+		int numberOfTasksDeleted = 0;
+		String date = arg[INDEX_OF_DATE_1] + " " + arg[INDEX_OF_DATE_2];
+		try {
+			date = parseDateString(date);
+		} catch (InvalidInputException e) {
+			return INVALID_DATE;
+		}
+		DateTime dateDT = convertStringToDateTime(date);
+		for (int i = list.getSize() - 1; i >= 0; i--) {
+			if(isSameEndDate(i,dateDT)) {
+				list.deleteListItem(i);
+				numberOfTasksDeleted++;
+			}
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+
+	/**
+	 * Method for checking if a task's enddate is same as a specified date
+	 * 
+	 * @param i: user-specified index of task 
+	 * @param dateDT: date to be checked against
+	 * @return true if task has the same date
+	 */
+	private static boolean isSameEndDate(int i, DateTime dateDT) {
+		if (list.getListItem(i).getEndDate() == null) {
+			return false;
+		}
+		if (list.getListItem(i).getEndDate().isSameDayAs(dateDT)) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Method for deleting all tasks
+	 * 
+	 * @return number of tasks deleted
+	 */
+	private static String deleteAll() {
+		int numberOfTasksDeleted = 0;
+		while(list.getSize() != 0) {
+			list.deleteListItem(0);
+			
+			numberOfTasksDeleted++;
+		}
+		return Integer.toString(numberOfTasksDeleted);
+	}
+	
+	/**
+	 * Method for deleting a single task 
+	 * 
+	 * @param indexStr: user-specified index of task to be deleted
+	 * @return task details of deleted task
+	 */
+	private static String deleteSingle(String indexStr) {
+		int index = Integer.parseInt(indexStr) - 1;
+		Task deletedTask = list.getListItem(index);
+		list.deleteListItem(index);
+		return deletedTask.toString();
+	}
+	
+	/**
+	 * Method for deleting multiple tasks
+	 * 
+	 * @param strIndices: user-specified indices of tasks to be deleted
+	 * @return number of tasks deleted
+	 */
+	private static String deleteMultiple(String[] strIndices) {
+		int[] intIndices = new int[strIndices.length];
+		for (int i = 0; i < strIndices.length; i++) {
+			intIndices[i] = Integer.parseInt(strIndices[i]);
+		}
+		Arrays.sort(intIndices);
+		reverse(intIndices);
+		for (int i = 0; i < intIndices.length; i++) {
+			list.deleteListItem(intIndices[i] - 1);
+		}
+		return Integer.toString(strIndices.length);
+	}
+	
+	/**
+	 * Method for reversing order in an array
+	 * 
+	 * @param arr: array to be reversed
+	 */
+	private static void reverse(int[] arr) {
+		int length = arr.length;
+		for (int i = 0; i < length/2; i++) {
+			int t = arr[i];
+			arr[i] = arr[length - 1 - i];
+			arr[length - 1 - i] = t;
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\DeleteProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\DisplayProcessor.java
+	 */
+
+/**
+ * This class contains methods to process display commands by the user. 
+ * 
+ * <p>
+ * The following ways to display are supported: 
+ * <ul>
+ * <li> display all tasks
+ * <ul> <li> "display" </ul>
+ * </ul>
+ * 
+ */
+public class DisplayProcessor extends Processor {
+	private static final String SUCCESS_DISPLAY = "All tasks have been displayed: ";
+	
+	/**
+	 * @param argument  
+	 * @return Status message along with a String of the list 
+	 */
+	public static String processDisplay(String argument) throws InvalidInputException {
+		return SUCCESS_DISPLAY + list.toString();
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\DisplayProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\HelpProcessor.java
+	 */
+
+/**
+ * This class shows a popup help window when command is given
+ * 
+ * 
+ */
+public class HelpProcessor {
+	private static final String HELP_TEXT = 
+			"1. Adding task: \n" +
+			"\t add <desc> at <starttime> <startdate> in <location> \n\n" +
+			"2. Updating task: \n" +
+			"\t update <index> <field> <detail> \n" +
+			"Note: \n" +
+			"- Append \'\\\' to end of <detail> when updating description or location \n" +
+			"- <detail> is not required when updating completion status \n\n" +
+			"3. Deleting task \n" +
+			"\t delete <index> \n\n" +
+			"Todomato also supports these features: \n" +
+			"- Finding tasks containing your specified search term \n" +
+			"- Sorting of tasks in the list \n" +
+			"- Undo \n" +
+			"- Redo \n\n" +
+			"Please refer to user guide for more details.";
+	
+	public static void processHelp() {
+		JFrame frame= new JFrame("Help");
+		JPanel panel = new JPanel();
+		panel.setLayout(new MigLayout("nocache"));
+		JTextArea helpText = new JTextArea(HELP_TEXT);
+		
+		frame.add(panel);
+		panel.add(helpText, "wrap, push, grow");
+		frame.setSize(500,400);
+		frame.setMinimumSize(new Dimension(400, 350));
+		frame.setVisible(true);
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\HelpProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\SortProcessor.java
+	 */
+
+/**
+ * This class contains methods to process sort commands by the user. 
+ * It updates the user's list of tasks, and saves it to disk.
+ * 
+ * <p>
+ * The following ways to sort are supported: 
+ * <ul>
+ * <li> sort tasks by date
+ * <ul> <li> "sort startdate" </ul>
+ * <ul> <li> "sort enddate" </ul>
+ * <li> sort tasks by priority from high to low
+ * <ul> <li> "sort priority" </ul>
+ * <li> sort tasks by completion status
+ * <ul> <li> "sort complete" </ul>
+ * </ul>
+ * 
+ * <p> 
+ * User may also specify order of sorting to be ascending or descending
+ * by appending it to the end of the command.
+ * 
+ * <p>
+ * The following notations for ascending order are allowed:
+ * <ul>
+ * <li> "a"
+ * <li> "asc"
+ * <li> "ascending"
+ * </ul>
+ * 
+ * <p>
+ * The following notations for descending order are allowed:
+ * <ul>
+ * <li> "d"
+ * <li> "desc"
+ * <li> "descending"
+ * </ul>
+ * 
+ * 
+ */
+
+public class SortProcessor extends Processor{
+	private static final String ARGUMENT_START_DATE = "startdate";
+	private static final String ARGUMENT_END_DATE = "enddate";
+	private static final String ARGUMENT_PRIORITY = "priority";
+	private static final String ARGUMENT_COMPLETION = "complete";
+	private static final String SUCCESS_SORT_BY_DATE = "Sorted by date";
+	private static final String SUCCESS_SORT_BY_PRIORITY = "Sorted by priority";
+	private static final String SUCCESS_SORT_BY_COMPLETION = "Sorted by completion status";
+	private static final String INVALID_INPUT_MISSING_ARGUMENT = "Missing argument";
+	private static final String INVALID_INPUT_ORDER = "Sorting order could not be determined";
+	private static final String INVALID_INPUT_TYPE = "Sorting type could not be determined";
+	
+	private static final String descending[] = {"descending", "d", "desc"};
+	private static final String ascending[] = {"ascending", "a", "asc"};
+	private static final int INDC_INVALID_PARAMETERS = -1;
+	private static final int INDEX_OF_TYPE = 0;
+	private static final int INDEX_OF_ORDER = 1;
+	private static final int NO_OF_ARG_WITH_ORDER = 2;
+	
+	/**
+	 * Method for processing different types of sort
+	 * 
+	 * @param argument containing type (and order)
+	 * @return success message
+	 * @throws InvalidInputException
+	 */
+	public static String processSort(String argument) throws InvalidInputException {
+		if (argument.isEmpty()) {
+			throw new InvalidInputException(INVALID_INPUT_MISSING_ARGUMENT);
+		}
+		
+		String argArr[] = argument.split(" ", 2);
+		String type = argArr[INDEX_OF_TYPE];
+		String order = "";
+		if (argArr.length == NO_OF_ARG_WITH_ORDER) {
+			order = argArr[INDEX_OF_ORDER];
+		}
+		
+		if (type.equalsIgnoreCase(ARGUMENT_START_DATE)) {
+			return sortByStartDate(order);
+		}
+		if (type.equalsIgnoreCase(ARGUMENT_END_DATE)) {
+			return sortByEndDate(order);
+		}
+		if (type.equalsIgnoreCase(ARGUMENT_PRIORITY)) {
+			return sortByPriority(order);
+		}
+		if (type.equalsIgnoreCase(ARGUMENT_COMPLETION)) {
+			return sortByCompletion(order);
+		}
+		throw new InvalidInputException(INVALID_INPUT_TYPE);
+	}
+	
+	/**
+	 * Sort by completion in order of:
+	 * Default/Ascending: unfinished -> completed tasks
+	 * Descending: order reversed from ascending order
+	 * 
+	 * @param order: user-specified
+	 * @return success sort by completion message
+	 * @throws InvalidInputException
+	 */
+	private static String sortByCompletion(String order) throws InvalidInputException {
+		if (!isValidOrder(order)) {
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
+		}
+		bubbleSort(ARGUMENT_COMPLETION);
+		if (isDescending(order)) {
+			list.reverse();
+		}
+		fileHandler.updateFile(list);
+		return SUCCESS_SORT_BY_COMPLETION;
+	}
+
+	/**
+	 * Sort by priority in order of:
+	 * Default/Descending: High -> Medium -> Low -> completed
+	 * Ascending: order reversed from descending order
+	 * 
+	 * @param order: user-specified
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private static String sortByPriority(String order) throws InvalidInputException {
+		if (!isValidOrder(order)) {
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
+		}
+		bubbleSort(ARGUMENT_PRIORITY);
+		if (isAscending(order)) {
+			list.reverse();
+		}
+		fileHandler.updateFile(list);
+		return SUCCESS_SORT_BY_PRIORITY;
+	}
+	
+	/**
+	 * Sort by start date in order of:
+	 * Default/Ascending: Most recent -> Least recent -> No date -> completed
+	 * Descending: in reverse order from ascending order
+	 * 
+	 * @param order
+	 * @return success sort by date message
+	 * @throws InvalidInputException
+	 */
+	private static String sortByStartDate(String order) throws InvalidInputException {
+		if (!isValidOrder(order)) {
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
+		}		
+		bubbleSort(ARGUMENT_START_DATE);
+		if (isDescending(order)) {
+			list.reverse();
+		}
+		fileHandler.updateFile(list);
+		return SUCCESS_SORT_BY_DATE;
+	}
+	
+	/**
+	 * Sort by end date in order of:
+	 * Default/Ascending: Most recent -> Least recent -> No date -> completed
+	 * Descending: in reverse order from ascending order
+	 * 
+	 * @param order
+	 * @return success sort by date message
+	 * @throws InvalidInputException
+	 */
+	private static String sortByEndDate(String order) throws InvalidInputException {
+		if (!isValidOrder(order)) {
+			throw new InvalidInputException(INVALID_INPUT_ORDER);
+		}
+		
+		bubbleSort(ARGUMENT_END_DATE);
+		if (isDescending(order)) {
+			list.reverse();
+		}
+		fileHandler.updateFile(list);
+		return SUCCESS_SORT_BY_DATE;
+	}
+	
+	/**
+	 * Compares completion status of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i is completed but task j is not
+	 */
+	private static boolean compareCompletion(int i, int j) {
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Compares priority levels of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i has lower priority than task j or has been completed
+	 */
+	private static boolean comparePriority(int i, int j) {
+		if (list.getListItem(i).getCompleted()) {
+			return true;
+		}
+		if (list.getListItem(j).getCompleted()) {
+			return false;
+		}
+		if (isSamePriority(i, j)) {
+			return false;
+		}
+		String iPriority = list.getListItem(i).getPriorityLevel();
+		String jPriority = list.getListItem(j).getPriorityLevel();
+		if ((iPriority.equals(PRIORITY_HIGH)) || (jPriority.equals(PRIORITY_LOW))) {
+			return false;
+		}
+		if ((jPriority.equals(PRIORITY_HIGH)) || (iPriority.equals(PRIORITY_LOW))) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if priority levels of two tasks are the same
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if priority levels are same
+	 */
+	private static boolean isSamePriority(int i, int j) {
+		String iPriority = list.getListItem(i).getPriorityLevel();
+		String jPriority = list.getListItem(j).getPriorityLevel();
+		if(iPriority.equals(jPriority)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Compares start dates of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i starts later than task j
+	 */
+	private static boolean compareStartDate(int i, int j) {
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
+				return true;
+			}
+		}
+		if (list.getListItem(j).getCompleted()) {
+			return false;
+		}
+		if (hasSameDate(ARGUMENT_START_DATE, i, j)) {
+			if (getLaterTimeTask(ARGUMENT_START_DATE, i, j) == i) {
+				return true;
+			}
+			return false;
+		}
+		if (getLaterDateTask(ARGUMENT_START_DATE, i ,j) == i) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Compares end dates of two tasks
+	 * 
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if task i ends later than task j
+	 */
+	private static boolean compareEndDate(int i, int j) {
+		if (list.getListItem(i).getCompleted()) {
+			if (!list.getListItem(j).getCompleted()) {
+				return true;
+			}
+		}
+		if (list.getListItem(j).getCompleted()) {
+			return false;
+		}
+		if (hasSameDate(ARGUMENT_END_DATE, i, j)) {
+			if (getLaterTimeTask(ARGUMENT_END_DATE, i, j) == i) {
+				return true;
+			}
+			return false;
+		}
+		if (getLaterDateTask(ARGUMENT_END_DATE, i ,j) == i) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if start/end date of two tasks are the same 
+	 * @param type: type of date to be checked
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return true if tasks lie on the same start/end date
+	 */
+	private static boolean hasSameDate(String type, int i, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			DateTime iStartDate = list.getListItem(i).getStartDate();
+			DateTime jStartDate = list.getListItem(j).getStartDate();
+			if (iStartDate == null && jStartDate == null) {
+				return true;
+			}
+			if (iStartDate == null || jStartDate == null) {
+				return false;
+			}
+			if (iStartDate.isSameDayAs(jStartDate)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			DateTime iEndDate = list.getListItem(i).getEndDate();
+			DateTime jEndDate = list.getListItem(j).getEndDate();
+			if (iEndDate == null && jEndDate == null) {
+				return true;
+			}
+			if (iEndDate == null || jEndDate == null) {
+				return false;
+			}
+			if (iEndDate.isSameDayAs(jEndDate)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Compares two tasks by either start or end time
+	 * If the times are the same, j will be returned
+	 * 
+	 * @param type: type of time to be compared
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return later task of the i'th and j'th tasks
+	 */
+	private static int getLaterTimeTask(String type, int i, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			DateTime iStartTime = list.getListItem(i).getStartTime();
+			DateTime jStartTime = list.getListItem(j).getStartTime();
+			
+			if (iStartTime == null) {
+				if (jStartTime == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jStartTime == null) {
+				return j;
+			}
+			if (jStartTime.gteq(iStartTime)) {
+				return j;
+			}
+			return i;
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			DateTime iEndTime = list.getListItem(i).getEndTime();
+			DateTime jEndTime = list.getListItem(j).getEndTime();
+			
+			if (iEndTime == null) {
+				if (jEndTime == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jEndTime == null) {
+				return j;
+			}
+			if (jEndTime.gteq(iEndTime)) {
+				return j;
+			}
+			return i;
+		}
+		return INDC_INVALID_PARAMETERS;
+	}
+	
+	/**
+	 * Compares two tasks by either start or end date
+	 * If the dates are the same, j will be returned
+	 * 
+	 * @param type: type of date to be compared
+	 * @param i: index of first task
+	 * @param j: index of second task
+	 * @return later task of the i'th and j'th tasks
+	 */
+	private static int getLaterDateTask(String type, int i, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			DateTime iStartDate = list.getListItem(i).getStartDate();
+			DateTime jStartDate = list.getListItem(j).getStartDate();
+			
+			if (iStartDate == null) {
+				if (jStartDate == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jStartDate == null) {
+				return j;
+			}
+			if (jStartDate.gteq(iStartDate)) {
+				return j;
+			}
+			return i;
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			DateTime iEndDate = list.getListItem(i).getEndDate();
+			DateTime jEndDate = list.getListItem(j).getEndDate();
+			
+			if (iEndDate == null) {
+				if (jEndDate == null) {
+					return j;
+				}
+				return i;
+			}
+			if (jEndDate == null) {
+				return j;
+			}
+			if (jEndDate.gteq(iEndDate)) {
+				return j;
+			}
+			return i;
+		}
+		return INDC_INVALID_PARAMETERS;
+	}
+	
+	/**
+	 * Bubble sort algorithm
+	 * 
+	 * @param type: type to sort by
+	 */
+	private static void bubbleSort(String type) {
+		for (int i = 0; i < (list.getSize() - 1); i++) {
+			for (int j = 0; j < (list.getSize() - i - 1); j++) {
+				if (needSwap(type, j)) {
+					list.swap(j, j + 1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Determine if there is a need to swap a task with the next 
+	 * for bubble sort
+	 * 
+	 * @param type: type to sort by
+	 * @param j: index of task
+	 * @return true if swap is needed
+	 */
+	private static boolean needSwap(String type, int j) {
+		if (type.equals(ARGUMENT_START_DATE)) {
+			if (compareStartDate(j, j + 1)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_END_DATE)) {
+			if (compareEndDate(j, j + 1)) {
+				return true;
+			}
+		}
+		if (type.equals(ARGUMENT_PRIORITY)) {
+			if (comparePriority(j, j + 1)) {
+				return true;
+			}
+		} 
+		if (type.equals(ARGUMENT_COMPLETION)) {
+			if (compareCompletion(j, j + 1)) {
+				return true;
+			}
+		} 
+		return false;
+	}
+	
+	/**
+	 * Check if user input for order is ascending
+	 * 
+	 * @param order: user input
+	 * @return true if user input matches allowed commands for ascending
+	 */
+	private static boolean isAscending(String order) {
+		for (String s: ascending) {
+			if (order.equalsIgnoreCase(s)) {
+				return true;				
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if user input for order is descending
+	 * 
+	 * @param order: user input
+	 * @return true if user input matches allowed commands for descending
+	 */
+	private static boolean isDescending(String order) {
+		for (String s: descending) {
+			if (order.equalsIgnoreCase(s)) {
+				return true;				
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if user input for order is ascending or descending
+	 * 
+	 * @param order: user input
+	 * @return true if user input is empty(default) or ascending/descending
+	 */
+	private static boolean isValidOrder(String order) {
+		if (order.isEmpty()) {
+			return true;
+		}
+		if (isAscending(order)) {
+			return true;
+		}
+		if (isDescending(order)) {
+			return true;
+		}
+		return false;
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\SortProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\DeleteProcessorTest.java
+	 */
+
+public class DeleteProcessorTest {
+	private  File tasks;
+	
+	@Rule 
+	public  TemporaryFolder folder= new TemporaryFolder();
+	
+	@Before
+	public void createTestData() throws IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		System.setProperty("user.dir", folder.getRoot().toString());
+		tasks = folder.newFile("tasks.txt");
+		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
+		out.write("null\r\n");
+        out.write("null\r\n");
+        out.write("null\r\n");
+        out.write("Lunch#null#null#null#null#null#0#1046042885#2014-04-09 16:19:17.842000000#HIGH#true#null#null#null\r\n");
+        out.write("Dinner#null#18:00#2014-04-09#2014-04-10#null#0#-1351579072#2014-04-09 16:18:25.784000000#LOW#false#null#null#null\r\n");
+        out.write("Project meeting#null#14:00#2014-04-01#2014-04-10#null#0#570051783#2014-04-09 16:18:48.669000000#MEDIUM#true#null#null#null\r\n");
+        out.close();
+        
+        FileHandler fileHandler = new FileHandler("tasks.txt");
+        TaskList newList = fileHandler.readFile();
+        Field f = Processor.class.getDeclaredField("list");
+        f.setAccessible(true);
+        if ("list".equals(f.getName())) {
+            f.setAccessible(true);
+            f.set("list", newList);
+        }
+	}
+
+	@Test
+	public void testDeleteAll() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("all");
+		assertEquals("Deleted: 3 task(s)", message);
+	}
+	
+	@Test
+	public void testDeleteSingle() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("1");
+		assertEquals("Deleted: Lunch", message);
+	}
+	
+	// This is a boundary case for the valid indices partition
+	@Test
+	public void testDeleteMultiple() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("3,1");
+		assertEquals("Deleted: 2 task(s)", message);
+	}
+	
+	@Test
+	public void testDeleteStartDate() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("startdate 1 apr");
+		assertEquals("Deleted: 1 task(s)", message);
+	}
+	
+	@Test
+	public void testDeleteEndDate() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("enddate 10 apr");
+		assertEquals("Deleted: 2 task(s)", message);
+	}
+	
+	@Test
+	public void testDeleteRange() throws InvalidInputException, IOException {
+		String message = DeleteProcessor.processDelete("1-3");
+		assertEquals("Deleted: 3 task(s)", message);
+	}
+	
+	// This is a boundary case for the invalid indices partition
+	@Test
+	public void testExceedMaxIndex() throws InvalidInputException {
+		String message = DeleteProcessor.processDelete("6");
+		assertEquals("Delete failed: Index out of bound", message);
+	}
+	
+	// This is a boundary case for the invalid indices partition
+	@Test
+	public void testNegativeIndex() throws InvalidInputException {
+		String message = DeleteProcessor.processDelete("-1");
+		assertEquals("Delete failed: Index not in number format", message);
+	}
+		
+	// This is a test for the empty list partition
+	@Test
+	public void testEmptyList() throws InvalidInputException {
+		try {
+			String message = DeleteProcessor.processDelete("all");
+			assertEquals("Deleted: 3 task(s)", message);
+			DeleteProcessor.processDelete("1");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "empty list");
+		}
+	}
+	
+	@Test
+	public void testInvalidNumberOfLimits() throws InvalidInputException {
+		try {
+			DeleteProcessor.processDelete("-");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Invalid range: Upper and lower limits required");
+		}
+	}
+	
+	@Test
+	public void testInvalidRangeLimits() throws InvalidInputException {
+		try {
+			DeleteProcessor.processDelete("4-2");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Invalid range: Enter <lower index> - <higher index>");
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\DeleteProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\FindProcessorTest.java
+	 */
+
+	@Rule 
+	public TemporaryFolder folder= new TemporaryFolder();
+
+	@Before
+	public void createTestData() throws IOException, NoSuchFieldException, 
+	SecurityException, IllegalArgumentException, IllegalAccessException {
+		System.setProperty(FILE_DIR, folder.getRoot().toString());
+		tasks = folder.newFile(FILE_NAME);
+		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
+		out.write(FILE_HEADING);
+		out.write(TASK1);
+		out.write(TASK2);
+		out.write(TASK3);
+		out.close();
+
+		// To reset list to the tasks written ^ before each test case
+		// by modifying list in Processor
+		FileHandler fileHandler = new FileHandler(FILE_NAME);
+		TaskList newList = fileHandler.readFile();
+		Field f = Processor.class.getDeclaredField(LIST);
+		f.setAccessible(true);
+		if (LIST.equals(f.getName())) {
+			f.setAccessible(true);
+			f.set(LIST, newList);
+		}
+	}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\FindProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\SortProcessorTest.java
+	 */
+
+public class SortProcessorTest {
+	private  File tasks;
+	private static final String ITEM_ONE = "Lunch at 12:00 on May 09 2014\r\n";
+	private static final String ITEM_TWO = "Orientation camp at 18:00 on Apr 09 2014 until 13:00 on Apr 14 2014\r\n";
+	private static final String ITEM_THREE = "Project meeting at 08:00 on Apr 01 2014 until 14:00\r\n";
+	private static final String ITEM_FOUR = "Breakfast at 07:00 on Apr 01 2014\r\n";
+	private static final String ITEM_FIVE = "AA1234 Homework 7 on Apr 14 2014\r\n";
+	
+	@Rule 
+	public  TemporaryFolder folder= new TemporaryFolder();
+	
+	@Before
+	public void createTestData() throws IOException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		System.setProperty("user.dir", folder.getRoot().toString());
+		tasks = folder.newFile("tasks.txt");
+		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
+		out.write("null\r\n");
+        out.write("null\r\n");
+        out.write("null\r\n");
+        out.write("Lunch#12:00#null#2014-05-09#2014-05-09#null#0#1046042885#2014-04-07 16:19:17.842000000#LOW#false#null#null#null\r\n");
+        out.write("Orientation camp#18:00#13:00#2014-04-09#2014-04-14#null#0#-1351579072#2014-04-09 16:18:25.784000000#LOW#false#null#null#null\r\n");
+        out.write("Project meeting#08:00#14:00#2014-04-01#2014-04-01#null#0#570051783#2014-04-09 16:18:48.669000000#HIGH#false#null#null#null\r\n");
+        out.write("Breakfast#07:00#null#2014-04-01#2014-04-01#null#0#1046042885#2014-04-09 16:19:17.842000000#LOW#true#null#null#null\r\n");
+        out.write("AA1234 Homework 7#null#null#2014-04-14#2014-04-14#null#0#-1351579072#2014-04-09 16:18:25.784000000#MEDIUM#false#null#null#null\r\n");
+        out.close();
+        
+        FileHandler fileHandler = new FileHandler("tasks.txt");
+        TaskList newList = fileHandler.readFile();
+        Field f = Processor.class.getDeclaredField("list");
+        f.setAccessible(true);
+        if ("list".equals(f.getName())) {
+            f.setAccessible(true);
+            f.set("list", newList);
+        }
+	}
+	
+	public static TaskList getList() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		Field f = Processor.class.getDeclaredField("list");
+        f.setAccessible(true);
+        if ("list".equals(f.getName())) {
+            f.setAccessible(true);
+            return (TaskList) f.get("list");
+        }
+		return null;
+	}
+	
+	@Test
+	public void testSortStartDate() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList =  
+				"1: " + ITEM_THREE +
+				"2: " + ITEM_TWO +
+				"3: " + ITEM_FIVE +
+				"4: " + ITEM_ONE +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("startdate");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortStartDateAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList =  
+				"1: " + ITEM_THREE +
+				"2: " + ITEM_TWO +
+				"3: " + ITEM_FIVE +
+				"4: " + ITEM_ONE +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("startdate a");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortStartDateDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_FOUR +
+				"2: " + ITEM_ONE + 
+				"3: " + ITEM_FIVE + 
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_THREE;
+		SortProcessor.processSort("startdate d");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortEndDate() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_THREE + 
+				"2: " + ITEM_TWO + 
+				"3: " + ITEM_FIVE +
+				"4: " + ITEM_ONE +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("enddate");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortEndDateAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_THREE + 
+				"2: " + ITEM_TWO + 
+				"3: " + ITEM_FIVE +
+				"4: " + ITEM_ONE +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("enddate a");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortEndDateDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_FOUR + 
+				"2: " + ITEM_ONE + 
+				"3: " + ITEM_FIVE +
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_THREE;
+		SortProcessor.processSort("enddate d");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortComplete() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_ONE + 
+				"2: " + ITEM_TWO +
+				"3: " + ITEM_THREE +
+				"4: " + ITEM_FIVE +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("complete");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortCompleteAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_ONE + 
+				"2: " + ITEM_TWO +
+				"3: " + ITEM_THREE +
+				"4: " + ITEM_FIVE +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("complete a");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortCompleteDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_FOUR + 
+				"2: " + ITEM_FIVE +
+				"3: " + ITEM_THREE +
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_ONE;
+		SortProcessor.processSort("complete d");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortPriority() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_THREE + 
+				"2: " + ITEM_FIVE +
+				"3: " + ITEM_ONE +
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("priority");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortPriorityAscending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_FOUR + 
+				"2: " + ITEM_TWO +
+				"3: " + ITEM_ONE +
+				"4: " + ITEM_FIVE +
+				"5: " + ITEM_THREE;
+		SortProcessor.processSort("priority a");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testSortPriorityDescending() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_THREE + 
+				"2: " + ITEM_FIVE +
+				"3: " + ITEM_ONE +
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("priority d");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	public void testMultipleSortPriority() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InvalidInputException {
+		String expectedList = 
+				"1: " + ITEM_THREE + 
+				"2: " + ITEM_FIVE +
+				"3: " + ITEM_ONE +
+				"4: " + ITEM_TWO +
+				"5: " + ITEM_FOUR;
+		SortProcessor.processSort("priority");
+		SortProcessor.processSort("priority a");
+		SortProcessor.processSort("priority d");
+		String resultList = getList().toString();
+		assertEquals(expectedList, resultList);
+	}
+	
+	@Test
+	public void testMissingArgument() throws InvalidInputException {
+		try {
+			SortProcessor.processSort("");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Missing argument");
+		}
+	}
+	
+	@Test
+	public void testInvalidSortType() throws InvalidInputException {
+		try {
+			SortProcessor.processSort("starryday");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Sorting type could not be determined");
+		}
+	}
+	
+	@Test
+	public void testInvalidSortOrder() throws InvalidInputException {
+		try {
+			SortProcessor.processSort("priority ass");
+			fail("Should have thrown InvalidInputException");
+		} catch (InvalidInputException e){
+			assertEquals(e.getMessage(), "Sorting order could not be determined");
+		}
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\SortProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\UpdateProcessorTest.java
+	 */
+
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
+
+	@Before
+	public void createTestData() throws IOException, NoSuchFieldException,
+			SecurityException, IllegalArgumentException, IllegalAccessException {
+		System.setProperty(FILE_DIR, folder.getRoot().toString());
+		tasks = folder.newFile(FILE_NAME);
+		BufferedWriter out = new BufferedWriter(new FileWriter(tasks));
+		out.write(FILE_HEADING);
+		out.write(TASK1);
+		out.write(TASK2);
+		out.write(TASK3);
+		out.close();
+
+		// To reset list to the tasks written before each test case
+		// by modifying list in Processor
+		FileHandler fileHandler = new FileHandler(FILE_NAME);
+		TaskList newList = fileHandler.readFile();
+		Field f = Processor.class.getDeclaredField(LIST);
+		f.setAccessible(true);
+		if (LIST.equals(f.getName())) {
+			f.setAccessible(true);
+			f.set(LIST, newList);
+		}
+	}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\UpdateProcessorTest.java
+
+
+
+
+
