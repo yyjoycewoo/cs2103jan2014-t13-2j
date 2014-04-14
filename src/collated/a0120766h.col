@@ -1,0 +1,1205 @@
+//@author: a0120766h
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Command.java
+	 */
+
+/**
+ * This class stores the different components of a user's command: the action, and the argument.
+ * The action is the keyword specified in the first word of a command (eg. add, delete, update,
+ * etc), and the argument is the rest of the command.
+ *
+ */
+public class Command {
+	private static final int ARGUMENT_POSITION = 1;
+	private static final int ACTION_POSITION = 0;
+	private static final String EMPTY_STRING = "";
+	private static final int ONE_WORD = 1;
+	private String action;
+	private String argument;
+	
+	/**
+	 * Create a new Command object with the specified action and argument as an empty String
+	 * @param action The action that the user wants to perform
+	 */
+	public Command(String action) {
+		this(action, "");
+	}
+	
+	/**
+	 * Create a new Command object with specified action and argument
+	 * @param action The action that the user wants to perform
+	 * @param argument The argument that the user wants to do with the action
+	 */
+	public Command(String action, String argument) {
+		this.setAction(action);
+		this.setArgument(argument);
+	}
+
+	/**
+	 * Create a new Command object with specified input
+	 * @param input Array with action and argument that the user wants to execute
+	 */
+	public Command(String[] input) {
+		//command is the first word that the user enters
+		this.setAction(input[ACTION_POSITION]);
+		
+		//argument is everything except the first word that the user enters
+		if (input.length > ONE_WORD) {
+			this.setArgument(input[ARGUMENT_POSITION]);
+		} else {
+			this.setArgument(EMPTY_STRING);
+		}
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public String getArgument() {
+		return argument;
+	}
+
+	public void setArgument(String argument) {
+		this.argument = argument;
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Command.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\FindProcessor.java
+	 */
+
+/**
+ * This class processes find commands by the user.
+ * 
+ * The user should enter the keyword "find" followed
+ * a String of word(s) that they would like to search
+ * for.
+ *  
+ *
+ */
+public class FindProcessor extends Processor {
+
+	private static final String NO_TASKS_FOUND_MESSAGE = "No tasks found";
+	private static final String SUCCESS_MSG = "Search completed";
+
+	/**
+	 * Finds and modifies the displayList to display all tasks that contain
+	 * the String argument. 
+	 * @param argument String to be found
+	 * @return a status message stating whether or not tasks have been found
+	 */
+	public static String processFind(String argument) {
+		//Make search case insensitive by converting everything to uppercase
+		argument = argument.toUpperCase();
+		TaskList tasksFound = new TaskList();
+		TaskList tasksNotFound = new TaskList();
+		
+		createTasksFoundList(argument, tasksFound, tasksNotFound);
+		reorderList(tasksFound, tasksNotFound);
+		
+		fileHandler.updateFile(list);		
+		displayList = tasksFound;
+		
+		if (tasksFound.isEmpty())
+			return NO_TASKS_FOUND_MESSAGE;
+		
+		return SUCCESS_MSG;
+	}
+
+	private static void reorderList(TaskList tasksFound, TaskList tasksNotFound) {
+		list.deepCopy(tasksFound);
+		for (Task i : tasksNotFound.getList()) {
+			list.addToList(i);
+		}
+	}
+
+	private static void createTasksFoundList(String argument,
+			TaskList tasksFound, TaskList tasksNotFound) {
+		for (Task i : list.getList()) {
+			String task = i.toString().toUpperCase();
+			if (task.contains(argument) && task != "") {
+				tasksFound.addToList(i);
+				System.out.println(task);
+			} else {
+				tasksNotFound.addToList(i);
+			}
+		}
+	}
+
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\FindProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\InvalidInputException.java
+	 */
+
+/**
+ * This class signals that the user has entered an unknown input.
+ *
+ */
+@SuppressWarnings("serial")
+public class InvalidInputException extends Exception {
+
+	/**
+	 * @param message
+	 */
+	public InvalidInputException(String message) {
+		super(message);
+	}
+	
+    /**
+     * @param message
+     * @param throwable
+     */
+    public InvalidInputException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Throwable#getMessage()
+     */
+    public String getMessage()
+    {
+        return super.getMessage();
+    }
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\InvalidInputException.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\RedoProcessor.java
+	 */
+
+/** 
+ * This class contains methods to process undo commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ *
+ */
+public class RedoProcessor extends Processor {
+	 private static final String NO_CHANGES_TO_REDO_MSG = "No changes to redo";
+	 private static final String SUCCESS_MSG = "Last action redone";
+
+		/**
+		 * Undo last action, if possible
+		 * @return Status message telling user if there were changes to redo
+		 */
+		public static String processRedo() {
+			if (!redoList.isEmpty()) {
+				undoList.push(list);
+				
+				list = redoList.pop();	
+				fileHandler.updateFile(list);
+
+				displayList = list;
+				return SUCCESS_MSG;
+			} else {
+				return NO_CHANGES_TO_REDO_MSG;
+			}
+		}
+
+ }
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\RedoProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\SplitProcessorsHandler.java
+	 */
+
+/**
+ * This class handles user commands by calling the processing method depending
+ * on the action specified.
+ * 
+ */
+public class SplitProcessorsHandler {
+
+	private static final String ADD_COMMAND = "add";
+	private static final String DELETE_COMMAND = "delete";
+	private static final String UPDATE_COMMAND = "update";
+	private static final String DISPLAY_COMMAND = "display";
+	private static final String SORT_COMMAND = "sort";
+	private static final String UNDO_COMMAND = "undo";
+	private static final String EXIT_COMMAND = "exit";
+	private static final String REDO_COMMAND = "redo";
+	private static final String FIND_COMMAND = "find";
+	private static final String RECUR_COMMAND = "recur";
+	private static final String NOTIFY_COMMAND = "notify";
+	private static final String SYNC_COMMAND = "sync";
+	private static final String SET_SYNC_INFO_COMMAND = "setsync";
+	private static final String HELP_COMMAND = "help";
+	private static final String FILLER_STRING = " ";
+
+	private static Command command;
+
+	/**
+	 * 
+	 * @param userInput
+	 * @return A status message describing the last action completed
+	 * @throws InvalidInputException
+	 */
+	public static String processCommand(String userInput)
+			throws InvalidInputException {
+		command = new Command(userInput.split(" ", 2));
+		if (command.getAction().equalsIgnoreCase(EXIT_COMMAND)) {
+			System.exit(0);
+		}
+		if (command.getAction().equalsIgnoreCase(DISPLAY_COMMAND)) {
+			return DisplayProcessor.processDisplay(command.getArgument());
+		}
+		if (command.getAction().equalsIgnoreCase(UPDATE_COMMAND)) {
+			return UpdateProcessor.processUpdate(command.getArgument());
+		}
+		if (command.getAction().equalsIgnoreCase(DELETE_COMMAND)) {
+			return DeleteProcessor.processDelete(command.getArgument());
+		}
+		if (command.getAction().equalsIgnoreCase(UNDO_COMMAND)) {
+			return UndoProcessor.processUndo();
+		}
+		if (command.getAction().equalsIgnoreCase(REDO_COMMAND)) {
+			return RedoProcessor.processRedo();
+		}
+		if (command.getAction().equalsIgnoreCase(FIND_COMMAND)) {
+			return FindProcessor.processFind(command.getArgument());
+		}
+		if (command.getAction().equalsIgnoreCase(SORT_COMMAND)) {
+			return SortProcessor.processSort(command.getArgument());
+		}
+		if (command.getAction().equalsIgnoreCase(ADD_COMMAND)) {
+			return AddProcessor.processAdd(command.getArgument());
+		}
+		if (command.getAction().equalsIgnoreCase(RECUR_COMMAND)) {
+			return RecurProcessor.processRecur(command.getArgument());
+		}
+		if (command.getAction().equals(NOTIFY_COMMAND)) {
+			return NotifyProcessor.processNotify(command.getArgument());
+		}
+		if (command.getAction().equals(SYNC_COMMAND)) {
+			return SyncProcessor.processSync();
+		}
+		if (command.getAction().equals(SET_SYNC_INFO_COMMAND)) {
+			return SetSyncProcessor.processSetSync(command.getArgument());
+		}
+		if (command.getAction().equals(HELP_COMMAND)) {
+			HelpProcessor.processHelp();
+			return FILLER_STRING;
+		}
+		// Do nothing if empty string is entered
+		if (command.getAction().equals("")) {
+			return FILLER_STRING;
+		}
+		// Otherwise, treat as an add command
+		return AddProcessor.processAdd(userInput);
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\SplitProcessorsHandler.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\TaskList.java
+	 */
+
+/**
+ * Class to store a list of all Tasks that the user wants to keep track of
+ *
+ */
+public class TaskList {
+	private static final int TASK_NOT_FOUND_VALUE = -1;
+	private static final int OFFSET_INDEX = 1;
+	private static final String INDEX_SEPARATOR = ": ";
+	private static final String LINE_BREAK = "\r\n";
+	private ArrayList<Task> list;
+	private DateTime lastSyncTime = null;
+	private String userName = null;
+	private String password = null;
+	
+	/**
+	 * Create a new empty TaskList
+	 */
+	public TaskList() {
+		this.list = new ArrayList<Task>();
+	}
+	
+	/**
+	 * Add t to the TaskList
+	 * @param t Task to be added
+	 * @return Task that was added
+	 */
+	public Task addToList(Task t) {
+		list.add(t);
+		return t;
+	}
+	
+	/**
+	 * Delete Task i from the TaskList
+	 * @param i index of Task to be deleted
+	 * @return Task deleted
+	 */
+	public Task deleteListItem(int i){
+		Task TaskDeleted = list.get(i);
+		list.remove(i);
+		return TaskDeleted;
+	}
+	
+	/**
+	 * Clears all the Tasks in the TaskList
+	 */
+	public void clearList() {
+		list = new ArrayList<Task>();
+	}
+	
+	/**
+	 * Get the Task at index i
+	 * @param i Index of Task to get
+	 * @return Task at index i
+	 */
+	public Task getListItem(int i) {
+		return list.get(i);
+	}
+	
+	/**
+	 * Get the index at which the task with the id id can be found
+	 * @param id id of Task to get
+	 * @return index of Task with id id, or -1 if Task cannot be found
+	 */
+	public int getItem(int id) {
+		for (int i=0; i<list.size(); i++) {
+			if (list.get(i).getId() == id) {
+				return i;
+			}
+		}
+		return TASK_NOT_FOUND_VALUE;
+	}
+
+	@Override
+	public String toString() {
+		String s = "";
+		int i = 0;
+		for (Task t : list){
+			s += Integer.toString(i + OFFSET_INDEX) + INDEX_SEPARATOR
+					+ t.toString() + LINE_BREAK;
+			i++;
+		}
+		return s;
+	}
+	
+	/**
+	 * Modifies TaskList to be a deep copy of copyList
+	 * @param copyList TaskList to be copied
+	 * @return modified TaskList
+	 */
+	public ArrayList<Task> deepCopy(TaskList copyList) {
+		list = new ArrayList<Task>();
+		for (Task i : copyList.getList()) {
+			list.add(new Task(i));
+		}
+		return list;
+	}
+	
+	/**
+	 * Checks to see if the list is empty
+	 * @return true if the list is empty
+	 */
+	public boolean isEmpty() {
+		return getSize() == 0;
+	}
+	
+	/**
+	 * Finds the size of the list
+	 * @return the size of the list
+	 */
+	public int getSize() {
+		return list.size();
+	}
+	
+	public ArrayList<Task> getList() {
+		return list;
+	} 
+
+	public void setList(ArrayList<Task> list) {
+		this.list = list;
+	}
+	
+	public void swap(int i, int j) {
+		Collections.swap(list, i, j);
+	}
+	
+	public void reverse() {
+		Collections.reverse(list);
+	}
+	
+	public void setLastSyncTime (DateTime lastSyncTime) {
+		this.lastSyncTime = lastSyncTime;
+	}
+	
+	public DateTime getLastSyncTime () {
+		return lastSyncTime;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public void setUserNameAndPassword(String username, String password) {
+		setUserName(username);
+		setPassword(password);
+	}
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\TaskList.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Todomato.java
+	 */
+
+/**
+ * This class is the driver for the Todomato application. It creates the GUI,
+ * and repeatedly obtains user input until the user in the main method, until
+ * the user wants to exit.
+ * 
+ */
+public class Todomato {
+
+	private static final String INVALID_INPUT_MSG = "Invalid input: ";
+	private static final String WELCOME_MSG = "Welcome to Todomato";
+	private static final String PROMPT_USER_INPUT = "Command: ";
+	private static Scanner scan = new Scanner(System.in);
+
+	/**
+	 * Take in and execute user commands until the user wants to exit.
+	 * 
+	 * @param args
+	 * @throws SchedulerException
+	 */
+	public static void main(String[] args) throws SchedulerException {
+		new TodomatoFrame();
+
+		System.out.println(WELCOME_MSG);
+
+		// show tasks for the next 3 days
+		Popup.show();
+		// show tasks that are due today according to the time of the day
+		Scheduler scheduler = Scheduling.schedulingTasks();
+
+		// loops forever until user types "exit"
+		while (true) {
+			try {
+				System.out.print(PROMPT_USER_INPUT);
+				String command = scan.nextLine();
+				assert command != null;
+				
+				// stop the scheduler from running
+				if (command == "exit") {
+					try {
+						scheduler.shutdown();
+					} catch (SchedulerException e) {
+						System.err.println(e.getMessage());
+					}
+				}
+				
+				String status = SplitProcessorsHandler.processCommand(command);
+				System.out.println(status);
+			} catch (InvalidInputException e) {
+				System.out.println(INVALID_INPUT_MSG + e.getMessage());
+			}
+		}
+	}
+
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\Todomato.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\TodomatoFrame.java
+	 */
+
+/**
+ * This class is the JFrame for the GUI of the application.
+ */
+@SuppressWarnings("serial")
+public class TodomatoFrame extends JFrame implements ActionListener {
+	//constants for formatting with MigLayout
+	private static final String MIG_LAYOUT = "nocache";
+	private static final String TABLE_LAYOUT = "wrap, push, grow";
+	private static final String START_DATE_BUTTON_LAYOUT = "split";
+	private static final String COMMAND_TEXTBOX_LAYOUT = "wrap, pushx, growx";
+	private static final String COMPLETED_BUTTON_LAYOUT = "wrap";
+	
+	//sizes for JFrame
+	private static final int GUI_MIN_HEIGHT = 200;
+	private static final int GUI_MIN_WIDTH = 400;
+	private static final int GUI_HEIGHT = 500;
+	private static final int GUI_WIDTH = 680;
+	
+	private static final int COMMAND_TEXTBOX_SIZE = 20;
+	
+	//arrow directions
+	private static final int UP_DIRECTION = 0;
+	private static final int DOWN_DIRECTION = 1;
+	
+	private static final String EMPTY_TEXT = "";
+	
+	private static final String REDO_COMMAND = "redo";
+	private static final String FIND_COMMAND = "find ";
+	private static final String DELETE_COMMAND = "delete ";
+	private static final String HELP_COMMAND = "help";
+	private static final String UNDO_COMMAND = "undo";
+	
+	private static final String SORT_PRIORITY_DESC_COMMAND = "sort priority desc";
+	private static final String SORT_PRIORITY_ASC_COMMAND = "sort priority asc";
+	private static final String SORT_COMPLETE_DESC_COMMAND = "sort complete desc";
+	private static final String SORT_COMPLETE_ASC_COMMAND = "sort complete asc";
+	private static final String SORT_DATE_DESC_COMMAND = "sort enddate desc";
+	private static final String SORT_DATE_ASC_COMMAND = "sort enddate asc";
+
+	private final String UNDO = "undo action key";
+	private final String REDO = "redo action key";
+	private final String FIND = "search action key";
+	private final String DELETE = "delete action key";
+	private final String HELP = "help action key";
+
+	protected static final int INDEX_OFFSET = 1;
+
+	private static final String INVALID_INPUT_MSG = "Invalid input: ";
+	private static final String SORT_PRIORITY = "Sort by priority";
+	private static final String SORT_COMPLETED = "Sort by completed";
+	private static final String SORT_DATE = "Sort by date";
+
+	private static Icon downArrow = new BevelArrowIcon(DOWN_DIRECTION, false, true);
+	private static Icon upArrow = new BevelArrowIcon(UP_DIRECTION, false, true);
+
+	private TodomatoTable table = new TodomatoTable();      
+	private JPanel panel = new JPanel();
+	private JTextField txtCommand = new JTextField(COMMAND_TEXTBOX_SIZE);
+	private JLabel lblStatus = new JLabel(" ");
+	private JButton btnPriority = new JButton(SORT_PRIORITY, upArrow);
+	private JButton btnCompleted = new JButton(SORT_COMPLETED, upArrow);
+	private JButton btnStartDate = new JButton(SORT_DATE, upArrow);
+
+
+	public TodomatoFrame() {
+		super("Todomato");
+		setSize(GUI_WIDTH, GUI_HEIGHT);
+		setMinimumSize(new Dimension(GUI_MIN_WIDTH, GUI_MIN_HEIGHT));
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		initDisplay();
+		initShortcuts();
+
+		add(panel);
+		setVisible(true);
+	}
+
+
+	private void initDisplay() {
+		panel.setLayout(new MigLayout(MIG_LAYOUT));
+		panel.add(table.getTableDisplay(), TABLE_LAYOUT);
+		panel.add(btnStartDate, START_DATE_BUTTON_LAYOUT);
+		panel.add(btnPriority);
+		panel.add(btnCompleted, COMPLETED_BUTTON_LAYOUT);
+		panel.add(txtCommand, COMMAND_TEXTBOX_LAYOUT);
+		panel.add(lblStatus);
+
+		updateData(EMPTY_TEXT);
+
+		initTxtCommandAction(); 
+		initBtnStartDateAction();
+		initBtnPriorityAction();   
+		initBtnCompletedAction();  
+	}
+
+
+	private void initBtnStartDateAction() {
+		btnStartDate.addActionListener(new ActionListener() {                         
+			public void actionPerformed(ActionEvent e)
+			{
+				String status;
+				try {
+					if (btnStartDate.getIcon() == upArrow) {
+						status = SplitProcessorsHandler.processCommand(SORT_DATE_ASC_COMMAND);
+						btnStartDate.setIcon(downArrow);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_DATE_DESC_COMMAND);
+						btnStartDate.setIcon(upArrow);
+					}
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					System.out.println(INVALID_INPUT_MSG + e1.getMessage());
+				}       
+			}
+		});
+	}
+
+
+	private void initBtnCompletedAction() {
+		btnCompleted.addActionListener(new ActionListener() {                    
+			public void actionPerformed(ActionEvent e)
+			{
+				String status;
+				try {
+					if (btnCompleted.getIcon() == upArrow) {
+						status = SplitProcessorsHandler.processCommand(SORT_COMPLETE_ASC_COMMAND);
+						btnCompleted.setIcon(downArrow);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_COMPLETE_DESC_COMMAND);
+						btnCompleted.setIcon(upArrow);
+					}
+					assert status != null;
+					table.update();
+				} catch (InvalidInputException e1) {
+					System.out.println(INVALID_INPUT_MSG + e1.getMessage());
+				}       
+			}
+		});
+	}
+
+
+	private void initBtnPriorityAction() {
+		btnPriority.addActionListener(new ActionListener() {                     
+			public void actionPerformed(ActionEvent e)
+			{
+				String status = null;
+				try {
+					if (btnPriority.getIcon() == upArrow) {
+						status = SplitProcessorsHandler.processCommand(SORT_PRIORITY_ASC_COMMAND);
+						btnPriority.setIcon(downArrow);
+					} else {
+						status = SplitProcessorsHandler.processCommand(SORT_PRIORITY_DESC_COMMAND);
+						btnPriority.setIcon(upArrow);                                           
+					}
+					assert status != null;
+					table.update();                                 
+				} catch (InvalidInputException e1) {
+					System.out.println(INVALID_INPUT_MSG + e1.getMessage());
+				}       
+			}
+		});
+	}
+
+
+	private void initTxtCommandAction() {
+		txtCommand.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateData(txtCommand.getText());
+			}
+		});
+	}
+
+	private void updateData(String command) {
+		String status;
+		try {
+			status = SplitProcessorsHandler.processCommand(command);
+			assert status != null;
+
+			table.update();
+
+			txtCommand.setText(EMPTY_TEXT);
+			lblStatus.setText(status);
+		} catch (InvalidInputException e) {
+			txtCommand.setText(EMPTY_TEXT);
+			lblStatus.setText(INVALID_INPUT_MSG + e.getMessage());
+		}
+	}
+
+	private void initShortcuts() {          
+
+
+		Action undoAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				updateData(UNDO_COMMAND);
+			}
+		};
+
+		Action redoAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				updateData(REDO_COMMAND);
+			}
+		};
+
+		Action searchAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				updateData(FIND_COMMAND + txtCommand.getText());
+			}
+		};
+
+		Action deleteAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				int rowIndex = table.rowSelected + INDEX_OFFSET;
+				updateData(DELETE_COMMAND + rowIndex);
+			}
+		};
+
+		Action helpAction = new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+				updateData(HELP_COMMAND);
+			}
+		};
+
+		panel.getActionMap().put(UNDO, undoAction);
+		panel.getActionMap().put(REDO, redoAction);
+		panel.getActionMap().put(FIND, searchAction);
+		panel.getActionMap().put(DELETE, deleteAction);
+		panel.getActionMap().put(HELP, helpAction);
+
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), UNDO);
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), REDO);
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F2"), FIND);
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F1"), HELP);
+		panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), DELETE);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\TodomatoFrame.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\TodomatoTable.java
+	 */
+
+/**
+ * This class consists of a table that is designed to display a user's
+ * TaskList. It color codes based on priority and completion status,
+ * and sets the width of each column.
+ *
+ */
+public class TodomatoTable extends JTable {     
+	private static final String DATE_LOCALE = "US";
+	private static final String DATE_FORMAT = "MMM DD YYYY";
+	private static final String EMPTY_TASK_LIST_DESC = "(Empty)";
+	private static final String EMPTY_TASK_LIST_INDEX = "0";
+	//constants for column names
+	private static final String INDEX_HEADER = "Index";
+	private static final String DESC_HEADER = "Description";
+	private static final String STARTTIME_HEADER = "Start Time";
+	private static final String ENDTIME_HEADER = "End Time";
+	private static final String STARTDATE_HEADER = "Start Date";
+	private static final String ENDDATE_HEADER = "End Date";
+	private static final String LOCATION_HEADER = "Location";
+	private static final String RECUR_HEADER = "Recur";
+
+	//constants for preferred column widths
+	private static final int INDEX_COLUNM_WIDTH = 10;
+	private static final int DESC_COLUNM_WIDTH = 185;
+	private static final int STARTTIME_COLUNM_WIDTH = 60;
+	private static final int ENDTIME_COLUNM_WIDTH = 60;
+	private static final int STARTDATE_COLUNM_WIDTH = 70;
+	private static final int ENDDATE_COLUNM_WIDTH = 70;
+	private static final int LOCATION_COLUNM_WIDTH = 90;
+	private static final int RECUR_COLUNM_WIDTH = 10;
+
+	//constants for minimum column widths
+	private static final int INDEX_MIN_WIDTH = 10;
+	private static final int DESC_MIN_WIDTH = 50;
+	private static final int STARTTIME_MIN_WIDTH = 50;
+	private static final int ENDTIME_MIN_WIDTH = 50;
+	private static final int STARTDATE_MIN_WIDTH = 60;
+	private static final int ENDDATE_MIN_WIDTH = 60;
+	private static final int LOCATION_MIN_WIDTH = 50;
+	private static final int RECUR_MIN_WIDTH = 10;
+
+	//constants for column indices
+	private static final int INDEX_COLUNM_INDEX = 0;
+	private static final int DESC_COLUNM_INDEX = 1;
+	private static final int STARTTIME_COLUNM_INDEX = 2;
+	private static final int ENDTIME_COLUNM_INDEX = 3;
+	private static final int STARTDATE_COLUNM_INDEX = 4;
+	private static final int ENDDATE_COLUNM_INDEX = 5;
+	private static final int LOCATION_COLUNM_INDEX = 6;
+	private static final int RECUR_COLUNM_INDEX = 7;
+
+	//constants for background colour for the rows
+	private static final Object PRIORITY_HIGH = "HIGH";
+	private static final Object PRIORITY_MEDIUM = "MEDIUM";
+
+	private static final int NUM_COLS = 5;
+
+	private JTable table;
+	private JScrollPane tableDisplay;
+	static Object[][] data;
+	int rowSelected;
+	TaskList list = Processor.getDisplayList();
+
+	/**
+	 * Create a new TodomatoTable.
+	 */
+	public TodomatoTable() {
+		String[] columnNames = {INDEX_HEADER, DESC_HEADER,
+				STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,
+				ENDDATE_HEADER, LOCATION_HEADER, RECUR_HEADER};
+
+		data = loadData(Processor.getDisplayList());
+
+		DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+			public Class getColumnClass(int column) {
+				Object value = this.getValueAt(0,column); 
+				return (value==null?Object.class:value.getClass());
+				//return getValueAt(0, column).getClass();
+			}
+
+		};
+
+		table = createData(model);
+		addListListener();
+		setColumnWidths();
+		tableDisplay = new JScrollPane(table);
+	}
+
+	private JTable createData(DefaultTableModel model) {
+		JTable table = new JTable(model) {
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+				Component c = super.prepareRenderer(renderer, row, column);
+
+				//  Color row based on priority and completed
+				if (!isRowSelected(row)) {
+					c.setBackground(getBackground());
+					int modelRow = convertRowIndexToModel(row);
+
+					int index = Integer.parseInt( (String) getModel().getValueAt(modelRow, INDEX_COLUNM_INDEX));
+					colorRows(c, index);
+				}
+				return c;
+			}
+
+			private void colorRows(Component c, int index) {
+				//if index is within bounds of the list
+				if (index != 0 && index <= list.getSize()) {
+					Task item = list.getListItem(index - 1);
+					String priority = item.getPriorityLevel();
+					
+					if (PRIORITY_HIGH.equals(priority)) {
+						c.setBackground(Color.RED);
+					}
+					
+					if (PRIORITY_MEDIUM.equals(priority)) {
+						c.setBackground(Color.YELLOW);
+					}
+
+					if (item.getCompleted()) {
+						c.setBackground(Color.GRAY);                                                
+					}
+				}
+			}
+		};
+
+		table.setAutoCreateRowSorter(true);
+		return table;
+	}
+
+	private void addListListener() {
+		table.getSelectionModel().addListSelectionListener(
+				new ListSelectionListener() {
+					public void valueChanged(ListSelectionEvent event) {
+						rowSelected = table.getSelectedRow();
+					}
+				}               
+				);
+	}
+
+	private void setColumnWidths() {
+		boolean canAutoCreateColumnsFromModel = false;
+		table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setPreferredWidth(INDEX_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setPreferredWidth(DESC_COLUNM_WIDTH);               
+		table.getColumnModel().getColumn(STARTTIME_COLUNM_INDEX).setPreferredWidth(STARTTIME_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setPreferredWidth(ENDTIME_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setPreferredWidth(STARTDATE_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setPreferredWidth(ENDDATE_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setPreferredWidth(LOCATION_COLUNM_WIDTH);
+		table.getColumnModel().getColumn(RECUR_COLUNM_INDEX).setPreferredWidth(RECUR_COLUNM_WIDTH);
+
+		table.getColumnModel().getColumn(INDEX_COLUNM_INDEX).setMinWidth(INDEX_MIN_WIDTH);
+		table.getColumnModel().getColumn(DESC_COLUNM_INDEX).setMinWidth(DESC_MIN_WIDTH);                
+		table.getColumnModel().getColumn(STARTTIME_COLUNM_INDEX).setMinWidth(STARTTIME_MIN_WIDTH);
+		table.getColumnModel().getColumn(ENDTIME_COLUNM_INDEX).setMinWidth(ENDTIME_MIN_WIDTH);
+		table.getColumnModel().getColumn(STARTDATE_COLUNM_INDEX).setMinWidth(STARTDATE_MIN_WIDTH);
+		table.getColumnModel().getColumn(ENDDATE_COLUNM_INDEX).setPreferredWidth(ENDDATE_MIN_WIDTH);
+		table.getColumnModel().getColumn(LOCATION_COLUNM_INDEX).setMinWidth(LOCATION_MIN_WIDTH);
+		table.getColumnModel().getColumn(RECUR_COLUNM_INDEX).setPreferredWidth(RECUR_MIN_WIDTH);
+
+		table.setAutoCreateColumnsFromModel(canAutoCreateColumnsFromModel);
+	}
+
+	private static Object[][] loadData(TaskList l) {        
+		Object[][] list = new Object[1][8];
+		if (l.getSize() == 0) {
+			for (int i=0; i<=NUM_COLS; i++) {
+				list[0][i] = "";
+			}                               
+			list[0][INDEX_COLUNM_INDEX] = EMPTY_TASK_LIST_INDEX;
+			list[0][DESC_COLUNM_INDEX] = EMPTY_TASK_LIST_DESC;
+		} else {
+			list = new Object[l.getSize()][8];
+			for (int i = 0; i < l.getSize(); i++) {
+				list[i][INDEX_COLUNM_INDEX] = String.valueOf(i+1);
+				list[i][DESC_COLUNM_INDEX] = checkNull(l.getListItem(i).getDescription());
+				list[i][STARTTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getStartTime());
+				list[i][ENDTIME_COLUNM_INDEX] = checkNull(l.getListItem(i).getEndTime());
+				list[i][STARTDATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getStartDate());  
+				list[i][ENDDATE_COLUNM_INDEX] = checkNullDate(l.getListItem(i).getEndDate());                             
+				list[i][LOCATION_COLUNM_INDEX] = checkNull(l.getListItem(i).getLocation());                           
+				list[i][RECUR_COLUNM_INDEX] = checkNull(l.getListItem(i).getRecurrencePeriod());
+			}
+		}
+		return list;
+	}
+
+	private static Object checkNullDate(DateTime date) {
+		if (date == null) {
+			return "";
+		} else {
+			return date.format(DATE_FORMAT, new Locale(DATE_LOCALE));
+		}
+	}
+
+	private static Object checkNull(Object item) {
+		if (item == null) {
+			return "";
+		} else {
+			return item;
+		}
+	}
+
+	public void update() {
+		data = loadData(Processor.getDisplayList());
+		table.setModel(new CustModel(data));
+	}
+
+	class CustModel extends AbstractTableModel {
+		private String[] columnNames = {INDEX_HEADER, DESC_HEADER,
+				STARTTIME_HEADER, ENDTIME_HEADER, STARTDATE_HEADER,
+				ENDDATE_HEADER, LOCATION_HEADER, RECUR_HEADER};
+		private Object[][] data = loadData(list);
+
+		public CustModel(Object[][] data) {
+			this.data = data;
+		}
+		public int getColumnCount() {
+			return columnNames.length;
+		}
+
+		public int getRowCount() {
+			return data.length;
+		}
+
+		public String getColumnName(int col) {
+			return columnNames[col];
+		}
+
+		public Object getValueAt(int row, int col) {
+			if (getColumnCount() == 0 || getRowCount() == 0) {
+				return null;
+			}
+			return data[row][col];
+		}
+	}       
+
+	public JTable getTable() {
+		return table;
+	}
+
+	public void setTable(JTable table) {
+		this.table = table;
+	}
+
+	public static Object[][] getData() {
+		return data;
+	}
+
+	public JScrollPane getTableDisplay() {
+		return tableDisplay;
+	}
+
+	public void setTableDisplay(JScrollPane tableDisplay) {
+		this.tableDisplay = tableDisplay;
+	}
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\TodomatoTable.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\UndoProcessor.java
+	 */
+
+/** 
+ * This class contains methods to process undo commands by the user.
+ * It updates the user's lists of tasks, and saves it to disk.
+ *
+ */
+public class UndoProcessor extends Processor {
+	private static final String NO_CHANGES_TO_UNDO_MSG = "No changes to undo";
+	private static final String SUCCESS_MSG = "Last action undone";
+	
+	/**
+	 * Undo last action, if possible
+	 * @return Status message telling user if there were changes to undo
+	 */
+	public static String processUndo() {		
+		if (!undoList.isEmpty()) {	
+			//add current list to redoList
+			redoList.push(list);
+			
+			//get latest list from undoList
+			list = undoList.pop();	
+			fileHandler.updateFile(list);
+			
+			displayList = list;
+			return SUCCESS_MSG;
+		} else {
+			return NO_CHANGES_TO_UNDO_MSG;
+		}
+	}
+
+}
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\todomato\UndoProcessor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\FindProcessorTest.java
+	 */
+
+public class FindProcessorTest {
+	private static final String ENDLINE_CHAR = "\n";
+	
+	private static final String SEARCH_STRING3 = "cs2103";
+	private static final String SEARCH_STRING2 = "CS2103";
+	private static final String SEARCH_STRING1 = "AOEUNTOHENTHAUC<#NPH#@P#@";
+	
+	private static final String LIST = "list";
+	private static final String FILE_DIR = "user.dir";
+	private static final String FILE_NAME = "tasks.txt";
+	private static final String FILE_HEADING = "null\r\nnull\r\nnull\r\n";
+	
+	private static final String TASK3 = "CS2103 Presentation#13:00#null#2014-04-17#2014-04-17#null#0#1463178207#2014-04-09 20:27:54.869000000#LOW#false#null#null#null\r\n";
+	private static final String TASK2 = "ES1531 Exam Prep#null#null#null#2014-04-23#Home#0#-1379251807#2014-04-09 20:27:29.951000000#HIGH#false#null#null#null\r\n";
+	private static final String TASK1 = "CS2103 Tutorial#13:00#null#2014-04-10#2014-04-10#Home#0#395871680#2014-04-09 20:27:24.669000000#LOW#false#null#null#null\r\n";
+	
+	private static final String NO_TASKS_FOUND_MESSAGE = "No tasks found";
+	private static final String SUCCESS_MSG = "Search completed";
+	
+	private File tasks;
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\FindProcessorTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\FindProcessorTest.java
+	 */
+
+	@Test
+	public void testEmptyString() {
+		//test boundary case of searching an empty string
+		String command = "";
+		assertEquals(FindProcessor.processFind(command), SUCCESS_MSG);
+		String original_list = Processor.getList().toString();
+		String found_list = Processor.getDisplayList().toString();
+		assertEquals(original_list, found_list);	
+	}
+
+	@Test
+	public void testNotFound() {
+		//test case of a task that does not exist
+		String command = SEARCH_STRING1;
+		assertEquals(FindProcessor.processFind(command), NO_TASKS_FOUND_MESSAGE);
+		String found_list = Processor.getDisplayList().toString();
+		assertEquals(found_list, "");	
+	}
+
+	@Test
+	public void testFound() {
+		//test case of a task that does exist
+		String command = SEARCH_STRING2;
+		assertEquals(FindProcessor.processFind(command), SUCCESS_MSG);
+		String found_list = Processor.getDisplayList().toString();
+		String[] tasks = found_list.split(ENDLINE_CHAR);
+		for (String i : tasks) {
+			assertTrue(i.contains(command.toUpperCase()));
+		}
+	}
+
+	@Test
+	public void testFound1() {
+		/*
+		 * test case of a task that does exist, but in different cases
+		 * (lowercase instead of upper case)
+		 */
+		String command = SEARCH_STRING3;
+		assertEquals(FindProcessor.processFind(command), SUCCESS_MSG);
+		String found_list = Processor.getDisplayList().toString();
+		String[] tasks = found_list.split(ENDLINE_CHAR);
+		for (String i : tasks) {
+			assertTrue(i.contains(command.toUpperCase()));
+		}
+	}
+
+}
+
+	// End of segment: C:\Users\Daryl Ho\Desktop\CS2103 Project\cs2103jan2014-t13-2j\src\tests\FindProcessorTest.java
+
+
+
+
+
