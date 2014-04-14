@@ -1,6 +1,3 @@
-/**
- * 
- */
 package todomato;
 
 import hirondelle.date4j.DateTime;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package todomato;
 
 import java.text.ParseException;
@@ -16,7 +13,7 @@ public class Popup extends Processor {
 	protected static TaskList myownlist = new TaskList();
 	// how many days from today for tasks to pop up
 	protected static int daysB4deadline = 3;
-	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-dd-MM");
+	protected static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-dd-MM");
 
 	public static void show() {
 		// create calendar instance
