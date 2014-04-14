@@ -1,6 +1,8 @@
+
 package todomato;
 
 //@author A0099332Y
+
 /**
  * This class signals that there is an error occur in sync process.
  *
