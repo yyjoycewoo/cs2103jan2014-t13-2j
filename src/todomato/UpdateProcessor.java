@@ -102,6 +102,7 @@ public class UpdateProcessor extends Processor {
 		int[] indices = getTaskIndex(argument);
 		for (int indice : indices) {
 			int index = indice - 1;
+			printInvalidIndexMsg(indice, argument);
 			whichToEdit = findDetailToEdit(argument);
 			updater(argument, whichToEdit, index);
 			displayList = list;
@@ -423,9 +424,10 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
-	
+
 	/**
 	 * Checks whether start time/date is greater than end time/date
+	 * 
 	 * @param input
 	 * @return true if start time is greater than end time
 	 */

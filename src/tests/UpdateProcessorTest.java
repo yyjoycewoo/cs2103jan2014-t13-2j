@@ -27,7 +27,7 @@ public class UpdateProcessorTest {
 	private static final String TASK2 = "Breakfast#07:00#null#2014-04-01#2014-04-01#null#0#1046042885#2014-04-09 16:19:17.842000000#LOW#true#null#null#null\r\n";
 	private static final String TASK3 = "walk with dog and wash car#01:00#02:00#null#null#utown#0#978601153#null00:33:20.173000000#LOW#false#null#null16:29:01.763000000#null\r\n";
 	private static final String STATUS_MSG = "Updated the task(s)";
-	private static final String startEndTime = "1 starttime 730pm endtime 930pm";
+	private static final String startEndTime = "1 starttime 7pm endtime 9pm";
 	private static final String descLoc = "2 desc CS2103\" location com1\\";
 	private static final String startEndDate = "3 startdate 11 apr enddate 12 apr";
 	private static final String invalidkey = "1 rubbish";
@@ -47,7 +47,7 @@ public class UpdateProcessorTest {
 
 	private File tasks;
 
-	//@author A0101578H
+	// @author A0101578H
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
@@ -67,6 +67,7 @@ public class UpdateProcessorTest {
 		// by modifying list in Processor
 		FileHandler fileHandler = new FileHandler(FILE_NAME);
 		TaskList newList = fileHandler.readFile();
+		System.out.println(newList.getSize());
 		Field f = Processor.class.getDeclaredField(LIST);
 		f.setAccessible(true);
 		if (LIST.equals(f.getName())) {
@@ -75,7 +76,7 @@ public class UpdateProcessorTest {
 		}
 	}
 
-	//@author A0101324A
+	// @author A0101324A
 	// testing the out of bound index
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidIndexOne() throws InvalidInputException {
