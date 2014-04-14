@@ -19,6 +19,7 @@ import todomato.InvalidInputException;
 import todomato.Task;
 import todomato.TaskList;
 
+//@author A0096620E
 public class IntegrationTest {
 	private File tasks;
 	

@@ -1,4 +1,3 @@
-//@author A0101324A
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -6,6 +5,7 @@ import hirondelle.date4j.DateTime;
 import java.util.Arrays;
 import java.util.TimeZone;
 
+//@author A0101324A
 /**
  * This class contains methods to process update commands by the user. It
  * updates the user's lists of tasks, and saves it to disk.
@@ -86,6 +86,7 @@ public class UpdateProcessor extends Processor {
 			" recur ", " priority ", " complete", " !", " @" };
 
 	/**
+	 * 
 	 * @param argument
 	 *            : <index of the task> time <startTime e.g. 1300> or <index of
 	 *            the task> desc <description e.g. cut dog's hair>
@@ -169,7 +170,7 @@ public class UpdateProcessor extends Processor {
 		if (argument.isEmpty()) {
 			throw new InvalidInputException(NOTHING_ERROR);
 		}
-		String[] words = argument.split(" ");
+		String[] words = argument.split(" |,");
 		// checking index is zero
 		if (words.length >= 1) {
 			printInvalidIndexMsg(Integer.parseInt(words[0]), argument);
@@ -422,10 +423,9 @@ public class UpdateProcessor extends Processor {
 		}
 		return edit;
 	}
-
+	
 	/**
 	 * Checks whether start time/date is greater than end time/date
-	 * 
 	 * @param input
 	 * @return true if start time is greater than end time
 	 */

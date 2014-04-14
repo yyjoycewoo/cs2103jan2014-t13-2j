@@ -1,4 +1,3 @@
-//@author A0120766H
 package todomato;
 
 import java.awt.event.ActionEvent;
@@ -8,6 +7,8 @@ import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
+//@author A0120766H-unused
+//depreciated with a CLI usable command
 /**
  * This class generates a dialogue box to ask the
  * user for his/her username and password.

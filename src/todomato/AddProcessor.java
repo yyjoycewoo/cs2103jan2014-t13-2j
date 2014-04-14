@@ -1,4 +1,3 @@
-//@author A0096620E
 package todomato;
 
 import hirondelle.date4j.DateTime;
@@ -8,6 +7,7 @@ import java.util.Arrays;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+//@author A0096620E
 /**
  * This class contains methods to process add commands by the user.
  * It updates the user's lists of tasks, and saves it to disk.

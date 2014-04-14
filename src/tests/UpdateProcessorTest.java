@@ -1,4 +1,3 @@
-//@author A0101324A
 package tests;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +20,7 @@ import todomato.Processor;
 import todomato.TaskList;
 import todomato.UpdateProcessor;
 
+//@author A0101324A
 public class UpdateProcessorTest {
 
 	private static final String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#2014-04-10 00:33:20.173000000#LOW#false#null#2014-04-13 16:29:01.763000000#null\r\n";
@@ -47,6 +47,7 @@ public class UpdateProcessorTest {
 
 	private File tasks;
 
+	//@author A0101578H
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
@@ -74,6 +75,7 @@ public class UpdateProcessorTest {
 		}
 	}
 
+	//@author A0101324A
 	// testing the out of bound index
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidIndexOne() throws InvalidInputException {
