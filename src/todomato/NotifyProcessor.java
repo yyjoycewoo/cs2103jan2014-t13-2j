@@ -6,11 +6,11 @@ import hirondelle.date4j.DateTime;
 /**
  * 
  * This class contains method to change notification commands by the user. It
- * changes the time or date to notify the user.
+ * changes the time to notify the user.
  * 
  * <p>
- * It can process command that allows pop-up window at the new notification time
- * or date.
+ * It can process command that allows pop-up window at the new notification
+ * time.
  * 
  * <p>
  * To change the notification of a task, start by typing "notify" followed by a
@@ -18,7 +18,6 @@ import hirondelle.date4j.DateTime;
  * the order is flexible:
  * <ul>
  * <li>"time" for the time
- * <li>"date" for the date
  * </ul>
  * 
  * <p>
