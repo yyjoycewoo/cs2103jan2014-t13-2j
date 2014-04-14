@@ -1,4 +1,3 @@
-//@author A0101324A
 package tests;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +20,7 @@ import todomato.NotifyProcessor;
 import todomato.Processor;
 import todomato.TaskList;
 
+//@author A0101324A
 public class NotifyProcessorTest {
 
 	private static String TASK1 = "dotaing#01:00#02:00#null#null#utown#0#978601153#null00:33:20.173000000#LOW#false#null#null16:29:01.763000000#null\r\n";
