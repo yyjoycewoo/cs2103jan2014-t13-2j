@@ -1,10 +1,10 @@
-//@author A0099332Y
+
 package todomato;
 
 import java.io.IOException;
-
 import org.apache.http.ParseException;
 
+//@author A0099332Y
 public class SyncProcessor extends Processor {
 
 	private static final String NO_USERNAME_PW = "Set username and password with \"setsync <username> <password>\"";
