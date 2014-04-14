@@ -1,6 +1,3 @@
-/**
- * 
- */
 package todomato;
 
 import java.awt.BorderLayout;
@@ -31,20 +28,33 @@ import javax.swing.plaf.basic.BasicArrowButton;
  */
 
 public abstract class Notification implements ActionListener {
-	private static int count = 0, width = 200;
+	private static int count = 0;
+	private static int width = 200;
+	private static int fwidth = 300;
+	private static int fheight = 125;
+	private static int inset_num = 5;
+	private static int grid_xy = 0;
+	private static int textWidth = 300;
+	private static int textHeight = 100;
+	private static float lweight_xy = 0f;
+	private static float fweight_xy = 1.0f;
+	private static String htmlCode = "<html><div WIDTH=%d>%s</div><html>";
+	private static String msg = "~~~Reminder! Do now or never!~~~";
+	private static String jFrame_name = "Reminder";
+	private static String labelHTML = "<HtMl>";
+	// pop up disappeared after 2sec
+	private static int waitfor = 2000;
+	private static int closeBt_inset_top_bot = 1;
+	private static int closeBt_inset_left_right = 4;
 
 	/**
 	 * @param myownlist
 	 * @param taskToDo
 	 */
 	protected static void popUpNotice(TaskList list) {
-		String msg = "~~~Reminder! Do now or never!~~~";
-		// pop up disappeared after 2sec
-		final int waitfor = 2000;
 		// create and set up the window
-		final JFrame frame = new JFrame("Reminder");
-
-		frame.setSize(300, 125);
+		final JFrame frame = new JFrame(jFrame_name);
+		frame.setSize(fwidth, fheight);
 		// remove the title bar and border
 		frame.setUndecorated(true);
 		// change the window location to bottom right corner of the screen
@@ -59,22 +69,23 @@ public abstract class Notification implements ActionListener {
 		frame.setAlwaysOnTop(true);
 
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		constraints.weightx = 1.0f;
-		constraints.weighty = 1.0f;
-		constraints.insets = new Insets(5, 5, 5, 5);
+		constraints.gridx = grid_xy;
+		constraints.gridy = grid_xy;
+		constraints.weightx = fweight_xy;
+		constraints.weighty = fweight_xy;
+		constraints.insets = new Insets(inset_num, inset_num, inset_num,
+				inset_num);
 		constraints.fill = GridBagConstraints.BOTH;
 
 		final JLabel textLabel = new JLabel();
 		buttonsAction(textLabel, list);
 
-		textLabel.setPreferredSize(new Dimension(300, 100));
+		textLabel.setPreferredSize(new Dimension(textWidth, textHeight));
 		textLabel.setOpaque(false);
 		frame.getContentPane().add(textLabel, constraints);
 		constraints.gridx++;
-		constraints.weightx = 0f;
-		constraints.weighty = 0f;
+		constraints.weightx = lweight_xy;
+		constraints.weighty = lweight_xy;
 		constraints.fill = GridBagConstraints.NONE;
 		constraints.anchor = GridBagConstraints.NORTH;
 
@@ -87,17 +98,20 @@ public abstract class Notification implements ActionListener {
 			}
 		});
 
-		closeBt.setMargin(new Insets(1, 4, 1, 4));
+		closeBt.setMargin(new Insets(closeBt_inset_top_bot,
+				closeBt_inset_left_right, closeBt_inset_top_bot,
+				closeBt_inset_left_right));
 		closeBt.setFocusable(false);
 		frame.getContentPane().add(closeBt, constraints);
-		constraints.gridx = 0;
+		constraints.gridx = grid_xy;
 		constraints.gridy++;
-		constraints.weightx = 1.0f;
-		constraints.weighty = 1.0f;
-		constraints.insets = new Insets(5, 5, 5, 5);
+		constraints.weightx = fweight_xy;
+		constraints.weighty = fweight_xy;
+		constraints.insets = new Insets(inset_num, inset_num, inset_num,
+				inset_num);
 		constraints.fill = GridBagConstraints.BOTH;
 
-		JLabel msgLabel = new JLabel("<HtMl>" + msg);
+		JLabel msgLabel = new JLabel(labelHTML + msg);
 		// Centralizing the text on the JLabel
 		msgLabel.setHorizontalAlignment(JLabel.CENTER);
 		frame.add(msgLabel, constraints);
@@ -171,12 +185,12 @@ public abstract class Notification implements ActionListener {
 				if (count <= 0) {
 					count = 0;
 					// allow text to be within the JLabel border
-					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, list.getListItem(count).toString());
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
 				} else {
 					count--;
-					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, list.getListItem(count).toString());
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
 				}
 				textLabel.setText(text);
 			}
@@ -192,14 +206,14 @@ public abstract class Notification implements ActionListener {
 				// get the next item in myownlist
 				if (count >= (list.getSize() - 1)) {
 					count = list.getSize() - 1;
-					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, list.getListItem(count).toString());
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
 
 				} else {
 					count++;
 					// allow text to be within the JLabel border
-					text = String.format("<html><div WIDTH=%d>%s</div><html>",
-							width, list.getListItem(count).toString());
+					text = String.format(htmlCode, width,
+							list.getListItem(count).toString());
 				}
 				textLabel.setText(text);
 			}
@@ -225,8 +239,8 @@ public abstract class Notification implements ActionListener {
 		next.addActionListener(actionListener_next);
 		textLabel.add(prev, BorderLayout.WEST);
 		textLabel.add(next, BorderLayout.EAST);
-		String text = String.format("<html><div WIDTH=%d>%s</div><html>",
-				width, list.getListItem(0).toString());
+		String text = String.format(htmlCode, width, list.getListItem(0)
+				.toString());
 		textLabel.setText(text);
 		// Centralizing the text on the JLabel
 		textLabel.setHorizontalAlignment(JLabel.CENTER);

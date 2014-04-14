@@ -10,15 +10,12 @@ import java.util.Date;
  * 
  */
 public class CurrentDate {
+	private static String format = "yyyy-dd-MM";
 
-	/**
-	 * @return
-	 */
 	protected static String date() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-dd-MM");
+		DateFormat dateFormat = new SimpleDateFormat(format);
 		// get current date time with Date()
 		Date date = new Date();
 		return dateFormat.format(date);
 	}
-
 }
